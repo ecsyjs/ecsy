@@ -1,5 +1,5 @@
-# ecs.js
-ECS.js
+# ecsy
+ECSY Entity Component System
 
 # IDEAS
 * Pool delegate to customize it, otherwise use a default one
