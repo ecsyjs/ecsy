@@ -1,0 +1,43 @@
+{
+  "name": "ecsy",
+  "version": "0.1.0",
+  "description": "Entity Component System in JS",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "ava",
+    "lint": "eslint ./src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fernandojsg/ecsy.git"
+  },
+  "author": "Fernando Serrano <fernandojsg@gmail.com> (http://fernandojsg.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fernandojsg/ecsy/issues"
+  },
+  "ava": {
+    "files": [
+      "test/**/*.test.js"
+    ],
+    "sources": [
+      "src/**/*.js"
+    ],
+    "require": [
+      "babel-register",
+      "esm"
+    ]
+  },
+  "homepage": "https://github.com/fernandojsg/ecsy#readme",
+  "devDependencies": {
+    "ava": "^1.4.1",
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-eslint": "^10.0.1",
+    "babel-loader": "^8.0.5",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^4.2.0",
+    "eslint-plugin-prettier": "^3.0.1",
+    "prettier": "^1.17.0"
+  }
+}
