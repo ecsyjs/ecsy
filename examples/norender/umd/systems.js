@@ -1,10 +1,11 @@
-import { Rotating, Transform } from "./components.mjs";
-import { System } from "../../src/System.js";
-
-export class RotatingSystem extends System {
+/* global ECSY */
+ECSY.RotatingSystem = class RotatingSystem extends ECSY.System {
   init() {
     return {
-      entities: this.world.entityManager.queryComponents([Rotating, Transform])
+      entities: this.world.entityManager.queryComponents([
+        ECSY.Rotating,
+        ECSY.Transform
+      ])
     };
   }
 

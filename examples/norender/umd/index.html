@@ -1,8 +1,4 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -11,24 +7,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <link rel="stylesheet" href="">
+    <script src="../../../build/ecsy.js"></script>
+    <script src="components.js"></script>
+    <script src="systems.js"></script>
   </head>
   <body>
-    <script type="module">
-      import {World} from '../../src/index.js';
-
-      import {Rotating, Pulsating, Transform} from './components.mjs';
-      import {RotatingSystem} from './systems.mjs';
-
-      var world = new World();
-
+    <script>
+      var world = new ECSY.World();
       for (var i = 0; i < 10; i++) {
         var entity = world.entityManager.createEntity();
-        entity.addComponent(Rotating, {rotationSpeed: 0.2})
+        entity.addComponent(ECSY.Rotating, {rotationSpeed: 0.2}).addComponent(ECSY.Transform);
       }
 
-      window.world = world;
-
-      world.systemManager.registerSystem(RotatingSystem);
+      world.systemManager.registerSystem(ECSY.RotatingSystem);
 
       function animate() {
         var time = performance.now();

@@ -4,8 +4,11 @@
   "description": "Entity Component System in JS",
   "main": "src/index.js",
   "scripts": {
-    "test": "ava",
-    "lint": "eslint ./src"
+    "build": "rollup -c",
+    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"http-server -c-1 -p 8080\"",
+    "lint": "eslint ./src",
+    "start": "npm run dev",
+    "test": "ava"
   },
   "repository": {
     "type": "git",
@@ -35,9 +38,12 @@
     "babel-core": "^6.26.3",
     "babel-eslint": "^10.0.1",
     "babel-loader": "^8.0.5",
+    "concurrently": "^4.1.0",
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^4.2.0",
     "eslint-plugin-prettier": "^3.0.1",
-    "prettier": "^1.17.0"
+    "prettier": "^1.17.0",
+    "rollup": "^1.11.3",
+    "rollup-plugin-json": "^4.0.0"
   }
 }
