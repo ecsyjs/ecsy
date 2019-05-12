@@ -16,7 +16,7 @@ import {
 export class RotatingSystem extends System {
   init() {
     return {
-      entities: this.world.entityManager.queryComponents([Rotating, Object3D])
+      entities: [Rotating, Object3D]
     };
   }
 
@@ -39,10 +39,7 @@ const TIMER_TIME = 1;
 export class PulsatingColorSystem extends System {
   init() {
     return {
-      entities: this.world.entityManager.queryComponents([
-        PulsatingColor,
-        Object3D
-      ])
+      entities: [PulsatingColor, Object3D]
     };
   }
 
@@ -69,7 +66,7 @@ export class PulsatingColorSystem extends System {
 export class PulsatingScaleSystem extends System {
   init() {
     return {
-      entities: this.world.entityManager.queryComponents([PulsatingScale])
+      entities: [PulsatingScale]
     };
   }
 
@@ -98,7 +95,7 @@ export class PulsatingScaleSystem extends System {
 export class MovingSystem extends System {
   init() {
     return {
-      entities: this.world.entityManager.queryComponents([Moving])
+      entities: [Moving]
     };
   }
 
@@ -118,7 +115,7 @@ export class MovingSystem extends System {
 export class TimeoutSystem extends System {
   init() {
     return {
-      entities: this.world.entityManager.queryComponents([Timeout])
+      entities: [Timeout]
     };
   }
 
@@ -147,8 +144,8 @@ export class TimeoutSystem extends System {
 export class ColliderSystem extends System {
   init() {
     return {
-      boxes: this.world.entityManager.queryComponents([Collisionable]),
-      balls: this.world.entityManager.queryComponents([Collider])
+      boxes: [Collisionable],
+      balls: [Collider]
     };
   }
 
@@ -170,12 +167,11 @@ export class ColliderSystem extends System {
         } else {
           if (prevColliding) {
             box.removeComponent(Colliding);
-            box.addComponent(Recovering, {}, true);
-            box.addComponent(
-              Timeout,
-              { timer: TIMER_TIME, removeComponents: [Recovering] },
-              true
-            );
+            box.addComponent(Recovering);
+            box.addComponent(Timeout, {
+              timer: TIMER_TIME,
+              removeComponents: [Recovering]
+            });
           }
         }
       }

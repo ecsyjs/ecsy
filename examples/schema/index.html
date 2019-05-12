@@ -16,9 +16,6 @@
       import {RotatingSystem} from './systems.mjs';
 
       var world = new World();
-      world.registerComponent(Rotating)
-          .registerComponent(Pulsating)
-          .registerComponent(Transform);
 
       for (var i = 0; i < 10; i++) {
         var entity = world.entityManager.createEntity();

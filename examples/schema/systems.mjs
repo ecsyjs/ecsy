@@ -4,7 +4,7 @@ import { System } from "../../../build/ecsy.module.js";
 export class RotatingSystem extends System {
   init() {
     return {
-      entities: [Rotating, Transform]
+      entities: this.world.entityManager.queryComponents([Rotating, Transform])
     };
   }
 

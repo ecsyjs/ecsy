@@ -18,43 +18,55 @@
   <body>
   </body>
   <script>
-      var ENGINE = {
-        setObjectMaterialColor: function (object, r, g, b) {
-          object.material.color.setRGB(r, g, b);
-        },
-        setObjectScale: function (object, value) {
-          object.scale.set(value, value, value);
-        },
-        objectsColliding: (function () {
-          let ballWorldPos = new THREE.Vector3();
-          return function (objectA, objectB) {
-            ballWorldPos = objectA.getWorldPosition(ballWorldPos);
-            let radius = objectA.geometry.boundingSphere.radius;
-            let bsphere = objectB.geometry.boundingSphere;
-            let radiusSum = bsphere.radius + radius;
+    var ENGINE = {
+      setObjectMaterialColor: function (object, r, g, b) {
+        object.material.color.setRGB(r, g, b);
+      },
+      setObjectScale: function (object, value) {
+        object.scale.set(value, value, value);
+      },
+      objectsColliding: (function () {
+        let ballWorldPos = new THREE.Vector3();
+        return function (objectA, objectB) {
+          ballWorldPos = objectA.getWorldPosition(ballWorldPos);
+          let radius = objectA.geometry.boundingSphere.radius;
+          let bsphere = objectB.geometry.boundingSphere;
+          let radiusSum = bsphere.radius + radius;
 
-            return objectB.position.distanceToSquared(ballWorldPos) <= radiusSum * radiusSum;
-          }
-        })()
-      };
-    </script>
+          return objectB.position.distanceToSquared(ballWorldPos) <= radiusSum * radiusSum;
+        }
+      })()
+    };
+  </script>
   <script type="module">
     import {World} from '../../../build/ecsy.module.js';
     import {Object3D, Collisionable, Collider, Recovering, Moving, PulsatingScale, Timeout, PulsatingColor, Colliding, Rotating} from '../components.mjs';
     import {RotatingSystem, ColliderSystem, PulsatingColorSystem, PulsatingScaleSystem, MovingSystem,TimeoutSystem} from '../systems.mjs';
 
     var world = new World();
+    window.world = world;
 
-
-    world.systemManager
+    world
       .registerSystem(RotatingSystem)
       .registerSystem(PulsatingColorSystem)
       .registerSystem(PulsatingScaleSystem)
       .registerSystem(TimeoutSystem)
       .registerSystem(ColliderSystem)
       .registerSystem(MovingSystem);
+
+    world
+      .registerComponent(Object3D)
+      .registerComponent(Collisionable)
+      .registerComponent(Collider)
+      .registerComponent(Recovering)
+      .registerComponent(Moving)
+      .registerComponent(PulsatingScale)
+      .registerComponent(Timeout)
+      .registerComponent(PulsatingColor)
+      .registerComponent(Colliding)
+      .registerComponent(Rotating);
+
     var camera, scene, renderer, parent;
-    var mesh;
     var clock = new THREE.Clock();
 
     init();
@@ -80,7 +92,7 @@
 
       camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 0.005, 10000 );
       camera.position.z = 20;
-      
+
       parent = new THREE.Object3D();
 
 
@@ -92,16 +104,15 @@
       objMoving.position.set(0,0,0);
       var radius = 10;
 
-      var entity = world.entityManager.createEntity();
+      var entity = world.createEntity();
       objMoving.position.set(0,0,radius);
       entity.addComponent(Collider);
-      entity.addComponent(Object3D);
-      entity.object3D.object = objMoving;
+      entity.addComponent(Object3D, {object: objMoving});
 
-      entity = world.entityManager.createEntity();
+      entity = world.createEntity();
       parent2.add(objMoving);
-      entity.addComponent(Rotating, {rotatingSpeed: 0.5}).addComponent(Object3D);
-      entity.object3D.object = parent2;
+      entity.addComponent(Rotating, {rotatingSpeed: 0.5})
+            .addComponent(Object3D, {object: parent2});
       parent.add(parent2);
 
       states = [];
@@ -117,10 +128,10 @@
       var geometry = new THREE.BoxBufferGeometry( size, size, size );
 
       for (var i = 0;i < numObjects; i++) {
-        var entity = world.entityManager.createEntity();
+        var entity = world.createEntity();
 
         var material = new THREE.MeshStandardMaterial({color: new THREE.Color(1,0,0)});
-        mesh = new THREE.Mesh( geometry, material );
+        var mesh = new THREE.Mesh( geometry, material );
         mesh.position.copy(randomSpherePoint(radius));
 
         var state = {
@@ -170,7 +181,7 @@
       var delta = clock.getDelta();
       var elapsedTime = clock.elapsedTime;
 
-      world.systemManager.tick(delta, elapsedTime);
+      world.tick(delta, elapsedTime);
     }
   </script>
 
