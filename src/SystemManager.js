@@ -9,9 +9,16 @@ export class SystemManager {
     return this;
   }
 
+  removeSystem(System) {
+    var index = this.systems.indexOf(System);
+    if (!~index) return;
+
+    this.systems.splice(index, 1);
+  }
+
   tick(delta, time) {
     this.systems.forEach(system => {
-      if (system.enabled) {
+      if (system.enabled && system.tick) {
         system.tick(delta, time);
       }
     });

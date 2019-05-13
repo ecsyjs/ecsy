@@ -21,3 +21,61 @@ export class RotatingSystem extends System {
     }
   }
 }
+
+export class InputSystem extends System {
+  init() {
+    var state = this.world.ctx.inputState;
+
+    window.addEventListener("keydown", evt => {
+      switch (evt.keyCode) {
+        case 38:
+          state.up = true;
+          break;
+        case 40:
+          state.down = true;
+          break;
+        case 37:
+          state.left = true;
+          break;
+        case 39:
+          state.right = true;
+          break;
+        case 90:
+          state.z = true;
+          break;
+        case 88:
+          state.x = true;
+          break;
+      }
+    });
+
+    window.addEventListener("keyup", evt => {
+      switch (evt.keyCode) {
+        case 38:
+          state.up = false;
+          break;
+        case 40:
+          state.down = false;
+          break;
+        case 37:
+          state.left = false;
+          break;
+        case 39:
+          state.right = false;
+          break;
+        case 90:
+          state.z = false;
+          break;
+        case 88:
+          state.x = false;
+          break;
+      }
+    });
+
+    return {};
+  }
+
+  tick() {
+    console.log(this.world.ctx.inputState);
+  }
+}

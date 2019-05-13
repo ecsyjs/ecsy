@@ -7,6 +7,9 @@ export class World {
     this.entityManager = new EntityManager();
     this.systemManager = new SystemManager(this);
     this.componentsManager = new ComponentManager(this);
+
+    // Storage for singleton components
+    this.ctx = {};
   }
 
   stats() {
@@ -16,6 +19,12 @@ export class World {
     };
 
     console.log(JSON.stringify(stats, null, 2));
+  }
+
+  registerSingletonComponent(Component) {
+    this.componentsManager.registerSingletonComponent(Component);
+    this.ctx[componentPropertyName(Component)] = new Component();
+    return this;
   }
 
   registerComponent(Component) {
@@ -32,8 +41,16 @@ export class World {
     this.systemManager.tick(delta, time);
   }
 
-
   createEntity() {
     return this.entityManager.createEntity();
   }
+}
+
+function getName(Component) {
+  return Component.name;
+}
+
+function componentPropertyName(Component) {
+  var name = getName(Component);
+  return name.charAt(0).toLowerCase() + name.slice(1);
 }

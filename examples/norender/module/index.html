@@ -12,13 +12,19 @@
     <script type="module">
       import {World} from '../../../build/ecsy.module.js';
 
-      import {Rotating, Pulsating, Transform} from './components.mjs';
-      import {RotatingSystem} from './systems.mjs';
+      import {Rotating, Pulsating, InputState, Transform} from './components.mjs';
+      import {RotatingSystem, InputSystem} from './systems.mjs';
 
       var world = new World();
-      world.registerComponent(Rotating)
+      world
+          .registerComponent(Rotating)
           .registerComponent(Pulsating)
-          .registerComponent(Transform);
+          .registerComponent(Transform)
+          .registerSingletonComponent(InputState);
+
+      world
+        .registerSystem(RotatingSystem)
+        .registerSystem(InputSystem);
 
       for (var i = 0; i < 10; i++) {
         var entity = world.entityManager.createEntity();
@@ -26,8 +32,6 @@
       }
 
       window.world = world;
-
-      world.systemManager.registerSystem(RotatingSystem);
 
       function animate() {
         var time = performance.now();

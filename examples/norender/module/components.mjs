@@ -29,3 +29,14 @@ export class Transform {
     this.scale = { x: 1, y: 1, z: 1 };
   }
 }
+
+export class InputState {
+  constructor() {
+    this.up = false;
+    this.down = false;
+    this.left = false;
+    this.right = false;
+    this.z = false;
+    this.x = false;
+  }
+}

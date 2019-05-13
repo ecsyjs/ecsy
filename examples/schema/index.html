@@ -13,7 +13,7 @@
       import {World} from '../../../build/ecsy.module.js';
 
       import {Rotating, Pulsating, Transform} from './components.mjs';
-      import {RotatingSystem} from './systems.mjs';
+      import {RotatingSystem, InputSystem} from './systems.mjs';
 
       var world = new World();
 
@@ -24,7 +24,9 @@
 
       window.world = world;
 
-      world.systemManager.registerSystem(RotatingSystem);
+      world
+        .registerSystem(RotatingSystem)
+        .registerSystem(InputSystem);
 
       function animate() {
         var time = performance.now();
