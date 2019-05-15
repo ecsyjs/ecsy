@@ -31,7 +31,7 @@
       function animate() {
         var time = performance.now();
         var delta = time - lastTime;
-        world.systemManager.tick(delta, time);
+        world.systemManager.execute(delta, time);
         lastTime = time;
         requestAnimationFrame(animate);
       }
