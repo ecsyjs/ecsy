@@ -28,7 +28,11 @@
       objectsColliding: (function () {
         let ballWorldPos = new THREE.Vector3();
         return function (objectA, objectB) {
+          objectA.geometry.computeBoundingSphere();
+          objectB.geometry.computeBoundingSphere();
+
           ballWorldPos = objectA.getWorldPosition(ballWorldPos);
+
           let radius = objectA.geometry.boundingSphere.radius;
           let bsphere = objectB.geometry.boundingSphere;
           let radiusSum = bsphere.radius + radius;
@@ -128,7 +132,6 @@
       var geometry = new THREE.BoxBufferGeometry( size, size, size );
 
       for (var i = 0;i < numObjects; i++) {
-        var entity = world.createEntity();
 
         var material = new THREE.MeshStandardMaterial({color: new THREE.Color(1,0,0)});
         var mesh = new THREE.Mesh( geometry, material );
@@ -144,6 +147,7 @@
 
         states.push(state);
 
+        var entity = world.createEntity();
         entity.addComponent(Object3D, {object: mesh});
         entity.addComponent(PulsatingColor, {offset: i});
         entity.addComponent(PulsatingScale, {offset: i});
@@ -177,11 +181,13 @@
     }
 
     function animate() {
-      renderer.render( scene, camera );
       var delta = clock.getDelta();
       var elapsedTime = clock.elapsedTime;
+      console.time('render');
+      world.execute(delta, elapsedTime);
+      console.timeEnd('render');
 
-      world.tick(delta, elapsedTime);
+      renderer.render( scene, camera );
     }
   </script>
 
