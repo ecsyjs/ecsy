@@ -38,7 +38,7 @@ export default class Entity {
    */
   getComponent(Component) {
     var component = this._ComponentsMap[Component.name];
-    if (DEBUG) return wrapImmutableComponent(Component, component);
+    //if (DEBUG) return wrapImmutableComponent(Component, component);
     return component;
   }
 

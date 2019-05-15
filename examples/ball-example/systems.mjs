@@ -25,7 +25,7 @@ export class RotatingSystem extends System {
     for (let i = 0; i < entities.length; i++) {
       let entity = entities[i];
       let rotatingSpeed = entity.getComponent(Rotating).rotatingSpeed;
-      let object = entity.object3D.object;
+      let object = entity.getComponent(Object3D).object;
 
       object.rotation.x += rotatingSpeed * delta;
       object.rotation.y += rotatingSpeed * delta * 2;
@@ -48,15 +48,15 @@ export class PulsatingColorSystem extends System {
     let entities = this.queries.entities;
     for (let i = 0; i < entities.length; i++) {
       let entity = entities[i];
-      let object = entity.object3D.object;
+      let object = entity.getComponent(Object3D).object;
       if (entity.hasComponent(Colliding)) {
         ENGINE.setObjectMaterialColor(object, 1, 1, 0);
       } else if (entity.hasComponent(Recovering)) {
-        let col = 0.3 + entity.timeout.timer / TIMER_TIME;
+        let col = 0.3 + entity.getComponent(Timeout).timer / TIMER_TIME;
         ENGINE.setObjectMaterialColor(object, col, col, 0);
       } else {
         let r =
-          Math.sin(time / 500 + entity.pulsatingColor.offset * 12) / 2 + 0.5;
+          Math.sin(time / 500 + entity.getComponent(PulsatingColor).offset * 12) / 2 + 0.5;
         ENGINE.setObjectMaterialColor(object, r, 0, 0);
       }
     }
@@ -74,7 +74,7 @@ export class PulsatingScaleSystem extends System {
     let entities = this.queries.entities;
     for (let i = 0; i < entities.length; i++) {
       let entity = entities[i];
-      let object = entity.object3D.object;
+      let object = entity.getComponent(Object3D).object;
 
       let mul;
       if (entity.hasComponent(Colliding)) {
@@ -85,7 +85,7 @@ export class PulsatingScaleSystem extends System {
         mul = 0.8;
       }
 
-      let offset = entity.pulsatingScale.offset;
+      let offset = entity.getComponent(PulsatingScale).offset;
       let sca = mul * (Math.cos(time + offset) / 2 + 1) + 0.2;
       ENGINE.setObjectScale(object, sca);
     }
@@ -103,8 +103,8 @@ export class MovingSystem extends System {
     let entities = this.queries.entities;
     for (let i = 0; i < entities.length; i++) {
       let entity = entities[i];
-      let object = entity.object3D.object;
-      let offset = entity.moving.offset;
+      let object = entity.getComponent(Object3D).object;
+      let offset = entity.getComponent(Moving).offset;
       let radius = 5;
       let maxRadius = 5;
       object.position.z = Math.cos(time + 3 * offset) * maxRadius + radius;
@@ -124,7 +124,7 @@ export class TimeoutSystem extends System {
     for (let i = 0; i < entities.length; i++) {
       let entity = entities[i];
 
-      let timeout = entity.timeout;
+      let timeout = entity.getMutableComponent(Timeout);
       timeout.timer -= delta;
       if (timeout.timer < 0) {
         timeout.timer = 0;
@@ -154,10 +154,10 @@ export class ColliderSystem extends System {
     let balls = this.queries.balls;
     for (let i = 0; i < balls.length; i++) {
       let ball = balls[i];
-      let ballObject = ball.object3D.object;
+      let ballObject = ball.getComponent(Object3D).object;
       for (let j = 0; j < boxes.length; j++) {
         let box = boxes[j];
-        let boxObject = box.object3D.object;
+        let boxObject = box.getComponent(Object3D).object;
         let prevColliding = box.hasComponent(Colliding);
 
         if (ENGINE.objectsColliding(ballObject, boxObject)) {

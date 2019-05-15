@@ -12,8 +12,8 @@ export class RotatingSystem extends System {
     let entities = this.queries.entities;
     for (var i = 0; i < entities.length; i++) {
       let entity = entities[i];
-      let rotationSpeed = entity.rotating.rotatingSpeed;
-      let transform = entity.transform;
+      let rotationSpeed = entity.getComponent(Rotating).rotatingSpeed;
+      let transform = entity.getMutableComponent(Transform);
 
       transform.rotation.x += rotationSpeed * delta;
       transform.rotation.y += rotationSpeed * delta * 2;

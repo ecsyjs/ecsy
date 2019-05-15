@@ -2,7 +2,7 @@ import Entity from "./Entity.js";
 import ObjectPool from "./ObjectPool.js";
 import QueryManager from "./QueryManager.js";
 import EventDispatcher from "./EventDispatcher.js";
-import { componentPropertyName } from "./Utils.js";
+import { componentPropertyName, getName } from "./Utils.js";
 
 export class EntityManager {
   constructor() {
@@ -40,11 +40,9 @@ export class EntityManager {
 
     var componentPool = this._getComponentsPool(Component);
     var component = componentPool.aquire();
-    var componentName = componentPropertyName(Component);
 
     entity._ComponentsMap[Component.name] = component;
 
-    entity[componentName] = component;
     if (values) {
       for (var name in values) {
         component[name] = values[name];
@@ -73,8 +71,9 @@ export class EntityManager {
     // Remove T listing on entity and property ref, then free the component.
     entity._Components.splice(index, 1);
     var propName = componentPropertyName(Component);
-    var component = entity[propName];
-    delete entity[propName];
+    var component = entity._ComponentsMap[getName(Component)];
+    //var component = entity[propName];
+    //delete entity[propName];
     this._componentPool[propName].release(component);
   }
 
