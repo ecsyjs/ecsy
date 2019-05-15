@@ -1,3 +1,5 @@
+import { ReactiveSystem } from "./ReactiveSystem.js";
+
 export class SystemManager {
   constructor(world) {
     this.systems = [];
@@ -16,10 +18,28 @@ export class SystemManager {
     this.systems.splice(index, 1);
   }
 
-  tick(delta, time) {
+  execute(delta, time) {
     this.systems.forEach(system => {
-      if (system.enabled && system.tick) {
-        system.tick(delta, time);
+      if (system.enabled) {
+        if (system instanceof ReactiveSystem) {
+          if (system.onEntitiesAdded && system.counters.added) {
+            system.onEntitiesAdded();
+          }
+          if (system.onEntitiesRemoved && system.counters.removed) {
+            system.onEntitiesRemoved();
+          }
+          if (system.onEntitiesChanged && system.counters.changed) {
+            system.onEntitiesChanged();
+          }
+        } else if (system.execute) {
+          system.execute(delta, time);
+        }
+      }
+    });
+
+    this.systems.forEach(system => {
+      if (system instanceof ReactiveSystem) {
+        system.clearQueries();
       }
     });
   }
@@ -33,10 +53,10 @@ export class SystemManager {
     for (var i = 0; i < this.systems.length; i++) {
       var system = this.systems[i];
       var systemStats = (stats.systems[system.constructor.name] = {
-        groups: {}
+        queries: {}
       });
       for (var name in system.ctx) {
-        systemStats.groups[name] = system.ctx[name].stats();
+        systemStats.queries[name] = system.ctx[name].stats();
       }
     }
 
