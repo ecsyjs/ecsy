@@ -1,18 +1,22 @@
 import Entity from "./Entity.js";
 import ObjectPool from "./ObjectPool.js";
-import GroupManager from "./GroupManager.js";
+import QueryManager from "./QueryManager.js";
 import EventDispatcher from "./EventDispatcher.js";
+import { componentPropertyName } from "./Utils.js";
 
 export class EntityManager {
   constructor() {
     this._entities = [];
     this._componentPool = [];
-    this._groupManager = new GroupManager(this);
+    this._queryManager = new QueryManager(this);
     this.eventDispatcher = new EventDispatcher();
     this._entityPool = new ObjectPool(Entity);
     this._tags = {};
   }
 
+  /**
+   * Create a new entity
+   */
   createEntity() {
     var entity = this._entityPool.aquire();
     entity._manager = this;
@@ -21,17 +25,25 @@ export class EntityManager {
     return entity;
   }
 
-  //---------------------------------------------------------------------------
   // COMPONENTS
-  //---------------------------------------------------------------------------
+
+  /**
+   * Add a component to an entity
+   * @param {Entity} entity Entity where the component will be added
+   * @param {Component} Component Component to be added to the entity
+   * @param {Object} values Optional values to replace the default attributes
+   */
   entityAddComponent(entity, Component, values) {
     if (~entity._Components.indexOf(Component)) return;
 
     entity._Components.push(Component);
 
-    var componentPool = this.getComponentsPool(Component);
+    var componentPool = this._getComponentsPool(Component);
     var component = componentPool.aquire();
     var componentName = componentPropertyName(Component);
+
+    entity._ComponentsMap[Component.name] = component;
+
     entity[componentName] = component;
     if (values) {
       for (var name in values) {
@@ -39,19 +51,24 @@ export class EntityManager {
       }
     }
 
-    this._groupManager.addEntity(entity, Component);
+    this._queryManager.onEntityAdded(entity, Component);
 
     this.eventDispatcher.dispatchEvent(COMPONENT_ADDED, entity, Component);
   }
 
+  /**
+   * Remove a component from an entity
+   * @param {Entity} entity Entity which will get removed the component
+   * @param {*} Component Component to remove from the entity
+   */
   entityRemoveComponent(entity, Component) {
     var index = entity._Components.indexOf(Component);
     if (!~index) return;
 
     this.eventDispatcher.dispatchEvent(COMPONENT_REMOVE, entity, Component);
 
-    // Check each indexed group to see if we need to remove it
-    this._groupManager.removeEntity(entity, Component);
+    // Check each indexed query to see if we need to remove it
+    this._queryManager.onEntityRemoved(entity, Component);
 
     // Remove T listing on entity and property ref, then free the component.
     entity._Components.splice(index, 1);
@@ -140,10 +157,10 @@ export class EntityManager {
   }
 
   queryComponents(Components) {
-    return this._groupManager.getGroup(Components);
+    return this._queryManager.getQuery(Components);
   }
 
-  getComponentsPool(Component) {
+  _getComponentsPool(Component) {
     var componentName = componentPropertyName(Component);
 
     if (!this._componentPool[componentName]) {
@@ -163,8 +180,8 @@ export class EntityManager {
   stats() {
     var stats = {
       numEntities: this._entities.length,
-      numGroups: Object.keys(this._groupManager._groups).length,
-      groups: this._groupManager.stats(),
+      numQueries: Object.keys(this._queryManager._queries).length,
+      queries: this._queryManager.stats(),
       numComponentPool: Object.keys(this._componentPool).length,
       componentPool: {},
       eventDispatcher: this.eventDispatcher.stats
@@ -182,16 +199,7 @@ export class EntityManager {
   }
 }
 
-function getName(Component) {
-  return Component.name;
-}
-
-function componentPropertyName(Component) {
-  var name = getName(Component);
-  return name.charAt(0).toLowerCase() + name.slice(1);
-}
-
-const ENTITY_CREATED = "EntityManager#createEntity";
+const ENTITY_CREATED = "EntityManager#ENTITY_CREATE";
 const ENTITY_REMOVE = "EntityManager#ENTITY_REMOVE";
 const COMPONENT_ADDED = "EntityManager#COMPONENT_ADDED";
 const COMPONENT_REMOVE = "EntityManager#COMPONENT_REMOVE";
