@@ -35,7 +35,7 @@ export default class EventDispatcher {
     }
   }
 
-  dispatchEvent(eventName /*, entity, option*/) {
+  dispatchEvent(eventName, entity, component) {
     this.stats.fired++;
 
     var listenerArray = this._listeners[eventName];
@@ -43,7 +43,7 @@ export default class EventDispatcher {
       var array = listenerArray.slice(0);
 
       for (var i = 0; i < array.length; i++) {
-        array[i].call(this, event);
+        array[i].call(this, entity, component);
       }
     }
   }
