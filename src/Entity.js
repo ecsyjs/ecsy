@@ -1,36 +1,11 @@
 import Query from "./Query.js";
+import wrapImmutableComponent from "./WrapImmutableComponent.js";
 
+// @todo Take this out from there or use ENV
 const DEBUG = true;
 
 // @todo reset it by world?
 var nextId = 0;
-
-const proxyHandler = {
-  set(target, prop) {
-    throw new Error(
-      `Tried to write to "${target.constructor.name}#${String(
-        prop
-      )}" on immutable component. Use .getMutableComponent() to write to a component.`
-    );
-  }
-};
-
-const proxyMap = new WeakMap();
-
-function wrapImmutableComponent(T, component) {
-  if (component === undefined) {
-    return undefined;
-  }
-
-  let wrappedComponent = proxyMap.get(component);
-
-  if (!wrappedComponent) {
-    wrappedComponent = new Proxy(component, proxyHandler);
-    proxyMap.set(component, wrappedComponent);
-  }
-
-  return wrappedComponent;
-}
 
 export default class Entity {
   constructor(manager) {
@@ -162,7 +137,7 @@ export default class Entity {
   }
 
   // EXTRAS
-  
+
   /**
    * Initialize the entity. To be used when returning an entity to the pool
    */

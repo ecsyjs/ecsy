@@ -7,6 +7,11 @@ export default class EventDispatcher {
     };
   }
 
+  /**
+   * Add an event listener
+   * @param {String} eventName Name of the event to listen
+   * @param {Function} listener Callback to trigger when the event is fired
+   */
   addEventListener(eventName, listener) {
     let listeners = this._listeners;
     if (listeners[eventName] === undefined) {
@@ -18,6 +23,11 @@ export default class EventDispatcher {
     }
   }
 
+  /**
+   * Check if an event listener is already added to the list of listeners
+   * @param {String} eventName Name of the event to check
+   * @param {Function} listener Callback for the specified event
+   */
   hasEventListener(eventName, listener) {
     return (
       this._listeners[eventName] !== undefined &&
@@ -25,6 +35,11 @@ export default class EventDispatcher {
     );
   }
 
+  /**
+   * Remove an event listener
+   * @param {String} eventName Name of the event to remove
+   * @param {Function} listener Callback for the specified event
+   */
   removeEventListener(eventName, listener) {
     var listenerArray = this._listeners[eventName];
     if (listenerArray !== undefined) {
@@ -35,6 +50,12 @@ export default class EventDispatcher {
     }
   }
 
+  /**
+   * Dispatch an event
+   * @param {String} eventName Name of the event to dispatch
+   * @param {Entity} entity (Optional) Entity to emit
+   * @param {Component} component
+   */
   dispatchEvent(eventName, entity, component) {
     this.stats.fired++;
 
@@ -48,6 +69,9 @@ export default class EventDispatcher {
     }
   }
 
+  /**
+   * Reset stats counters
+   */
   resetCounters() {
     this.stats.fired = this.stats.handled = 0;
   }

@@ -78,6 +78,10 @@ export class EntityManager {
     this._componentPool[propName].release(component);
   }
 
+  /**
+   * Remove all the components from an entity
+   * @param {Entity} entity Entity from which the components will be removed
+   */
   entityRemoveAllComponents(entity) {
     let Components = entity._Components;
 
@@ -87,6 +91,10 @@ export class EntityManager {
     }
   }
 
+  /**
+   * Remove the entity from this manager. It will clear also its components and tags
+   * @param {Entity} entity Entity to remove from the manager
+   */
   removeEntity(entity) {
     var index = this._entities.indexOf(entity);
 
@@ -111,15 +119,22 @@ export class EntityManager {
     this._entityPool.release(entity);
   }
 
+  /**
+   * Remove all entities from this manager
+   */
   removeAllEntities() {
     for (var i = this._entities.length - 1; i >= 0; i--) {
       this._entities[i].remove();
     }
   }
 
-  //---------------------------------------------------------------------------
+
   // TAGS
-  //---------------------------------------------------------------------------
+
+  /**
+   * Remove all the entities that has the specified tag
+   * @param {String} tag Tag to filter the entities to be removed
+   */
   removeEntitiesByTag(tag) {
     var entities = this._tags[tag];
 
@@ -131,6 +146,11 @@ export class EntityManager {
     }
   }
 
+  /**
+   * Add tag to an entity
+   * @param {Entity} entity Entity which will get the tag
+   * @param {String} tag Tag to add to the entity
+   */
   entityAddTag(entity, tag) {
     var entities = this._tags[tag];
 
@@ -144,6 +164,11 @@ export class EntityManager {
     entity._tags.push(tag);
   }
 
+  /**
+   * Remove a tag from an entity
+   * @param {Entity} entity Entity that will get removed the tag
+   * @param {String} tag Tag to remove
+   */
   entityRemoveTag(entity, tag) {
     var entities = this._tags[tag];
     if (!entities) return;
@@ -156,10 +181,18 @@ export class EntityManager {
     entity._tags.splice(entity._tags.indexOf(tag), 1);
   }
 
+  /**
+   * Get a query based on a list of components
+   * @param {Array(Component)} Components List of components that will form the query
+   */
   queryComponents(Components) {
     return this._queryManager.getQuery(Components);
   }
 
+  /**
+   * Get components pool
+   * @param {Component} Component Type of component type for the pool
+   */
   _getComponentsPool(Component) {
     var componentName = componentPropertyName(Component);
 
@@ -170,13 +203,18 @@ export class EntityManager {
     return this._componentPool[componentName];
   }
 
-  //---------------------------------------------------------------------------
   // EXTRAS
-  //---------------------------------------------------------------------------
+
+  /**
+   * Return number of entities
+   */
   count() {
     return this._entities.length;
   }
 
+  /**
+   * Return some stats
+   */
   stats() {
     var stats = {
       numEntities: this._entities.length,

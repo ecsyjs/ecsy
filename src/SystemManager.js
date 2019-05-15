@@ -6,11 +6,19 @@ export class SystemManager {
     this.world = world;
   }
 
+  /**
+   * Register a system
+   * @param {System} System System to register
+   */
   registerSystem(System) {
     this.systems.push(new System(this.world));
     return this;
   }
 
+  /**
+   * Remove a system
+   * @param {System} System System to remove
+   */
   removeSystem(System) {
     var index = this.systems.indexOf(System);
     if (!~index) return;
@@ -18,6 +26,11 @@ export class SystemManager {
     this.systems.splice(index, 1);
   }
 
+  /**
+   * Update all the systems. Called per frame.
+   * @param {Number} delta Delta time since the last frame
+   * @param {Number} time Elapsed time
+   */
   execute(delta, time) {
     this.systems.forEach(system => {
       if (system.enabled) {
@@ -44,6 +57,9 @@ export class SystemManager {
     });
   }
 
+  /**
+   * Return stats
+   */
   stats() {
     var stats = {
       numSystems: this.systems.length,
