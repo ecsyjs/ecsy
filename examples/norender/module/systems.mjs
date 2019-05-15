@@ -8,7 +8,7 @@ export class RotatingSystem extends System {
     };
   }
 
-  tick(delta) {
+  execute(delta) {
     let entities = this.queries.entities;
     for (var i = 0; i < entities.length; i++) {
       let entity = entities[i];
@@ -24,7 +24,7 @@ export class RotatingSystem extends System {
 
 export class InputSystem extends System {
   init() {
-    var state = this.world.ctx.inputState;
+    var state = this.world.components.inputState;
 
     window.addEventListener("keydown", evt => {
       switch (evt.keyCode) {
@@ -75,7 +75,7 @@ export class InputSystem extends System {
     return {};
   }
 
-  tick() {
-    console.log(this.world.ctx.inputState);
+  execute() {
+//    console.log(this.world.ctx.inputState);
   }
 }

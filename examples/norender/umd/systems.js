@@ -9,7 +9,7 @@ ECSY.RotatingSystem = class RotatingSystem extends ECSY.System {
     };
   }
 
-  tick(delta) {
+  execute(delta) {
     let entities = this.queries.entities;
     for (var i = 0; i < entities.length; i++) {
       let entity = entities[i];

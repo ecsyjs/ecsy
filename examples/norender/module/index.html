@@ -10,33 +10,104 @@
   </head>
   <body>
     <script type="module">
-      import {World} from '../../../build/ecsy.module.js';
+      import {World, System, ReactiveSystem} from '../../../build/ecsy.module.js';
 
       import {Rotating, Pulsating, InputState, Transform} from './components.mjs';
       import {RotatingSystem, InputSystem} from './systems.mjs';
 
+      class TestSystem extends System {
+        init() {
+          return {
+            entities: [Rotating, Transform]
+          };
+        }
+
+        execute(delta) {
+          let entities = this.queries.entities;
+          for (var i = 0; i < entities.length; i++) {
+            var entity = entities[i];
+            var rotating = entity.getComponent(Rotating);
+            var rotatingSpeed = rotating.rotatingSpeed;
+            //var transform = entity.getMutableComponent(Transform);
+            //transform.rotation.x += rotatingSpeed;
+          }
+        }
+      }
+
+      class TestReactiveSystem extends ReactiveSystem {
+        init() {
+          return {
+            entities: [Rotating, Transform]
+          };
+        }
+
+        onEntitiesAdded(entities) {
+          console.log('OnAdded', this.queries.entities.added);
+        }
+        onEntitiesRemoved(entities) {
+          console.log('OnRemoved', this.queries.entities.removed);
+        }
+        onEntitiesChanged(entities) {
+          console.log('OnChanged entities', this.queries.entities.changed);
+        }
+        onComponentChanged(entities, component) {
+          console.log('OnChanged components', entities, component);
+        }
+
+/*
+        execute(delta) {
+          let added = this.reactiveQueries.entities.added;
+          for (var i = 0; i < added.length; i++) {}
+
+          let removed = this.reactiveQueries.entities.removed;
+          for (var i = 0; i < removed.length; i++) {}
+
+          let changed = this.reactiveQueries.entities.changed;
+          for (var i = 0; i < changed.length; i++) {}
+        }
+
+        execute(delta) {
+          let entities = this.queries.entities;
+          for (var i = 0; i < entities.length; i++) {
+            var entity = entities[i];
+            var rotating = entity.getComponent(Rotating);
+            var rotatingSpeed = rotating.rotatingSpeed;
+            //rotating.rotatingSpeed = 10;
+            var transform = entity.getMutableComponent(Transform);
+            transform.rotation.x += rotatingSpeed;
+          }
+        }
+*/
+      }
+
       var world = new World();
       world
-          .registerComponent(Rotating)
-          .registerComponent(Pulsating)
-          .registerComponent(Transform)
-          .registerSingletonComponent(InputState);
+        .registerComponent(Rotating)
+        .registerComponent(Pulsating)
+        .registerComponent(Transform)
+        .registerSingletonComponent(InputState);
 
       world
         .registerSystem(RotatingSystem)
+        .registerSystem(TestSystem)
+        .registerSystem(TestReactiveSystem)
         .registerSystem(InputSystem);
 
       for (var i = 0; i < 10; i++) {
-        var entity = world.entityManager.createEntity();
-        entity.addComponent(Rotating, {rotationSpeed: 0.2});
+        var entity = world.createEntity();
+        entity
+          .addComponent(Rotating, {rotationSpeed: 0.2})
+          .addComponent(Transform);
       }
 
       window.world = world;
+      window.Transform = Transform;
+      window.Rotating = Rotating;
 
       function animate() {
         var time = performance.now();
         var delta = time - lastTime;
-        world.systemManager.tick(delta, time);
+        world.systemManager.execute(delta, time);
         lastTime = time;
         requestAnimationFrame(animate);
       }
