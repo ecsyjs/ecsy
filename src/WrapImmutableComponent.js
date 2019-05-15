@@ -5,7 +5,7 @@ const proxyHandler = {
     throw new Error(
       `Tried to write to "${target.constructor.name}#${String(
         prop
-      )}" on immutable component. Use .getMutableComponent() to write to a component.`
+      )}" on immutable component. Use .getMutableComponent() to modify a component.`
     );
   }
 };

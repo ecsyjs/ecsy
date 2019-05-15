@@ -13,11 +13,13 @@ export class RotatingSystem extends System {
     for (var i = 0; i < entities.length; i++) {
       let entity = entities[i];
       let rotationSpeed = entity.getComponent(Rotating).rotatingSpeed;
+      /*
       let transform = entity.getMutableComponent(Transform);
 
       transform.rotation.x += rotationSpeed * delta;
       transform.rotation.y += rotationSpeed * delta * 2;
       transform.rotation.z += rotationSpeed * delta * 3;
+      */
     }
   }
 }
