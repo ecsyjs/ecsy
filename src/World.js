@@ -1,6 +1,7 @@
 import { SystemManager } from "./SystemManager.js";
 import { EntityManager } from "./EntityManager.js";
 import { ComponentManager } from "./ComponentManager.js";
+import { componentPropertyName } from "./Utils.js";
 
 export class World {
   constructor() {
@@ -9,21 +10,12 @@ export class World {
     this.componentsManager = new ComponentManager(this);
 
     // Storage for singleton components
-    this.ctx = {};
-  }
-
-  stats() {
-    var stats = {
-      entities: this.entityManager.stats(),
-      system: this.systemManager.stats()
-    };
-
-    console.log(JSON.stringify(stats, null, 2));
+    this.components = {};
   }
 
   registerSingletonComponent(Component) {
     this.componentsManager.registerSingletonComponent(Component);
-    this.ctx[componentPropertyName(Component)] = new Component();
+    this.components[componentPropertyName(Component)] = new Component();
     return this;
   }
 
@@ -37,20 +29,20 @@ export class World {
     return this;
   }
 
-  tick(delta, time) {
-    this.systemManager.tick(delta, time);
+  execute(delta, time) {
+    this.systemManager.execute(delta, time);
   }
 
   createEntity() {
     return this.entityManager.createEntity();
   }
-}
 
-function getName(Component) {
-  return Component.name;
-}
+  stats() {
+    var stats = {
+      entities: this.entityManager.stats(),
+      system: this.systemManager.stats()
+    };
 
-function componentPropertyName(Component) {
-  var name = getName(Component);
-  return name.charAt(0).toLowerCase() + name.slice(1);
+    console.log(JSON.stringify(stats, null, 2));
+  }
 }
