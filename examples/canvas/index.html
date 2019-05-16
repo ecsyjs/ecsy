@@ -6,6 +6,11 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="">
+    <style>
+      body {
+				margin: 0px;
+      }
+    </style>
   </head>
   <body>
     <script src="https://raw.githack.com/mrdoob/three.js/r104/build/three.js"></script>
@@ -22,13 +27,15 @@
         .registerSingletonComponent(DemoSettings)
         .registerComponent(Circle)
         .registerComponent(Movement)
-        .registerComponent(CanvasContext)
         .registerComponent(Intersecting)
         .registerSystem(MovementSystem)
         .registerSystem(Renderer)
         .registerSystem(IntersectionSystem);
 
       var canvas = document.querySelector("canvas");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
       var canvasComponent = world.components.canvasContext;
       canvasComponent.ctx = canvas.getContext("2d");
       canvasComponent.width = canvas.width;
@@ -52,6 +59,11 @@
       window.Circle = Circle;
       window.Movement = Movement;
 
+      window.addEventListener( 'resize', () => {
+        canvasComponent.width = canvas.width = window.innerWidth
+        canvasComponent.height = canvas.height = window.innerHeight;
+      }, false );
+
       var lastTime = performance.now();
       function update() {
         var time = performance.now();
@@ -64,6 +76,6 @@
       update();
 
     </script>
-    <canvas width="800" height="400"></canvas>
+    <canvas></canvas>
   </body>
 </html>
