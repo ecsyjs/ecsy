@@ -11,315 +11,47 @@
     <script src="https://raw.githack.com/mrdoob/three.js/r104/build/three.js"></script>
     <script type="module">
       import {World, System, ReactiveSystem} from '../../../build/ecsy.module.js';
+      import {Movement, Circle, CanvasContext, DemoSettings, Intersecting} from './components.js';
+      import {MovementSystem, Renderer, IntersectionSystem} from './systems.js';
+      import {random} from './utils.js';
 
       var world = new World();
-
-      function random(a, b) {
-        return Math.random() * (b - a) + a;
-      }
-
-      function fillCircle(ctx, x, y, radius) {
-        ctx.beginPath();
-        ctx.arc(x, y, radius, 0, Math.PI * 2, false);
-        ctx.fill();
-
-        return this;
-      }
-
-      function drawLine(ctx, a, b, c, d) {
-        ctx.beginPath(),
-        ctx.moveTo(a, b),
-        ctx.lineTo(c, d),
-        ctx.stroke();
-      }
-
-      function intersection(circleA, circleB) {
-        var a, dx, dy, d, h, rx, ry;
-        var x2, y2;
-
-        // dx and dy are the vertical and horizontal distances between the circle centers.
-        dx = circleB.position.x - circleA.position.x;
-        dy = circleB.position.y - circleA.position.y;
-
-        // Distance between the centers
-        d = Math.sqrt(dy * dy + dx * dx);
-
-        // Check for solvability
-        if (d > circleA.radius + circleB.radius) {
-          // No solution: circles don't intersect
-          return false;
-        }
-        if (d < Math.abs(circleA.radius - circleB.radius)) {
-          // No solution: one circle is contained in the other
-          return false;
-        }
-
-        /* 'point 2' is the point where the line through the circle
-        * intersection points crosses the line between the circle
-        * centers.
-        */
-
-        /* Determine the distance from point 0 to point 2. */
-        a =
-          (circleA.radius * circleA.radius -
-            circleB.radius * circleB.radius +
-            d * d) /
-          (2.0 * d);
-
-        /* Determine the coordinates of point 2. */
-        x2 = circleA.position.x + (dx * a) / d;
-        y2 = circleA.position.y + (dy * a) / d;
-
-        /* Determine the distance from point 2 to either of the
-        * intersection points.
-        */
-        h = Math.sqrt(circleA.radius * circleA.radius - a * a);
-
-        /* Now determine the offsets of the intersection points from
-        * point 2.
-        */
-        rx = -dy * (h / d);
-        ry = dx * (h / d);
-
-        /* Determine the absolute intersection points. */
-        var xi = x2 + rx;
-        var xi_prime = x2 - rx;
-        var yi = y2 + ry;
-        var yi_prime = y2 - ry;
-
-        return [xi, yi, xi_prime, yi_prime];
-      }
-/*
-      class Movement {
-        constructor() {
-          this.velocity = new THREE.Vector3();
-          this.acceleration = new THREE.Vector2();
-        }
-      }
-*/
-      class Circle {
-        constructor() {
-          this.position = new THREE.Vector2();
-          this.radius = 0;
-          this.velocity = new THREE.Vector2();
-          this.acceleration = new THREE.Vector2();
-        }
-
-        copy(src) {
-          this.position.copy(src.position);
-          this.radius = src.radius;
-          this.velocity.copy(src.velocity);
-          this.acceleration.copy(src.acceleration);
-        }
-      }
-
-      class CanvasContext {
-        constructor() {
-          this.ctx = null;
-          this.width = 0;
-          this.height = 0;
-        }
-      }
-
-      class DemoSettings {
-        constructor() {
-          this.speedMultiplier = 1;
-        }
-      }
-
-      class Intersecting {
-        constructor() {
-          this.points = [];
-        }
-      }
-
-      class MovementSystem extends System {
-        init() {
-          return {
-            entities: [Circle]
-          };
-        }
-
-        execute(delta) {
-          let canvasWidth = this.world.components.canvasContext.width;
-          let canvasHeight = this.world.components.canvasContext.height;
-          let multiplier = this.world.components.demoSettings.speedMultiplier;
-
-          let entities = this.queries.entities;
-          for (var i = 0; i < entities.length; i++) {
-            let entity = entities[i];
-            let circle = entity.getComponent(Circle);
-
-            circle.position.x +=
-              circle.velocity.x * circle.acceleration.x * delta * multiplier;
-            circle.position.y +=
-              circle.velocity.y * circle.acceleration.y * delta * multiplier;
-
-            if (circle.acceleration.x > 1)
-              circle.acceleration.x -= delta * multiplier;
-            if (circle.acceleration.y > 1)
-              circle.acceleration.y -= delta * multiplier;
-            if (circle.acceleration.x < 1) circle.acceleration.x = 1;
-            if (circle.acceleration.y < 1) circle.acceleration.y = 1;
-
-            var dx = circle.position.x;
-            var dy = circle.position.y;
-            var dist = Math.sqrt(dx * dx + dy * dy);
-
-            if (circle.position.y + circle.radius < 0)
-              circle.position.y = canvasHeight + circle.radius;
-
-            if (circle.position.y - circle.radius > canvasHeight)
-              circle.position.y = -circle.radius;
-
-            if (circle.position.x - circle.radius > canvasWidth)
-              circle.position.x = 0;
-
-            if (circle.position.x + circle.radius < 0)
-              circle.position.x = canvasWidth;
-          }
-        }
-      }
-
-      class IntersectionSystem extends System {
-        init() {
-          return {
-            entities: [Circle]
-          };
-        }
-
-        execute(delta) {
-          var ctx = this.world.components.canvasContext.ctx;
-          let entities = this.queries.entities;
-
-          for (var i = 0; i < entities.length; i++) {
-            let entity = entities[i];
-            if (entity.hasComponent(Intersecting)) {
-              entity.getMutableComponent(Intersecting).points.length = 0;
-            }
-
-            let circle = entity.getComponent(Circle);
-
-            for (var j = i + 1; j < entities.length; j++) {
-              let entityB = entities[j];
-              let circleB = entityB.getComponent(Circle);
-
-              var intersect = intersection(circle, circleB);
-              if (intersect !== false) {
-
-                var intersectComponent;
-                if (!entity.hasComponent(Intersecting)) {
-                  entity.addComponent(Intersecting);
-                }
-                intersectComponent = entity.getMutableComponent(Intersecting);
-                intersectComponent.points.push(intersect);
-              }
-            }
-
-          }
-        }
-
-        stop() {
-          super.stop();
-          // Clean up interesection when stopping
-          let entities = this.queries.entities;
-
-          for (var i = 0; i < entities.length; i++) {
-            let entity = entities[i];
-            if (entity.hasComponent(Intersecting)) {
-              entity.getMutableComponent(Intersecting).points.length = 0;
-            }
-          }
-        }
-      }
-
-      class Renderer extends System {
-        init() {
-          return {
-            circles: [Circle],
-            intersectingCircles: [Intersecting]
-          };
-        }
-
-        execute(delta) {
-          let canvasComponent = this.world.components.canvasContext;
-          let ctx = canvasComponent.ctx;
-          let canvasWidth = canvasComponent.width;
-          let canvasHeight = canvasComponent.height;
-
-          ctx.fillStyle = "black";
-          ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-
-          let circles = this.queries.circles;
-          for (var i = 0; i < circles.length; i++) {
-            let circle = circles[i].getComponent(Circle);
-
-            ctx.beginPath();
-            ctx.arc(
-              circle.position.x,
-              circle.position.y,
-              circle.radius,
-              0,
-              2 * Math.PI,
-              false
-            );
-            ctx.lineWidth = 1;
-            ctx.strokeStyle = "#fff";
-            ctx.stroke();
-          }
-
-          let intersectingCircles = this.queries.intersectingCircles;
-          for (var i = 0; i < intersectingCircles.length; i++) {
-            let intersect = intersectingCircles[i].getComponent(Intersecting);
-            for (var j=0;j< intersect.points.length; j++) {
-              var points = intersect.points[j];
-              ctx.lineWidth = 1;
-              ctx.strokeStyle = "#ff9";
-
-              ctx.fillStyle = "rgba(255, 255,255, 0.2)";
-              fillCircle(ctx, points[0], points[1], 8);
-              fillCircle(ctx, points[2], points[3], 8);
-
-              ctx.fillStyle = "#fff";
-              fillCircle(ctx, points[0], points[1], 3);
-              fillCircle(ctx, points[2], points[3], 3);
-
-              ctx.strokeStyle = "#ff9";
-              drawLine(ctx, points[0], points[1], points[2], points[3]);
-            }
-          }
-        }
-      }
 
       world
         .registerSingletonComponent(CanvasContext)
         .registerSingletonComponent(DemoSettings)
         .registerComponent(Circle)
+        .registerComponent(Movement)
         .registerComponent(CanvasContext)
         .registerComponent(Intersecting)
         .registerSystem(MovementSystem)
         .registerSystem(Renderer)
         .registerSystem(IntersectionSystem);
 
-      var canvas = document.getElementById('canvas2');
+      var canvas = document.querySelector("canvas");
       var canvasComponent = world.components.canvasContext;
       canvasComponent.ctx = canvas.getContext("2d");
       canvasComponent.width = canvas.width;
       canvasComponent.height = canvas.height;
 
-
       for (var i = 0; i < 30; i++) {
-        var entity = world.createEntity().addComponent(Circle);
+        var entity = world
+          .createEntity()
+          .addComponent(Circle)
+          .addComponent(Movement);
 
         var circle = entity.getMutableComponent(Circle);
         circle.position.set(random(0, canvas.width), random(0, canvas.height), 0);
         circle.radius = random(10, 80);
-        var speed = 20;
-        circle.velocity.set(random(-speed, speed), random(-speed, speed), 0);
+
+        var movement = entity.getMutableComponent(Movement);
+        movement.velocity.set(random(-20, 20), random(-20, 20), 0);
       }
 
       window.world = world;
       window.Circle = Circle;
+      window.Movement = Movement;
+
       var lastTime = performance.now();
       function update() {
         var time = performance.now();
@@ -332,6 +64,6 @@
       update();
 
     </script>
-    <canvas id="canvas2" width="800" height="400"></canvas>
+    <canvas width="800" height="400"></canvas>
   </body>
 </html>
