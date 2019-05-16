@@ -10,6 +10,9 @@ export default class Query {
     this.entities = [];
     this.eventDispatcher = new EventDispatcher();
 
+    // This query is being used by a ReactiveSystem
+    this.reactive = false;
+
     this.key = queryKey(Components);
 
     // Fill the query with the existing entities
