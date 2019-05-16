@@ -99,10 +99,17 @@
 */
       class Circle {
         constructor() {
-          this.position = new THREE.Vector3();
+          this.position = new THREE.Vector2();
           this.radius = 0;
-          this.velocity = new THREE.Vector3();
+          this.velocity = new THREE.Vector2();
           this.acceleration = new THREE.Vector2();
+        }
+
+        copy(src) {
+          this.position.copy(src.position);
+          this.radius = src.radius;
+          this.velocity.copy(src.velocity);
+          this.acceleration.copy(src.acceleration);
         }
       }
 
@@ -211,6 +218,19 @@
 
           }
         }
+
+        stop() {
+          super.stop();
+          // Clean up interesection when stopping
+          let entities = this.queries.entities;
+
+          for (var i = 0; i < entities.length; i++) {
+            let entity = entities[i];
+            if (entity.hasComponent(Intersecting)) {
+              entity.getMutableComponent(Intersecting).points.length = 0;
+            }
+          }
+        }
       }
 
       class Renderer extends System {
@@ -287,7 +307,6 @@
       canvasComponent.width = canvas.width;
       canvasComponent.height = canvas.height;
 
-      var speed = 20;
 
       for (var i = 0; i < 30; i++) {
         var entity = world.createEntity().addComponent(Circle);
@@ -295,10 +314,12 @@
         var circle = entity.getMutableComponent(Circle);
         circle.position.set(random(0, canvas.width), random(0, canvas.height), 0);
         circle.radius = random(10, 80);
+        var speed = 20;
         circle.velocity.set(random(-speed, speed), random(-speed, speed), 0);
       }
 
       window.world = world;
+      window.Circle = Circle;
       var lastTime = performance.now();
       function update() {
         var time = performance.now();
