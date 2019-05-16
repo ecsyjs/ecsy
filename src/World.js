@@ -5,9 +5,9 @@ import { componentPropertyName } from "./Utils.js";
 
 export class World {
   constructor() {
-    this.entityManager = new EntityManager();
-    this.systemManager = new SystemManager(this);
     this.componentsManager = new ComponentManager(this);
+    this.entityManager = new EntityManager(this);
+    this.systemManager = new SystemManager(this);
 
     // Storage for singleton components
     this.components = {};

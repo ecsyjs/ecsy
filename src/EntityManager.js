@@ -5,13 +5,19 @@ import EventDispatcher from "./EventDispatcher.js";
 import { componentPropertyName, getName } from "./Utils.js";
 
 export class EntityManager {
-  constructor() {
+  constructor(world) {
+    this.world = world;
+    this.componentsManager = world.componentsManager;
+
+    // All the entities in this instance
     this._entities = [];
-    this._componentPool = [];
+
+    // Map between tag and entities
+    this._tags = {};
+
     this._queryManager = new QueryManager(this);
     this.eventDispatcher = new EventDispatcher();
     this._entityPool = new ObjectPool(Entity);
-    this._tags = {};
   }
 
   /**
@@ -38,7 +44,7 @@ export class EntityManager {
 
     entity._ComponentTypes.push(Component);
 
-    var componentPool = this._getComponentsPool(Component);
+    var componentPool = this.world.componentsManager.getComponentsPool(Component);
     var component = componentPool.aquire();
 
     entity._components[Component.name] = component;
@@ -74,7 +80,7 @@ export class EntityManager {
     var component = entity._components[getName(Component)];
     //var component = entity[propName];
     //delete entity[propName];
-    this._componentPool[propName].release(component);
+    this.componentsManager._componentPool[propName].release(component);
   }
 
   /**
@@ -188,20 +194,6 @@ export class EntityManager {
     return this._queryManager.getQuery(Components);
   }
 
-  /**
-   * Get components pool
-   * @param {Component} Component Type of component type for the pool
-   */
-  _getComponentsPool(Component) {
-    var componentName = componentPropertyName(Component);
-
-    if (!this._componentPool[componentName]) {
-      this._componentPool[componentName] = new ObjectPool(Component);
-    }
-
-    return this._componentPool[componentName];
-  }
-
   // EXTRAS
 
   /**
@@ -219,13 +211,13 @@ export class EntityManager {
       numEntities: this._entities.length,
       numQueries: Object.keys(this._queryManager._queries).length,
       queries: this._queryManager.stats(),
-      numComponentPool: Object.keys(this._componentPool).length,
+      numComponentPool: Object.keys(this.componentsManager._componentPool).length,
       componentPool: {},
       eventDispatcher: this.eventDispatcher.stats
     };
 
-    for (var cname in this._componentPool) {
-      var pool = this._componentPool[cname];
+    for (var cname in this.componentsManager._componentPool) {
+      var pool = this.componentsManager._componentPool[cname];
       stats.componentPool[cname] = {
         used: pool.totalUsed(),
         size: pool.count
