@@ -5,7 +5,7 @@ import { ReactiveSystem } from "./ReactiveSystem.js";
  */
 export class SystemManager {
   constructor(world) {
-    this.systems = [];
+    this.systems = {};
     this.world = world;
   }
 
@@ -14,7 +14,7 @@ export class SystemManager {
    * @param {System} System System to register
    */
   registerSystem(System) {
-    this.systems.push(new System(this.world));
+    this.systems[System.name] = new System(this.world);
     return this;
   }
 
@@ -23,10 +23,7 @@ export class SystemManager {
    * @param {System} System System to remove
    */
   removeSystem(System) {
-    var index = this.systems.indexOf(System);
-    if (!~index) return;
-
-    this.systems.splice(index, 1);
+    delete this.systems[System];
   }
 
   /**
@@ -35,7 +32,10 @@ export class SystemManager {
    * @param {Number} time Elapsed time
    */
   execute(delta, time) {
-    this.systems.forEach(system => {
+    var name, system;
+
+    for (name in this.systems) {
+      system = this.systems[name];
       if (system.enabled) {
         if (system instanceof ReactiveSystem) {
           if (system.onEntitiesAdded && system.counters.added) {
@@ -51,13 +51,14 @@ export class SystemManager {
           system.execute(delta, time);
         }
       }
-    });
+    }
 
-    this.systems.forEach(system => {
+    for (name in this.systems) {
+      system = this.systems[name];
       if (system instanceof ReactiveSystem) {
         system.clearQueries();
       }
-    });
+    }
   }
 
   /**
