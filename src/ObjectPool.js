@@ -1,3 +1,6 @@
+/**
+ * @class ObjectPool
+ */
 export default class ObjectPool {
   constructor(T) {
     this.freeList = [];

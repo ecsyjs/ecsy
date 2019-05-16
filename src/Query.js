@@ -1,6 +1,9 @@
 import EventDispatcher from "./EventDispatcher.js";
 import { queryKey } from "./Utils.js";
 
+/**
+ * @class Query
+ */
 export default class Query {
   /**
    * @param {Array(Component)} Components List of types of components to query

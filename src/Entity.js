@@ -7,7 +7,15 @@ const DEBUG = true;
 // @todo reset it by world?
 var nextId = 0;
 
+/**
+ * @class Entity
+ */
 export default class Entity {
+  /**
+   * @constructor
+   * @class Entity
+   * @param {World} world
+   */
   constructor(world) {
     this._world = world || null;
 

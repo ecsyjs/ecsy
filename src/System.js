@@ -1,3 +1,6 @@
+/**
+ * @class System
+ */
 export class System {
   constructor(world) {
     this.world = world;

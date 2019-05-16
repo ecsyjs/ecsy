@@ -4,6 +4,9 @@ import QueryManager from "./QueryManager.js";
 import EventDispatcher from "./EventDispatcher.js";
 import { componentPropertyName, getName } from "./Utils.js";
 
+/**
+ * @class EntityManager
+ */
 export class EntityManager {
   constructor(world) {
     this.world = world;

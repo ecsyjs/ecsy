@@ -1,5 +1,8 @@
 import Query from "./Query.js";
 
+/**
+ * @class ReactiveSystem
+ */
 export class ReactiveSystem {
   constructor(world) {
     this.world = world;

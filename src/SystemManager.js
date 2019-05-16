@@ -1,5 +1,8 @@
 import { ReactiveSystem } from "./ReactiveSystem.js";
 
+/**
+ * @class SystemManager
+ */
 export class SystemManager {
   constructor(world) {
     this.systems = [];

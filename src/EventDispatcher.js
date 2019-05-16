@@ -1,3 +1,6 @@
+/**
+ * @class EventDispatcher
+ */
 export default class EventDispatcher {
   constructor() {
     this._listeners = {};

@@ -1,6 +1,9 @@
 import ObjectPool from "./ObjectPool.js";
-import { componentPropertyName, getName } from "./Utils.js";
+import { componentPropertyName } from "./Utils.js";
 
+/**
+ * @class ComponentManager
+ */
 export class ComponentManager {
   constructor() {
     this.Components = {};

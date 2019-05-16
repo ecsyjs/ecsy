@@ -1,6 +1,9 @@
 import Query from "./Query.js";
 import { queryKey } from "./Utils.js";
 
+/**
+ * @class QueryManager
+ */
 export default class QueryManager {
   constructor(world) {
     this._world = world;

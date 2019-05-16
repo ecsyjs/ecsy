@@ -3,6 +3,9 @@ import { EntityManager } from "./EntityManager.js";
 import { ComponentManager } from "./ComponentManager.js";
 import { componentPropertyName } from "./Utils.js";
 
+/**
+ * @class World
+ */
 export class World {
   constructor() {
     this.componentsManager = new ComponentManager(this);
