@@ -1,4 +1,4 @@
-/* global ENGINE */
+/* global THREE */
 import { System } from "../../../build/ecsy.module.js";
 import {
   Object3D,
@@ -55,7 +55,12 @@ export class PulsatingColorSystem extends System {
         let col = 0.3 + entity.getComponent(Timeout).timer / TIMER_TIME;
         object.material.color.setRGB(col, col, 0);
       } else {
-        let r = Math.sin(time / 500 + entity.getComponent(PulsatingColor).offset * 12) / 2 + 0.5;
+        let r =
+          Math.sin(
+            time / 500 + entity.getComponent(PulsatingColor).offset * 12
+          ) /
+            2 +
+          0.5;
         object.material.color.setRGB(r, 0, 0);
       }
     }
@@ -172,7 +177,10 @@ export class ColliderSystem extends System {
         let radiusBox = boxObject.geometry.boundingSphere.radius;
         let radiusSum = radiusBox + radiusBall;
 
-        if (boxObject.position.distanceToSquared(ballWorldPos) <= radiusSum * radiusSum) {
+        if (
+          boxObject.position.distanceToSquared(ballWorldPos) <=
+          radiusSum * radiusSum
+        ) {
           if (!prevColliding) {
             box.addComponent(Colliding);
           }
