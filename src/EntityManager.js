@@ -132,7 +132,7 @@ export class EntityManager {
    */
   removeAllEntities() {
     for (var i = this._entities.length - 1; i >= 0; i--) {
-      this._entities[i].remove();
+      this._entities[i].dispose();
     }
   }
 
@@ -150,7 +150,7 @@ export class EntityManager {
 
     for (var x = entities.length - 1; x >= 0; x--) {
       var entity = entities[x];
-      entity.remove();
+      entity.dispose();
     }
   }
 
