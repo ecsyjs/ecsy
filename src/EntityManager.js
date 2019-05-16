@@ -34,14 +34,14 @@ export class EntityManager {
    * @param {Object} values Optional values to replace the default attributes
    */
   entityAddComponent(entity, Component, values) {
-    if (~entity._Components.indexOf(Component)) return;
+    if (~entity._ComponentTypes.indexOf(Component)) return;
 
-    entity._Components.push(Component);
+    entity._ComponentTypes.push(Component);
 
     var componentPool = this._getComponentsPool(Component);
     var component = componentPool.aquire();
 
-    entity._ComponentsMap[Component.name] = component;
+    entity._components[Component.name] = component;
 
     if (values) {
       for (var name in values) {
@@ -60,7 +60,7 @@ export class EntityManager {
    * @param {*} Component Component to remove from the entity
    */
   entityRemoveComponent(entity, Component) {
-    var index = entity._Components.indexOf(Component);
+    var index = entity._ComponentTypes.indexOf(Component);
     if (!~index) return;
 
     this.eventDispatcher.dispatchEvent(COMPONENT_REMOVE, entity, Component);
@@ -69,9 +69,9 @@ export class EntityManager {
     this._queryManager.onEntityRemoved(entity, Component);
 
     // Remove T listing on entity and property ref, then free the component.
-    entity._Components.splice(index, 1);
+    entity._ComponentTypes.splice(index, 1);
     var propName = componentPropertyName(Component);
-    var component = entity._ComponentsMap[getName(Component)];
+    var component = entity._components[getName(Component)];
     //var component = entity[propName];
     //delete entity[propName];
     this._componentPool[propName].release(component);
@@ -82,7 +82,7 @@ export class EntityManager {
    * @param {Entity} entity Entity from which the components will be removed
    */
   entityRemoveAllComponents(entity) {
-    let Components = entity._Components;
+    let Components = entity._ComponentTypes;
 
     for (let j = Components.length - 1; j >= 0; j--) {
       var C = Components[j];

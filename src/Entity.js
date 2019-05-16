@@ -15,10 +15,10 @@ export default class Entity {
     this.id = nextId++;
 
     // List of components types the entity has
-    this._Components = [];
+    this._ComponentTypes = [];
 
     // Instance of the components
-    this._ComponentsMap = {};
+    this._components = {};
 
     // List of tags this entity has
     this._tags = [];
@@ -37,7 +37,7 @@ export default class Entity {
    * @return {Component} Immutable component reference
    */
   getComponent(Component) {
-    var component = this._ComponentsMap[Component.name];
+    var component = this._components[Component.name];
     if (DEBUG) return wrapImmutableComponent(Component, component);
     return component;
   }
@@ -48,7 +48,7 @@ export default class Entity {
    * @return {Component} Mutable component reference
    */
   getMutableComponent(Component) {
-    var component = this._ComponentsMap[Component.name];
+    var component = this._components[Component.name];
     for (var i = 0; i < this.queries.length; i++) {
       var query = this.queries[i];
       if (query.reactive) {
@@ -86,7 +86,7 @@ export default class Entity {
    * @param {Component} Component to check
    */
   hasComponent(Component) {
-    return !!~this._Components.indexOf(Component);
+    return !!~this._ComponentTypes.indexOf(Component);
   }
 
   /**
@@ -97,7 +97,7 @@ export default class Entity {
     var result = true;
 
     for (var i = 0; i < Components.length; i++) {
-      result = result && !!~this._Components.indexOf(Components[i]);
+      result = result && !!~this._ComponentTypes.indexOf(Components[i]);
     }
 
     return result;
@@ -146,7 +146,7 @@ export default class Entity {
   __init() {
     this.id = nextId++;
     this._manager = null;
-    this._Components.length = 0;
+    this._ComponentTypes.length = 0;
     this._tags.length = 0;
   }
 
