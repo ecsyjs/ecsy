@@ -8,7 +8,8 @@
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"http-server -c-1 -p 8080\"",
     "lint": "eslint ./src",
     "start": "npm run dev",
-    "test": "ava"
+    "test": "ava",
+		"watch:test": "ava --watch"
   },
   "repository": {
     "type": "git",

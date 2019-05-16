@@ -1,9 +1,9 @@
-import test from 'ava';
-import Entity from '../../src/Entity';
-import {EntityManager} from '../../src/EntityManager';
-import {FooComponent, BarComponent} from '../helpers/components';
+import test from "ava";
+import Entity from "../../src/Entity";
+import { World } from "../../src/index.js";
+import { FooComponent, BarComponent } from "../helpers/components";
 
-test('entity id', t => {
+test("entity id", t => {
   var entities = [];
   for (var i = 0; i < 10; i++) {
     entities.push(new Entity());
@@ -14,48 +14,60 @@ test('entity id', t => {
   }
 });
 
-test('adding components', async t => {
-  var entityManager = new EntityManager();
+test("adding components", async t => {
+  var world = new World();
 
-  var entity = new Entity(entityManager);
+  var entity = world.createEntity();
+
+  // Add a new component and check it exist
   entity.addComponent(FooComponent);
-
-  t.is(entity.Components.length, 1);
+  t.is(entity.getComponentTypes().length, 1);
   t.true(entity.hasComponent(FooComponent));
   t.false(entity.hasComponent(BarComponent));
+  t.deepEqual(Object.keys(entity.getComponents()), ["FooComponent"]);
+
+  // Entity doesn't contain BarComponent
   t.false(entity.hasAllComponents([FooComponent, BarComponent]));
 
   entity.addComponent(BarComponent);
-  t.is(entity.Components.length, 2);
+  t.is(entity.getComponentTypes().length, 2);
   t.true(entity.hasComponent(FooComponent));
   t.true(entity.hasComponent(BarComponent));
   t.true(entity.hasAllComponents([FooComponent, BarComponent]));
+  t.deepEqual(Object.keys(entity.getComponents()), [
+    "FooComponent",
+    "BarComponent"
+  ]);
 
   entity.removeComponent(FooComponent);
-  t.is(entity.Components.length, 1);
+  t.is(entity.getComponentTypes().length, 1);
   t.false(entity.hasComponent(FooComponent));
   t.true(entity.hasComponent(BarComponent));
   t.false(entity.hasAllComponents([FooComponent, BarComponent]));
+  t.deepEqual(Object.keys(entity.getComponents()), ["BarComponent"]);
 
   entity.addComponent(FooComponent);
   entity.removeAllComponents();
-  t.is(entity.Components.length, 0);
+  t.is(entity.getComponentTypes().length, 0);
   t.false(entity.hasComponent(FooComponent));
   t.false(entity.hasComponent(BarComponent));
   t.false(entity.hasAllComponents([FooComponent, BarComponent]));
-
+  t.deepEqual(Object.keys(entity.getComponents()), []);
 });
 
+/*
 // Entity created directly without using entityManager.createEntity()
-test('dispose entity', async t => {
-  var entityManager = new EntityManager();
+test("dispose entity", async t => {
+  var world = new World();
 
-  var entity = new Entity(entityManager);
+  var entity = world.createEntity();
+  t.is(world.entityManager._entities.length, 1);
   entity.addComponent(FooComponent);
+  //entity.dispose();
+  //t.is(world.entityManager._entities.length, 0);
 
-  const error = t.throws(() => {
-    entity.dispose();
-  }, Error);
+  //entity.dispose();
 
-  t.is(error.message, 'Tried to remove entity not in list');
+  //t.is(error.message, "Tried to remove entity not in list");
 });
+*/

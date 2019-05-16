@@ -42,6 +42,14 @@ export default class Entity {
     return component;
   }
 
+  getComponents() {
+    return this._components;
+  }
+
+  getComponentTypes() {
+    return this._ComponentTypes;
+  }
+
   /**
    * Return a mutable reference of a component.
    * @param {Component} Type of component to get

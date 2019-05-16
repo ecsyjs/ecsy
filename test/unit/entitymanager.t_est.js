@@ -1,9 +1,9 @@
-import test from 'ava';
-import Entity from '../../src/Entity';
-import {EntityManager} from '../../src/EntityManager';
-import {FooComponent, BarComponent} from '../helpers/components';
+import test from "ava";
+import Entity from "../../src/Entity";
+import { EntityManager } from "../../src/EntityManager";
+import { FooComponent, BarComponent } from "../helpers/components";
 
-test('entity', t => {
+test("entity", t => {
   var entityManager = new EntityManager();
   for (var i = 0; i < 10; i++) {
     entityManager.createEntity();
@@ -12,7 +12,7 @@ test('entity', t => {
   t.is(entityManager._entities.length, 10);
 });
 
-test('entity', t => {
+test("entity", t => {
   var entityManager = new EntityManager();
   for (var i = 0; i < 10; i++) {
     entityManager.createEntity();

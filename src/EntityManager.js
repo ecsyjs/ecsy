@@ -77,9 +77,9 @@ export class EntityManager {
     // Remove T listing on entity and property ref, then free the component.
     entity._ComponentTypes.splice(index, 1);
     var propName = componentPropertyName(Component);
-    var component = entity._components[getName(Component)];
-    //var component = entity[propName];
-    //delete entity[propName];
+    var componentName = getName(Component);
+    var component = entity._components[componentName];
+    delete entity._components[componentName];
     this.componentsManager._componentPool[propName].release(component);
   }
 
