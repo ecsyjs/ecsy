@@ -51,11 +51,13 @@ export default class Entity {
     var component = this._ComponentsMap[Component.name];
     for (var i = 0; i < this.queries.length; i++) {
       var query = this.queries[i];
-      query.eventDispatcher.dispatchEvent(
-        Query.prototype.COMPONENT_CHANGED,
-        this,
-        component
-      );
+      if (query.reactive) {
+        query.eventDispatcher.dispatchEvent(
+          Query.prototype.COMPONENT_CHANGED,
+          this,
+          component
+        );
+      }
     }
     return component;
   }

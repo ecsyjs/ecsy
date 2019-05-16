@@ -20,8 +20,10 @@ export class ReactiveSystem {
       var query = this.world.entityManager.queryComponents(Components);
       this._queries[name] = query;
       this.queries[name] = {};
+      var reactive = false;
 
       if (this.onEntitiesAdded) {
+        reactive = true;
         this.queries[name].added = [];
         query.eventDispatcher.addEventListener(
           Query.prototype.ENTITY_ADDED,
@@ -33,6 +35,7 @@ export class ReactiveSystem {
       }
 
       if (this.onEntitiesRemoved) {
+        reactive = true;
         this.queries[name].removed = [];
         query.eventDispatcher.addEventListener(
           Query.prototype.ENTITY_REMOVED,
@@ -44,6 +47,7 @@ export class ReactiveSystem {
       }
 
       if (this.onEntitiesChanged) {
+        reactive = true;
         this.queries[name].changed = [];
         query.eventDispatcher.addEventListener(
           Query.prototype.COMPONENT_CHANGED,
@@ -53,6 +57,9 @@ export class ReactiveSystem {
           }
         );
       }
+
+      query.reactive = reactive;
+
 /*
       @todo
       if (this.onComponentChanged) {

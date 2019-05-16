@@ -24,23 +24,10 @@
   <body>
     <canvas id="renderCanvas"></canvas>
   </body>
-  <script>
-    var ENGINE = {
-      setObjectMaterialColor: function (object, r, g, b) {
-        object.material.diffuseColor.set(r, g, b);
-      },
-      setObjectScale: function (object, value) {
-        object.scaling.set(value, value, value);
-      },
-      objectsColliding: function (objectA, objectB) {
-        return BABYLON.BoundingSphere.Intersects(objectA.getBoundingInfo().boundingSphere, objectB.getBoundingInfo().boundingSphere);
-      }
-    };
-  </script>
   <script type="module">
       import {World} from '../../../build/ecsy.module.js';
-      import {Object3D, Collisionable, Collider, Recovering, Moving, PulsatingScale, Timeout, PulsatingColor, Colliding, Rotating} from '../components.mjs';
-      import {RotatingSystem, ColliderSystem, PulsatingColorSystem, PulsatingScaleSystem, MovingSystem,TimeoutSystem} from '../systems.mjs';
+      import {Object3D, Collisionable, Collider, Recovering, Moving, PulsatingScale, Timeout, PulsatingColor, Colliding, Rotating} from './components.mjs';
+      import {RotatingSystem, ColliderSystem, PulsatingColorSystem, PulsatingScaleSystem, MovingSystem,TimeoutSystem} from './systems.mjs';
 
       var world = new World();
 
