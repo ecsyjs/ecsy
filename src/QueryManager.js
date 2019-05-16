@@ -2,8 +2,8 @@ import Query from "./Query.js";
 import { queryKey } from "./Utils.js";
 
 export default class QueryManager {
-  constructor(manager) {
-    this._manager = manager;
+  constructor(world) {
+    this._world = world;
 
     // Queries indexed by a unique identifier for the components it has
     this._queries = {};
@@ -74,7 +74,7 @@ export default class QueryManager {
     var key = queryKey(Components);
     var query = this._queries[key];
     if (!query) {
-      this._queries[key] = query = new Query(Components, this._manager);
+      this._queries[key] = query = new Query(Components, this._world);
     }
     return query;
   }

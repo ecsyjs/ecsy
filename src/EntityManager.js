@@ -25,7 +25,7 @@ export class EntityManager {
    */
   createEntity() {
     var entity = this._entityPool.aquire();
-    entity._manager = this;
+    entity._world = this;
     this._entities.push(entity);
     this.eventDispatcher.dispatchEvent(ENTITY_CREATED, entity);
     return entity;
@@ -120,7 +120,7 @@ export class EntityManager {
     }
 
     // Prevent any acecss and free
-    entity.manager = null;
+    entity._world = null;
     this._entityPool.release(entity);
   }
 

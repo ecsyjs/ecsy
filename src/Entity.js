@@ -8,8 +8,8 @@ const DEBUG = true;
 var nextId = 0;
 
 export default class Entity {
-  constructor(manager) {
-    this._manager = manager || null;
+  constructor(world) {
+    this._world = world || null;
 
     // Unique ID for this entity
     this.id = nextId++;
@@ -68,7 +68,7 @@ export default class Entity {
    * @param {Object} Optional values to replace the default attributes on the component
    */
   addComponent(Component, values) {
-    this._manager.entityAddComponent(this, Component, values);
+    this._world.entityAddComponent(this, Component, values);
     return this;
   }
 
@@ -77,7 +77,7 @@ export default class Entity {
    * @param {Component} Component to remove from the entity
    */
   removeComponent(Component) {
-    this._manager.entityRemoveComponent(this, Component);
+    this._world.entityRemoveComponent(this, Component);
     return this;
   }
 
@@ -107,7 +107,7 @@ export default class Entity {
    * Remove all the components from the entity
    */
   removeAllComponents() {
-    return this._manager.entityRemoveAllComponents(this);
+    return this._world.entityRemoveAllComponents(this);
   }
 
   // TAGS
@@ -125,7 +125,7 @@ export default class Entity {
    * @param {String} tag Tag to add to this entity
    */
   addTag(tag) {
-    this._manager.entityAddTag(this, tag);
+    this._world.entityAddTag(this, tag);
     return this;
   }
 
@@ -134,7 +134,7 @@ export default class Entity {
    * @param {String} tag Tag to remove from the entity
    */
   removeTag(tag) {
-    this._manager.entityRemoveTag(this, tag);
+    this._world.entityRemoveTag(this, tag);
     return this;
   }
 
@@ -145,15 +145,15 @@ export default class Entity {
    */
   __init() {
     this.id = nextId++;
-    this._manager = null;
+    this._world = null;
     this._ComponentTypes.length = 0;
     this._tags.length = 0;
   }
 
   /**
-   * Dispose the entity from the manager
+   * Dispose the entity from the world
    */
   dispose() {
-    return this._manager.removeEntity(this);
+    return this._world.removeEntity(this);
   }
 }
