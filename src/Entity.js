@@ -155,6 +155,8 @@ export default class Entity {
     this.id = nextId++;
     this._world = null;
     this._ComponentTypes.length = 0;
+    this.queries.length = 0;
+    this._components = {};
     this._tags.length = 0;
   }
 
