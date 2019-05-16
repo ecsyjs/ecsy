@@ -16,4 +16,12 @@ export class System {
       this.queries[name] = query.entities;
     }
   }
+
+  stop() {
+    this.enabled = false;
+  }
+
+  play() {
+    this.enabled = true;
+  }
 }
