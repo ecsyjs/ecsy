@@ -1,20 +1,26 @@
 {
   "name": "ecsy",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "Entity Component System in JS",
-  "main": "src/index.js",
+  "main": "build/ecsy.js",
+  "jsnext:main": "build/ecsy.module.js",
+  "module": "build/ecsy.module.js",
   "scripts": {
     "build": "rollup -c",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"http-server -c-1 -p 8080\"",
-    "lint": "eslint ./src",
+    "lint": "eslint src",
     "start": "npm run dev",
     "test": "ava",
-		"watch:test": "ava --watch"
+    "watch:test": "ava --watch"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/fernandojsg/ecsy.git"
   },
+  "keywords": [
+    "ecs",
+    "entity component system"
+  ],
   "author": "Fernando Serrano <fernandojsg@gmail.com> (http://fernandojsg.com)",
   "license": "MIT",
   "bugs": {
@@ -31,6 +37,17 @@
       "babel-register",
       "esm"
     ]
+  },
+  "jspm": {
+    "files": [
+      "package.json",
+      "LICENSE",
+      "README.md",
+      "build/ecsy.js",
+      "build/ecsy.min.js",
+      "build/ecsy.module.js"
+    ],
+    "directories": {}
   },
   "homepage": "https://github.com/fernandojsg/ecsy#readme",
   "devDependencies": {
