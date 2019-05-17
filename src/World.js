@@ -39,8 +39,8 @@ export class World {
    * Register a system
    * @param {System} System
    */
-  registerSystem(System) {
-    this.systemManager.registerSystem(System);
+  registerSystem(System, attributes) {
+    this.systemManager.registerSystem(System, attributes);
     return this;
   }
 

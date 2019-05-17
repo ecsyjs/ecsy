@@ -4,12 +4,17 @@ import Query from "./Query.js";
  * @class ReactiveSystem
  */
 export class ReactiveSystem {
-  constructor(world) {
+  constructor(world, attributes) {
     this.world = world;
     this.enabled = true;
     this.queryComponents = this.init ? this.init() : null;
     this._queries = {};
     this.queries = {};
+    this.priority = 0;
+
+    if (attributes) {
+      if (attributes.priority) { this.priority = attributes.priority; }
+    }
 
     this.counters = {
       added: 0,

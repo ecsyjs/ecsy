@@ -5,7 +5,7 @@ import { ReactiveSystem } from "./ReactiveSystem.js";
  */
 export class SystemManager {
   constructor(world) {
-    this.systems = {};
+    this.systems = [];
     this.world = world;
   }
 
@@ -13,9 +13,16 @@ export class SystemManager {
    * Register a system
    * @param {System} System System to register
    */
-  registerSystem(System) {
-    this.systems[System.name] = new System(this.world);
+  registerSystem(System, attributes) {
+    this.systems.push(new System(this.world, attributes));
+    this.sortSystems();
     return this;
+  }
+
+  sortSystems() {
+    this.systems.sort((a, b) => {
+      return b.priority - a.priority;
+    });
   }
 
   /**
@@ -23,7 +30,10 @@ export class SystemManager {
    * @param {System} System System to remove
    */
   removeSystem(System) {
-    delete this.systems[System];
+    var index = this.systems.indexOf(System);
+    if (!~index) return;
+
+    this.systems.splice(index, 1);
   }
 
   /**
@@ -32,10 +42,7 @@ export class SystemManager {
    * @param {Number} time Elapsed time
    */
   execute(delta, time) {
-    var name, system;
-
-    for (name in this.systems) {
-      system = this.systems[name];
+    this.systems.forEach(system => {
       if (system.enabled) {
         if (system instanceof ReactiveSystem) {
           if (system.onEntitiesAdded && system.counters.added) {
@@ -51,14 +58,14 @@ export class SystemManager {
           system.execute(delta, time);
         }
       }
-    }
+    });
 
-    for (name in this.systems) {
+    this.systems.forEach(system => {
       system = this.systems[name];
       if (system instanceof ReactiveSystem) {
         system.clearQueries();
       }
-    }
+    });
   }
 
   /**
