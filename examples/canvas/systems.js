@@ -1,4 +1,4 @@
-import { System } from "../../../build/ecsy.module.js";
+import { System } from "../../build/ecsy.module.js";
 import { Movement, Circle, Intersecting } from "./components.js";
 import { fillCircle, drawLine, intersection } from "./utils.js";
 
