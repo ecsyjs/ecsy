@@ -54,18 +54,16 @@ export class SystemManager {
           if (system.onEntitiesChanged && system.counters.changed) {
             system.onEntitiesChanged();
           }
-        } else if (system.execute) {
+
+          system.clearQueries();
+        }
+
+        if (system.execute) {
           system.execute(delta, time);
         }
       }
     });
 
-    this.systems.forEach(system => {
-      system = this.systems[name];
-      if (system instanceof ReactiveSystem) {
-        system.clearQueries();
-      }
-    });
   }
 
   /**
