@@ -28,8 +28,8 @@
             var entity = entities[i];
             var rotating = entity.getComponent(Rotating);
             var rotatingSpeed = rotating.rotatingSpeed;
-            //var transform = entity.getMutableComponent(Transform);
-            //transform.rotation.x += rotatingSpeed;
+            var transform = entity.getMutableComponent(Transform);
+            transform.rotation.x += rotatingSpeed;
           }
         }
       }
