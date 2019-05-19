@@ -53,8 +53,12 @@ export class EntityManager {
     entity._components[Component.name] = component;
 
     if (values) {
-      for (var name in values) {
-        component[name] = values[name];
+      if (component.copy) {
+        component.copy(values);
+      } else {
+        for (var name in values) {
+          component[name] = values[name];
+        }
       }
     }
 
