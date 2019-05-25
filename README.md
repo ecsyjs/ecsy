@@ -19,11 +19,11 @@ Designed aiming to achieve a "pure" ECS implementation, following two main rules
 - Singleton components can be registered per `world`
 - Multiple queries per system
 - Reactive support:
-  - Support for reactive systems (React to changes on entities and components)
+  - Support for reactive behaviour on systems (React to changes on entities and components)
   - System can query mutable or immutable components
 - Predictable:
-  - Systems will run on the order they were registered
-  - Reactive events will not generate a random callback when emited but queued
+  - Systems will run on the order they were registered or based on the priority defined when registering them
+  - Reactive events will not generate a random callback when emited but queued and be processed in order
 - Modern Javascript: ES6, classes, modules,...
 - Pool for components and entities
 
@@ -68,7 +68,9 @@ class MouseState {
 class RotatingSystem extends System {
   init() {
     return {
-      entities: [Rotating, Transform]
+      queries: {
+        entities: { components: [Rotating, Transform] }
+      }
     };
   }
 
@@ -104,21 +106,39 @@ class MouseSystem extends System {
 class ReactiveSystem extends System {
   init() {
     return {
-      entities: [Transform]
+      queries: {
+        entities: {
+          components: [Rotating, Transform]
+          events: {
+            added: {
+              event: "EntityAdded"
+            },
+            removed: {
+              event: "EntityRemoved"
+            },
+            changed: {
+              event: "EntityChanged"
+            },
+            rotatingChanged: {
+              event: "ComponentChanged",
+              components: [Rotating]
+            },
+            transformChanged: {
+              event: "ComponentChanged",
+              components: [Transform]
+            }
+          }
+        }
+      }
     };
   }
 
-  onEntitiesAdded(entities) {
-    console.log('OnAdded', this.queries.entities.added);
-  }
-  onEntitiesRemoved(entities) {
-    console.log('OnRemoved', this.queries.entities.removed);
-  }
-  onEntitiesChanged(entities) {
-    console.log('OnChanged entities', this.queries.entities.changed);
-  }
-  onComponentChanged(entities, component) {
-    console.log('OnChanged components', entities, component);
+  execute() {
+    console.log('OnAdded', this.events.entities.added);
+    console.log('OnRemoved', this.events.entities.removed);
+    console.log('OnChanged entities', this.events.entities.changed);
+    console.log('OnChanged Rotating Component', this.events.entities.rotatingChanged);
+    console.log('OnChanged Transform Component', this.events.entities.transformChanged);
   }
 }
 

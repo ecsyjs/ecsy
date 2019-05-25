@@ -10,7 +10,7 @@
   </head>
   <body>
     <script type="module">
-      import {World, System, ReactiveSystem} from '../../../build/ecsy.module.js';
+      import {World, System} from '../../../build/ecsy.module.js';
 
       import {Rotating, Pulsating, InputState, Transform} from './components.mjs';
       import {RotatingSystem, InputSystem} from './systems.mjs';
@@ -18,7 +18,9 @@
       class TestSystem extends System {
         init() {
           return {
-            entities: [Rotating, Transform]
+            queries: {
+              entities: {components: [Rotating, Transform]}
+            }
           };
         }
 
@@ -28,56 +30,70 @@
             var entity = entities[i];
             var rotating = entity.getComponent(Rotating);
             var rotatingSpeed = rotating.rotatingSpeed;
-            var transform = entity.getMutableComponent(Transform);
-            transform.rotation.x += rotatingSpeed;
+            //var transform = entity.getMutableComponent(Transform);
+            //transform.rotation.x += rotatingSpeed;
           }
         }
       }
 
-      class TestReactiveSystem extends ReactiveSystem {
+      class MyReactiveSystem extends System {
         init() {
           return {
-            entities: [Rotating, Transform]
-          };
-        }
-
-        onEntitiesAdded(entities) {
-          console.log('OnAdded', this.queries.entities.added);
-        }
-        onEntitiesRemoved(entities) {
-          console.log('OnRemoved', this.queries.entities.removed);
-        }
-        onEntitiesChanged(entities) {
-          console.log('OnChanged entities', this.queries.entities.changed);
-        }
-        onComponentChanged(entities, component) {
-          console.log('OnChanged components', entities, component);
-        }
-
-/*
-        execute(delta) {
-          let added = this.reactiveQueries.entities.added;
-          for (var i = 0; i < added.length; i++) {}
-
-          let removed = this.reactiveQueries.entities.removed;
-          for (var i = 0; i < removed.length; i++) {}
-
-          let changed = this.reactiveQueries.entities.changed;
-          for (var i = 0; i < changed.length; i++) {}
-        }
-
-        execute(delta) {
-          let entities = this.queries.entities;
-          for (var i = 0; i < entities.length; i++) {
-            var entity = entities[i];
-            var rotating = entity.getComponent(Rotating);
-            var rotatingSpeed = rotating.rotatingSpeed;
-            //rotating.rotatingSpeed = 10;
-            var transform = entity.getMutableComponent(Transform);
-            transform.rotation.x += rotatingSpeed;
+            queries: {
+              entities: {
+                components: [Transform, Rotating],
+                events: {
+                  added: {
+                    event: "EntityAdded"
+                  },
+                  removed: {
+                    event: "EntityRemoved"
+                  },
+                  changed: {
+                    event: "EntityChanged"
+                  },
+                  transformChanged: {
+                    event: "ComponentChanged",
+                    components: [Transform]
+                  },
+                  rotatingChanged: {
+                    event: "ComponentChanged",
+                    components: [Rotating]
+                  }
+                }
+              }
+            },
+            events: {
+              onColliding: "SphereColliding"
+            }
           }
         }
-*/
+
+        execute() {
+          if (this.events.entities.added.length > 0) {
+            console.log('OnAdded', this.events.entities.added);
+          }
+
+          if (this.events.entities.removed.length > 0) {
+            console.log('Onremoved', this.events.entities.removed);
+          }
+
+          if (this.events.entities.changed.length > 0) {
+            console.log('Onchanged', this.events.entities.changed);
+          }
+
+          if (this.events.entities.transformChanged.length > 0) {
+            console.log('OntransformChanged', this.events.entities.transformChanged);
+          }
+
+          if (this.events.entities.rotatingChanged.length > 0) {
+            console.log('OnrotatingChanged', this.events.entities.rotatingChanged);
+          }
+
+          if (this.events.onColliding.length > 0) {
+            console.log('onColliding', this.events.onColliding);
+          }
+        }
       }
 
       var world = new World();
@@ -85,13 +101,8 @@
         .registerComponent(Rotating)
         .registerComponent(Pulsating)
         .registerComponent(Transform)
-        .registerSingletonComponent(InputState);
-
-      world
-        .registerSystem(RotatingSystem)
-        .registerSystem(TestSystem)
-        .registerSystem(TestReactiveSystem)
-        .registerSystem(InputSystem);
+        .registerSingletonComponent(InputState)
+        .registerSystem(MyReactiveSystem);
 
       for (var i = 0; i < 10; i++) {
         var entity = world.createEntity();

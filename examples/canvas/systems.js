@@ -5,7 +5,9 @@ import { fillCircle, drawLine, intersection } from "./utils.js";
 export class MovementSystem extends System {
   init() {
     return {
-      entities: [Circle, Movement]
+      queries: {
+        entities: { components: [Circle, Movement] }
+      }
     };
   }
 
@@ -32,10 +34,6 @@ export class MovementSystem extends System {
       if (movement.acceleration.x < 1) movement.acceleration.x = 1;
       if (movement.acceleration.y < 1) movement.acceleration.y = 1;
 
-      var dx = circle.position.x;
-      var dy = circle.position.y;
-      var dist = Math.sqrt(dx * dx + dy * dy);
-
       if (circle.position.y + circle.radius < 0)
         circle.position.y = canvasHeight + circle.radius;
 
@@ -54,12 +52,13 @@ export class MovementSystem extends System {
 export class IntersectionSystem extends System {
   init() {
     return {
-      entities: [Circle]
+      queries: {
+        entities: { components: [Circle] }
+      }
     };
   }
 
-  execute(delta) {
-    var ctx = this.world.components.canvasContext.ctx;
+  execute() {
     let entities = this.queries.entities;
 
     for (var i = 0; i < entities.length; i++) {
@@ -104,12 +103,14 @@ export class IntersectionSystem extends System {
 export class Renderer extends System {
   init() {
     return {
-      circles: [Circle],
-      intersectingCircles: [Intersecting]
+      queries: {
+        circles: { components: [Circle] },
+        intersectingCircles: { components: [Intersecting] }
+      }
     };
   }
 
-  execute(delta) {
+  execute() {
     let canvasComponent = this.world.components.canvasContext;
     let ctx = canvasComponent.ctx;
     let canvasWidth = canvasComponent.width;

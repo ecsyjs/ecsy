@@ -1,5 +1,3 @@
-import { ReactiveSystem } from "./ReactiveSystem.js";
-
 /**
  * @class SystemManager
  */
@@ -44,26 +42,10 @@ export class SystemManager {
   execute(delta, time) {
     this.systems.forEach(system => {
       if (system.enabled) {
-        if (system instanceof ReactiveSystem) {
-          if (system.onEntitiesAdded && system.counters.added) {
-            system.onEntitiesAdded();
-          }
-          if (system.onEntitiesRemoved && system.counters.removed) {
-            system.onEntitiesRemoved();
-          }
-          if (system.onEntitiesChanged && system.counters.changed) {
-            system.onEntitiesChanged();
-          }
-
-          system.clearQueries();
-        }
-
-        if (system.execute) {
-          system.execute(delta, time);
-        }
+        if (system.execute) system.execute(delta, time);
+        system.clearEvents();
       }
     });
-
   }
 
   /**

@@ -16,7 +16,9 @@ import {
 export class RotatingSystem extends System {
   init() {
     return {
-      entities: [Rotating, Object3D]
+      queries: {
+        entities: { components: [Rotating, Object3D] }
+      }
     };
   }
 
@@ -39,7 +41,9 @@ const TIMER_TIME = 1;
 export class PulsatingColorSystem extends System {
   init() {
     return {
-      entities: [PulsatingColor, Object3D]
+      queries: {
+        entities: { components: [PulsatingColor, Object3D] }
+      }
     };
   }
 
@@ -70,7 +74,9 @@ export class PulsatingColorSystem extends System {
 export class PulsatingScaleSystem extends System {
   init() {
     return {
-      entities: [PulsatingScale]
+      queries: {
+        entities: { components: [PulsatingScale] }
+      }
     };
   }
 
@@ -99,7 +105,9 @@ export class PulsatingScaleSystem extends System {
 export class MovingSystem extends System {
   init() {
     return {
-      entities: [Moving]
+      queries: {
+        entities: { components: [Moving] }
+      }
     };
   }
 
@@ -119,7 +127,9 @@ export class MovingSystem extends System {
 export class TimeoutSystem extends System {
   init() {
     return {
-      entities: [Timeout]
+      queries: {
+        entities: { components: [Timeout] }
+      }
     };
   }
 
@@ -150,8 +160,10 @@ let ballWorldPos = new THREE.Vector3();
 export class ColliderSystem extends System {
   init() {
     return {
-      boxes: [Collisionable],
-      balls: [Collider]
+      queries: {
+        boxes: { components: [Collisionable] },
+        balls: { components: [Collider] }
+      }
     };
   }
 

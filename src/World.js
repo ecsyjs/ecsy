@@ -2,6 +2,7 @@ import { SystemManager } from "./SystemManager.js";
 import { EntityManager } from "./EntityManager.js";
 import { ComponentManager } from "./ComponentManager.js";
 import { componentPropertyName } from "./Utils.js";
+import EventDispatcher from "./EventDispatcher.js";
 
 /**
  * @class World
@@ -14,6 +15,21 @@ export class World {
 
     // Storage for singleton components
     this.components = {};
+
+    this.eventQueues = {};
+    this.eventDispatcher = new EventDispatcher();
+  }
+
+  emitEvent(eventName, data) {
+    this.eventDispatcher.dispatchEvent(eventName, data);
+  }
+
+  addEventListener(eventName, callback) {
+    this.eventDispatcher.addEventListener(eventName, callback);
+  }
+
+  removeEventListener(eventName, callback) {
+    this.eventDispatcher.removeEventListener(eventName, callback);
   }
 
   /**

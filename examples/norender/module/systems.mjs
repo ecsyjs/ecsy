@@ -4,11 +4,59 @@ import { System } from "../../../build/ecsy.module.js";
 export class RotatingSystem extends System {
   init() {
     return {
-      entities: [Rotating, Transform]
+      queries: {
+        entities: {
+          components: [Rotating, Transform],
+          events: {
+            added: {
+              event: "EntityAdded"
+            },
+            removed: {
+              event: "EntityRemoved"
+            },
+            changed: {
+              event: "EntityChanged"
+            },
+            rotatingChanged: {
+              event: "ComponentChanged",
+              components: [Rotating]
+            },
+            transformChanged: {
+              event: "ComponentChanged",
+              components: [Transform]
+            }
+          }
+        }
+      },
+      events: {
+        onCollided: "entityCollide"
+      }
     };
   }
 
-  execute(delta) {
+  getEvents() {
+    return {
+      sphereChanged: {
+        event: "ComponentChanged"
+      },
+      sphereActiveComponentChanged: {
+        event: "ComponentChanged",
+        components: [Rotating]
+      }
+    };
+  }
+
+  execute() {
+    for (var name in this.events) {
+      let events = this.events[name];
+      if (events.length > 0) {
+        console.log('->', name, events.length);
+        events.forEach(event => {
+          //console.log(event);
+        });
+      }
+    }
+
     let entities = this.queries.entities;
     for (var i = 0; i < entities.length; i++) {
       let entity = entities[i];
@@ -78,6 +126,6 @@ export class InputSystem extends System {
   }
 
   execute() {
-//    console.log(this.world.ctx.inputState);
+    //    console.log(this.world.ctx.inputState);
   }
 }

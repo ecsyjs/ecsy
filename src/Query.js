@@ -13,7 +13,7 @@ export default class Query {
     this.entities = [];
     this.eventDispatcher = new EventDispatcher();
 
-    // This query is being used by a ReactiveSystem
+    // This query is being used by a reactive system
     this.reactive = false;
 
     this.key = queryKey(Components);

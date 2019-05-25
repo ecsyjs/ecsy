@@ -15,7 +15,7 @@
   <body>
     <script src="https://raw.githack.com/mrdoob/three.js/r104/build/three.js"></script>
     <script type="module">
-      import {World, System, ReactiveSystem} from '../../build/ecsy.module.js';
+      import {World, System} from '../../build/ecsy.module.js';
       import {Movement, Circle, CanvasContext, DemoSettings, Intersecting} from './components.js';
       import {MovementSystem, Renderer, IntersectionSystem} from './systems.js';
       import {random} from './utils.js';
@@ -49,7 +49,7 @@
 
         var circle = entity.getMutableComponent(Circle);
         circle.position.set(random(0, canvas.width), random(0, canvas.height), 0);
-        circle.radius = random(10, 80);
+        circle.radius = random(20, 100);
 
         var movement = entity.getMutableComponent(Movement);
         movement.velocity.set(random(-20, 20), random(-20, 20), 0);
