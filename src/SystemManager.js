@@ -42,7 +42,11 @@ export class SystemManager {
   execute(delta, time) {
     this.systems.forEach(system => {
       if (system.enabled) {
-        if (system.execute) system.execute(delta, time);
+        if (system.execute) {
+          let startTime = performance.now();
+          system.execute(delta, time);
+          system.executeTime = performance.now() - startTime;
+        }
         system.clearEvents();
       }
     });

@@ -71,27 +71,27 @@
 
         execute() {
           if (this.events.entities.added.length > 0) {
-            console.log('OnAdded', this.events.entities.added);
+            // console.log('OnAdded', this.events.entities.added);
           }
 
           if (this.events.entities.removed.length > 0) {
-            console.log('Onremoved', this.events.entities.removed);
+            // console.log('Onremoved', this.events.entities.removed);
           }
 
           if (this.events.entities.changed.length > 0) {
-            console.log('Onchanged', this.events.entities.changed);
+            // console.log('Onchanged', this.events.entities.changed);
           }
 
           if (this.events.entities.transformChanged.length > 0) {
-            console.log('OntransformChanged', this.events.entities.transformChanged);
+            // console.log('OntransformChanged', this.events.entities.transformChanged);
           }
 
           if (this.events.entities.rotatingChanged.length > 0) {
-            console.log('OnrotatingChanged', this.events.entities.rotatingChanged);
+            // console.log('OnrotatingChanged', this.events.entities.rotatingChanged);
           }
 
           if (this.events.onColliding.length > 0) {
-            console.log('onColliding', this.events.onColliding);
+            // console.log('onColliding', this.events.onColliding);
           }
         }
       }
@@ -124,7 +124,7 @@
       function animate() {
         var time = performance.now();
         var delta = time - lastTime;
-        world.systemManager.execute(delta, time);
+        world.execute(delta, time);
         lastTime = time;
         requestAnimationFrame(animate);
       }

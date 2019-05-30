@@ -4,6 +4,49 @@
 import Query from "./Query.js";
 
 export class System {
+  toJSON() {
+    var json = {
+      name: this.constructor.name,
+      enabled: this.enabled,
+      executeTime: this.executeTime,
+      priority: this.priority,
+      queries: {},
+      events: {}
+    };
+
+    if (this.config) {
+      var queries = this.config.queries;
+      for (let queryName in queries) {
+        let query = queries[queryName];
+        json.queries[queryName] = {
+          key: this._queries[queryName].key
+        };
+        if (query.events) {
+          let events = (json.queries[queryName]["events"] = {});
+          for (let eventName in query.events) {
+            let event = query.events[eventName];
+            events[eventName] = {
+              eventName: event.event,
+              numEntities: this.events[queryName][eventName].length
+            };
+            if (event.components) {
+              events[eventName].components = event.components.map(c => c.name);
+            }
+          }
+        }
+      }
+
+      let events = this.config.events;
+      for (let eventName in events) {
+        json.events[eventName] = {
+          eventName: events[eventName]
+        };
+      }
+    }
+
+    return json;
+  }
+
   constructor(world, attributes) {
     this.world = world;
     this.enabled = true;
@@ -16,6 +59,9 @@ export class System {
     this.events = {};
 
     this.priority = 0;
+
+    // Used for stats
+    this.executeTime = 0;
 
     if (attributes && attributes.priority) {
       this.priority = attributes.priority;

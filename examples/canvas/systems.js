@@ -83,6 +83,9 @@ export class IntersectionSystem extends System {
           intersectComponent.points.push(intersect);
         }
       }
+      if (entity.hasComponent(Intersecting) && entity.getComponent(Intersecting).points.length === 0) {
+        entity.removeComponent(Intersecting);
+      }
     }
   }
 
