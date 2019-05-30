@@ -97,6 +97,7 @@
       }
 
       var world = new World();
+
       world
         .registerComponent(Rotating)
         .registerComponent(Pulsating)
@@ -109,6 +110,10 @@
         entity
           .addComponent(Rotating, {rotationSpeed: 0.2})
           .addComponent(Transform);
+
+        if (i > 5)
+          entity
+            .addComponent(Pulsating);
       }
 
       window.world = world;
