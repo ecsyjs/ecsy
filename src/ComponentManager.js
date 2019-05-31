@@ -40,5 +40,4 @@ export class ComponentManager {
 
     return this._componentPool[componentName];
   }
-
 }

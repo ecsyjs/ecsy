@@ -47,7 +47,9 @@ export class EntityManager {
 
     entity._ComponentTypes.push(Component);
 
-    var componentPool = this.world.componentsManager.getComponentsPool(Component);
+    var componentPool = this.world.componentsManager.getComponentsPool(
+      Component
+    );
     var component = componentPool.aquire();
 
     entity._components[Component.name] = component;
@@ -140,7 +142,6 @@ export class EntityManager {
     }
   }
 
-
   // TAGS
 
   /**
@@ -218,7 +219,8 @@ export class EntityManager {
       numEntities: this._entities.length,
       numQueries: Object.keys(this._queryManager._queries).length,
       queries: this._queryManager.stats(),
-      numComponentPool: Object.keys(this.componentsManager._componentPool).length,
+      numComponentPool: Object.keys(this.componentsManager._componentPool)
+        .length,
       componentPool: {},
       eventDispatcher: this.eventDispatcher.stats
     };
