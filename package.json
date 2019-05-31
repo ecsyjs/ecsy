@@ -11,6 +11,7 @@
     "lint": "eslint src",
     "start": "npm run dev",
     "test": "ava",
+    "travis": "npm run lint",
     "watch:test": "ava --watch"
   },
   "repository": {
