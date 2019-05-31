@@ -192,5 +192,5 @@ requestAnimationFrame(update);
 [dev-dependencies-url]: https://david-dm.org/fernandojsg/ecsy#info=devDependencies
 [lgtm]: https://img.shields.io/lgtm/grade/javascript/g/fernandojsg/ecsy.svg?label=code%20quality
 [lgtm-url]: https://lgtm.com/projects/g/fernandojsg/ecsy/
-[build-status]: https://travis-ci.org/fernandojsg/ecsy.svg?branch=master
-[build-status-url]: https://travis-ci.org/fernandojsg/ecsy
+[build-status]: https://travis-ci.com/fernandojsg/ecsy.svg?branch=master
+[build-status-url]: https://travis-ci.com/fernandojsg/ecsy
