@@ -3,10 +3,10 @@ An highly experimental Entity Component System written in Javascript.
 
 [![NPM package][npm]][npm-url]
 [![Build Size][build-size]][build-size-url]
-<!--[![Build Status][build-status]][build-status-url]
-[![Dependencies][dependencies]][dependencies-url]-->
 [![Dev Dependencies][dev-dependencies]][dev-dependencies-url]
 <!--[![Language Grade][lgtm]][lgtm-url]-->
+<!--[![Build Status][build-status]][build-status-url]
+[![Dependencies][dependencies]][dependencies-url]-->
 
 
 
