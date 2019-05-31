@@ -1,5 +1,5 @@
 # ecsy
-An highly experimental Entity Component System written in Javascript.
+======
 
 [![NPM package][npm]][npm-url]
 [![Build Size][build-size]][build-size-url]
@@ -8,7 +8,7 @@ An highly experimental Entity Component System written in Javascript.
 <!--[![Language Grade][lgtm]][lgtm-url]
 [![Dependencies][dependencies]][dependencies-url]-->
 
-
+#### An highly experimental Entity Component System written in Javascript ####
 
 Designed aiming to achieve a "pure" ECS implementation, following two main rules:
 - Components are just data, and do not have behaviour.
