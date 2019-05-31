@@ -4,8 +4,8 @@ An highly experimental Entity Component System written in Javascript.
 [![NPM package][npm]][npm-url]
 [![Build Size][build-size]][build-size-url]
 [![Dev Dependencies][dev-dependencies]][dev-dependencies-url]
-<!--[![Language Grade][lgtm]][lgtm-url]-->
-<!--[![Build Status][build-status]][build-status-url]
+[![Build Status][build-status]][build-status-url]
+<!--[![Language Grade][lgtm]][lgtm-url]
 [![Dependencies][dependencies]][dependencies-url]-->
 
 
@@ -192,3 +192,5 @@ requestAnimationFrame(update);
 [dev-dependencies-url]: https://david-dm.org/fernandojsg/ecsy#info=devDependencies
 [lgtm]: https://img.shields.io/lgtm/grade/javascript/g/fernandojsg/ecsy.svg?label=code%20quality
 [lgtm-url]: https://lgtm.com/projects/g/fernandojsg/ecsy/
+[build-status]: https://travis-ci.org/fernandojsg/ecsy.svg?branch=master
+[build-status-url]: https://travis-ci.org/fernandojsg/ecsy
