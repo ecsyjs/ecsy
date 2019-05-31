@@ -1,5 +1,4 @@
 # ecsy
-======
 
 [![NPM package][npm]][npm-url]
 [![Build Size][build-size]][build-size-url]
