@@ -1,6 +1,15 @@
 # ecsy
 An highly experimental Entity Component System written in Javascript.
 
+[![NPM package][npm]][npm-url]
+[![Build Size][build-size]][build-size-url]
+<!--[![Build Status][build-status]][build-status-url]
+[![Dependencies][dependencies]][dependencies-url]-->
+[![Dev Dependencies][dev-dependencies]][dev-dependencies-url]
+<!--[![Language Grade][lgtm]][lgtm-url]-->
+
+
+
 Designed aiming to achieve a "pure" ECS implementation, following two main rules:
 - Components are just data, and do not have behaviour.
 - Systems have just behaviour, without storing state.
@@ -172,3 +181,14 @@ function update() {
 
 requestAnimationFrame(update);
 ```
+
+[npm]: https://img.shields.io/npm/v/ecsy.svg
+[npm-url]: https://www.npmjs.com/package/ecsy
+[build-size]: https://badgen.net/bundlephobia/minzip/ecsy
+[build-size-url]: https://bundlephobia.com/result?p=ecsy
+[dependencies]: https://img.shields.io/david/fernandojsg/ecsy.svg
+[dependencies-url]: https://david-dm.org/fernandojsg/ecsy
+[dev-dependencies]: https://img.shields.io/david/dev/fernandojsg/ecsy.svg
+[dev-dependencies-url]: https://david-dm.org/fernandojsg/ecsy#info=devDependencies
+[lgtm]: https://img.shields.io/lgtm/grade/javascript/g/fernandojsg/ecsy.svg?label=code%20quality
+[lgtm-url]: https://lgtm.com/projects/g/fernandojsg/ecsy/
