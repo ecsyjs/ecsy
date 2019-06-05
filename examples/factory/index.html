@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <link rel="stylesheet" href="">
+  </head>
+  <body>
+    <textarea cols="100" rows="20"></textarea>
+    <br/>
+    <button id="createNPC">Create empty NPC</button>
+    <button id="removeName">Remove name from NPC</button>
+    <button id="removeTshirt">Remove tshirt from NPC</button>
+
+    <script type="module">
+
+      var textarea = document.querySelector('textarea');
+      function log(msg) {
+        console.log(msg);
+        textarea.innerHTML += msg + '\n';
+      }
+
+      import {World, System, Not} from '../../../build/ecsy.module.js';
+
+      class Name {
+        constructor() {
+          this.value = '';
+        }
+      }
+
+      class Tshirt {
+        constructor() {
+          this.color = 'white';
+          this.size = 'XL';
+        }
+      }
+
+      class NPC {}
+
+      class NameSystem extends System {
+        init() {
+          return {
+            queries: {
+              entities: { components: [NPC, Not(Name)] }
+            }
+          };
+        }
+
+        execute() {
+          const names = [
+            'Isobel',
+            'Scot',
+            'Francene',
+            'America',
+            'Kizzie',
+            'Leroy',
+            'Layla',
+            'Stella',
+            'Marianela',
+            'Devorah'
+          ];
+          this.queries.entities.forEach(entity => {
+            var name = names[Math.floor(Math.random() * names.length)];
+            log(`Added name '${name}' to player id=${entity.id}`);
+            entity.addComponent(Name, {value: name});
+          });
+        }
+      }
+
+      class TshirtSystem extends System {
+        init() {
+          return {
+            queries: {
+              entities: { components: [NPC, Not(Tshirt)] }
+            }
+          };
+        }
+
+        execute() {
+          const sizes = [ 'XS', 'S', 'M', 'L', 'XL' ];
+          const colors = [ 'white', 'red', 'yellow', 'purple', 'pink', 'blue', 'cyan', 'black' ];
+          this.queries.entities.forEach(entity => {
+            var size = sizes[Math.floor(Math.random() * sizes.length)];
+            var color = colors[Math.floor(Math.random() * colors.length)];
+            log(`Added '${color}' '${size}' tshirt to player id=${entity.id}`);
+            entity.addComponent(Tshirt, {color: color, size: size});
+          });
+        }
+      }
+
+      var world = new World();
+
+      world
+        .registerComponent(NPC)
+        .registerSystem(NameSystem)
+        .registerSystem(TshirtSystem)
+
+
+
+      document.getElementById('createNPC').addEventListener('click', () => {
+        var npc = world.createEntity();
+        npc.addComponent(NPC);
+        log(`Created NPC, (id = ${npc.id})`);
+      });
+
+      document.getElementById('removeName').addEventListener('click', () => {
+        var entity = randomEntity();
+        if (!entity) return;
+        log(`Removing name '${entity.getComponent(Name).value}' from player id=${entity.id}`);
+        entity.removeComponent(Name);
+      });
+
+      document.getElementById('removeTshirt').addEventListener('click', () => {
+        var entity = randomEntity();
+        if (!entity) return;
+        var tshirt = entity.getComponent(Tshirt);
+        log(`Removing ${tshirt.color} ${tshirt.size} from player id=${entity.id}`);
+        entity.removeComponent(Tshirt);
+      });
+
+      function randomEntity() {
+        var idx = Math.floor(Math.random() * world.entityManager._entities.length);
+        return world.entityManager._entities[idx];
+      }
+
+      function animate() {
+        var time = performance.now();
+        var delta = time - lastTime;
+        world.execute(delta, time);
+        lastTime = time;
+        requestAnimationFrame(animate);
+      }
+
+      var lastTime = performance.now();
+      animate();
+    </script>
+  </body>
+</html>
