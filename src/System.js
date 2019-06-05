@@ -149,3 +149,10 @@ export class System {
     }
   }
 }
+
+export function Not(Component) {
+  return {
+    operator: "not",
+    Component: Component
+  };
+}

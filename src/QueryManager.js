@@ -24,21 +24,26 @@ export default class QueryManager {
     for (var queryName in this._queries) {
       var query = this._queries[queryName];
 
+      if (
+        !!~query.NotComponents.indexOf(Component) &&
+        ~query.entities.indexOf(entity)
+      ) {
+        query.removeEntity(entity);
+        continue;
+      }
+
       // Add the entity only if:
       // Component is in the query
       // and Entity has ALL the components of the query
       // and Entity is not already in the query
       if (
         !~query.Components.indexOf(Component) ||
-        !entity.hasAllComponents(query.Components) ||
+        !query.match(entity) ||
         ~query.entities.indexOf(entity)
       )
         continue;
 
-      query.eventDispatcher.dispatchEvent(Query.prototype.ENTITY_ADDED, entity);
-
-      entity.queries.push(query);
-      query.entities.push(entity);
+      query.addEntity(entity);
     }
   }
 
@@ -51,21 +56,18 @@ export default class QueryManager {
     for (var queryName in this._queries) {
       var query = this._queries[queryName];
 
-      if (!~query.Components.indexOf(Component)) continue;
-      if (!entity.hasAllComponents(query.Components)) continue;
-
-      var index = query.entities.indexOf(entity);
-      if (~index) {
-        query.entities.splice(index, 1);
-
-        index = entity.queries.indexOf(query);
-        entity.queries.splice(index, 1);
-
-        query.eventDispatcher.dispatchEvent(
-          Query.prototype.ENTITY_REMOVED,
-          entity
-        );
+      if (
+        !!~query.NotComponents.indexOf(Component) &&
+        !~query.entities.indexOf(entity)
+      ) {
+        query.addEntity(entity);
+        continue;
       }
+
+      if (!~query.Components.indexOf(Component)) continue;
+      if (!query.match(entity)) continue;
+
+      query.removeEntity(entity);
     }
   }
 
