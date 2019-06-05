@@ -10,7 +10,7 @@
   </head>
   <body>
     <script type="module">
-      import {World, System} from '../../../build/ecsy.module.js';
+      import {World, System, Not} from '../../../build/ecsy.module.js';
 
       import {Rotating, Pulsating, InputState, Transform} from './components.mjs';
       import {RotatingSystem, InputSystem} from './systems.mjs';
@@ -33,6 +33,20 @@
             //var transform = entity.getMutableComponent(Transform);
             //transform.rotation.x += rotatingSpeed;
           }
+        }
+      }
+
+      class MyNot extends System {
+        init() {
+          return {
+            queries: {
+              transRot: { components: [Transform, Rotating, Not(Pulsating)] }
+              /*all: { components: [Transform, Rotating, Pulsating] },
+              transRot: { components: [Transform, Rotating] },
+              pulsating: { components: [Pulsating] },
+              transRotNotPulsating: { components: [Transform, Rotating, Not(Pulsating)] },*/
+            }
+          };
         }
       }
 
@@ -103,7 +117,8 @@
         .registerComponent(Pulsating)
         .registerComponent(Transform)
         .registerSingletonComponent(InputState)
-        .registerSystem(MyReactiveSystem);
+        .registerSystem(MyReactiveSystem)
+        .registerSystem(MyNot);
 
       for (var i = 0; i < 10; i++) {
         var entity = world.createEntity();
@@ -111,10 +126,13 @@
           .addComponent(Rotating, {rotationSpeed: 0.2})
           .addComponent(Transform);
 
-        if (i > 5)
+        if (i >= 5) {
           entity
             .addComponent(Pulsating);
+        }
       }
+
+      world.entityManager._entities[6].removeComponent(Pulsating);
 
       window.world = world;
       window.World = World;

@@ -19,8 +19,10 @@ export class World {
     this.eventQueues = {};
     this.eventDispatcher = new EventDispatcher();
 
-    var event = new CustomEvent("ecsy-world-created", { detail: this });
-    window.dispatchEvent(event);
+    if (typeof CustomEvent !== "undefined") {
+      var event = new CustomEvent("ecsy-world-created", { detail: this });
+      window.dispatchEvent(event);
+    }
   }
 
   emitEvent(eventName, data) {

@@ -23,7 +23,12 @@ export function queryKey(Components) {
   var names = [];
   for (var n = 0; n < Components.length; n++) {
     var T = Components[n];
-    names.push(getName(T));
+    if (typeof T === "object") {
+      var operator = T.operator === "not" ? "!" : T.operator;
+      names.push(operator + getName(T.Component));
+    } else {
+      names.push(getName(T));
+    }
   }
 
   return names
