@@ -1,6 +1,10 @@
 import test from "ava";
-import { World, System } from "../../src/index.js";
-import { FooComponent, BarComponent } from "../helpers/components";
+import { World, System, Not } from "../../src/index.js";
+import {
+  FooComponent,
+  BarComponent,
+  EmptyComponent
+} from "../helpers/components";
 
 test("init", t => {
   var world = new World();
@@ -134,6 +138,7 @@ test("queries", t => {
     var entity = world.createEntity();
     if (i < 10) entity.addComponent(FooComponent);
     if (i >= 5) entity.addComponent(BarComponent);
+    entity.addComponent(EmptyComponent);
   }
 
   class SystemFoo extends System {
@@ -166,7 +171,6 @@ test("queries", t => {
     }
   }
 
-  // Register empty system
   world
     .registerSystem(SystemFoo)
     .registerSystem(SystemBar)
@@ -180,6 +184,70 @@ test("queries", t => {
   t.is(world.systemManager.systems[2].queries.entities.length, 5);
 });
 
+test("queries_not", t => {
+  var world = new World();
+
+  world.registerComponent(FooComponent).registerComponent(BarComponent);
+
+  // 10 Foo
+  // 10 Bar
+  // 15 Empty
+  for (var i = 0; i < 15; i++) {
+    var entity = world.createEntity();
+    if (i < 10) entity.addComponent(FooComponent);
+    if (i >= 5) entity.addComponent(BarComponent);
+    entity.addComponent(EmptyComponent);
+  }
+
+  class SystemNotNot extends System {
+    init() {
+      return {
+        queries: {
+          notFoo: { components: [Not(FooComponent), Not(BarComponent)] }
+        }
+      };
+    }
+  }
+
+  const error = t.throws(() => {
+    world.registerSystem(SystemNotNot);
+  }, Error);
+
+  t.is(error.message, "Can't create a query without components");
+
+  class SystemNotBar extends System {
+    init() {
+      return {
+        queries: {
+          fooNotBar: { components: [FooComponent, Not(BarComponent)] },
+          emptyNotBar: { components: [EmptyComponent, Not(BarComponent)] },
+          emptyNotBarFoo: {
+            components: [EmptyComponent, Not(BarComponent), Not(FooComponent)]
+          }
+        }
+      };
+    }
+  }
+
+  world.registerSystem(SystemNotBar);
+  var queries = world.systemManager.systems[0].queries;
+
+  t.is(queries.fooNotBar.length, 5);
+  t.is(queries.emptyNotBar.length, 5);
+  t.is(queries.emptyNotBarFoo.length, 0);
+
+  // Adding BarComponent to entity0 will remove it from the queries Not(BarComponent)
+  world.entityManager._entities[0].addComponent(BarComponent);
+  t.is(queries.fooNotBar.length, 4);
+  t.is(queries.emptyNotBar.length, 4);
+
+  // Removing BarComponent from entity0 will add it from the queries Not(BarComponent)
+  world.entityManager._entities[0].removeComponent(BarComponent);
+  t.is(queries.fooNotBar.length, 5);
+  t.is(queries.emptyNotBar.length, 5);
+});
+
+/*
 test("reactive", t => {
   var world = new World();
 
@@ -311,3 +379,4 @@ test("reactive", t => {
   world.execute(); // After execute, events should be cleared
   t.is(world.systemManager.systems[0].events.entities.removed.length, 0);
 });
+*/
