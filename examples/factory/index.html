@@ -63,7 +63,7 @@
             'Devorah'
           ];
           this.queries.entities.forEach(entity => {
-            var name = names[Math.floor(Math.random() * names.length)];
+            var name = randomFromArray(names);
             log(`Added name '${name}' to player id=${entity.id}`);
             entity.addComponent(Name, {value: name});
           });
@@ -83,8 +83,8 @@
           const sizes = [ 'XS', 'S', 'M', 'L', 'XL' ];
           const colors = [ 'white', 'red', 'yellow', 'purple', 'pink', 'blue', 'cyan', 'black' ];
           this.queries.entities.forEach(entity => {
-            var size = sizes[Math.floor(Math.random() * sizes.length)];
-            var color = colors[Math.floor(Math.random() * colors.length)];
+            var size = randomFromArray(sizes);
+            var color = randomFromArray(colors);
             log(`Added '${color}' '${size}' tshirt to player id=${entity.id}`);
             entity.addComponent(Tshirt, {color: color, size: size});
           });
@@ -95,10 +95,13 @@
 
       world
         .registerComponent(NPC)
+        .registerComponent(Tshirt)
+        .registerComponent(Name)
         .registerSystem(NameSystem)
         .registerSystem(TshirtSystem)
 
 
+      // HTML Code to interact with the world
 
       document.getElementById('createNPC').addEventListener('click', () => {
         var npc = world.createEntity();
@@ -117,14 +120,20 @@
         var entity = randomEntity();
         if (!entity) return;
         var tshirt = entity.getComponent(Tshirt);
-        log(`Removing ${tshirt.color} ${tshirt.size} from player id=${entity.id}`);
+        log(`Removing '${tshirt.color}' '${tshirt.size}' from player id=${entity.id}`);
         entity.removeComponent(Tshirt);
       });
 
+      // Utils
       function randomEntity() {
-        var idx = Math.floor(Math.random() * world.entityManager._entities.length);
-        return world.entityManager._entities[idx];
+        return randomFromArray(world.entityManager._entities);
       }
+
+      function randomFromArray(array) {
+        var idx = Math.floor(Math.random() * array.length);
+        return array[idx];
+      }
+
 
       function animate() {
         var time = performance.now();
