@@ -70,7 +70,6 @@ export default class Entity {
     var component = this._components[Component.name];
     for (var i = 0; i < this.queries.length; i++) {
       var query = this.queries[i];
-      console.log(i, query.key);
       if (query.reactive) {
         query.eventDispatcher.dispatchEvent(
           Query.prototype.COMPONENT_CHANGED,

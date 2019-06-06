@@ -1,3 +1,5 @@
+var performance = typeof performance !== 'undefined' ? performance : {now: () => 0 }
+
 import test from "ava";
 import { World, System, Not } from "../../src/index.js";
 import {
