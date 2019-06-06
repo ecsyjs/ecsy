@@ -183,7 +183,7 @@ test("queries", t => {
   // Both
   t.is(world.systemManager.systems[2].queries.entities.length, 5);
 });
-
+/*
 test("queries_not", t => {
   var world = new World();
 
@@ -245,6 +245,228 @@ test("queries_not", t => {
   world.entityManager._entities[0].removeComponent(BarComponent);
   t.is(queries.fooNotBar.length, 5);
   t.is(queries.emptyNotBar.length, 5);
+});
+*/
+
+test("queries_remove_entities_sync", t => {
+  var world = new World();
+
+  world.registerComponent(FooComponent).registerComponent(BarComponent);
+
+  // 10 Foo
+  // 10 Bar
+  for (var i = 0; i < 10; i++) {
+    var entity = world.createEntity();
+    entity.addComponent(FooComponent);
+  }
+
+  class SystemA extends System {
+    init() {
+      return {
+        queries: {
+          entities: {
+            components: [FooComponent],
+            events: {
+              removed: {
+                event: "EntityRemoved"
+              }
+            }
+          }
+        }
+      };
+    }
+    execute() {
+      var entities = this.queries.entities;
+      for (var i = 0; i < entities.length; i++) {
+        entities[i].remove(true);
+      }
+    }
+  }
+
+  class SystemB extends System {
+    init() {
+      return {
+        queries: {
+          entities: {
+            components: [FooComponent],
+            events: {
+              removed: {
+                event: "EntityRemoved"
+              }
+            }
+          }
+        }
+      };
+    }
+    execute() {
+      var entities = this.queries.entities;
+      for (var i = 0, l = entities.length; i < l; i++) {
+        entities[i].remove(true);
+      }
+    }
+  }
+
+  world.registerSystem(SystemA).registerSystem(SystemB);
+
+  var systemA = world.systemManager.systems[0];
+  var systemB = world.systemManager.systems[1];
+
+  var entitiesA = systemA.queries.entities;
+  var entitiesB = systemA.queries.entities;
+  var entitiesRemovedA = systemA.events.entities.removed;
+  var entitiesRemovedB = systemB.events.entities.removed;
+
+  // Sync standard remove invalid loop
+  t.is(entitiesA.length, 10);
+
+  systemA.execute();
+
+  // Just removed half because of the sync update of the array that throws an exception
+  t.is(entitiesA.length, 5);
+  t.is(entitiesRemovedA.length, 5);
+
+  // Sync standard remove with stored length on invalid loop
+  t.is(entitiesB.length, 5);
+  const error = t.throws(() => {
+    systemB.execute();
+  }, Error);
+
+  t.is(error.message, "Cannot read property \'remove\' of undefined");
+
+  // Just removed half because of the sync update of the array that throws an exception
+  t.is(entitiesB.length, 2);
+  t.is(entitiesRemovedB.length, 8);
+});
+
+test("queries_deferred", t => {
+  var world = new World();
+
+  world.registerComponent(FooComponent).registerComponent(BarComponent);
+
+  // 10 Foo
+  // 10 Bar
+  // 15 Empty
+  for (var i = 0; i < 6; i++) {
+    var entity = world.createEntity();
+    if (i < 4) entity.addComponent(FooComponent);
+    if (i >= 2) entity.addComponent(BarComponent);
+  }
+
+  class SystemF extends System {
+    init() {
+      return {
+        queries: {
+          entities: {
+            components: [FooComponent],
+            events: {
+              removed: {
+                event: "EntityRemoved"
+              }
+            }
+          }
+        }
+      };
+    }
+    execute() {
+      this.queries.entities[1].remove();
+      this.queries.entities[0].remove();
+      // [F,F,FB,FB,B,B]
+    }
+  }
+
+  class SystemFB extends System {
+    init() {
+      return {
+        queries: {
+          entities: {
+            components: [FooComponent, BarComponent],
+            events: {
+              removed: {
+                event: "EntityRemoved"
+              }
+            }
+          }
+        }
+      };
+    }
+    execute() {
+      // @todo Instead of removing backward should it work also forward?
+      var entities = this.queries.entities;
+      for (let i = entities.length - 1; i >= 0; i--) {
+        entities[i].remove();
+      }
+    }
+  }
+
+  class SystemB extends System {
+    init() {
+      return {
+        queries: {
+          entities: {
+            components: [BarComponent],
+            events: {
+              removed: {
+                event: "EntityRemoved"
+              }
+            }
+          }
+        }
+      };
+    }
+  }
+
+  world
+    .registerSystem(SystemF)
+    .registerSystem(SystemFB)
+    .registerSystem(SystemB);
+
+  var systemF = world.systemManager.systems[0];
+  var systemFB = world.systemManager.systems[1];
+  var systemB = world.systemManager.systems[2];
+
+  var entitiesF = systemF.queries.entities;
+  var entitiesFB = systemFB.queries.entities;
+  var entitiesB = systemB.queries.entities;
+  var entitiesRemovedF = systemF.events.entities.removed;
+  var entitiesRemovedFB = systemFB.events.entities.removed;
+  var entitiesRemovedB = systemB.events.entities.removed;
+
+  // [F,F,FB,FB,B,B]
+  t.is(entitiesF.length, 4);
+  t.is(entitiesFB.length, 2);
+  t.is(entitiesB.length, 4);
+
+  //world.execute();
+  systemF.execute();
+
+  // [-F,-F,FB,FB,B,B]
+  // [FB,FB,B, B]
+  t.is(entitiesF.length, 2);
+  t.is(entitiesFB.length, 2);
+  t.is(entitiesB.length, 4);
+  t.is(entitiesRemovedF.length, 2);
+  t.is(entitiesRemovedFB.length, 0);
+  t.is(entitiesRemovedB.length, 0);
+
+  // Clear the previously removed Fs
+  systemF.clearEvents();
+  t.is(entitiesRemovedF.length, 0);
+
+  // Force remove on systemB
+  // [-FB,-FB, B, B]
+  // [B, B]
+  systemFB.execute();
+  t.is(entitiesF.length, 0);
+  t.is(entitiesFB.length, 0);
+  t.is(entitiesB.length, 2);
+  t.is(entitiesRemovedF.length, 2);
+  t.is(entitiesRemovedFB.length, 2);
+  t.is(entitiesRemovedB.length, 2);
+
+  // Process the deferred removals of entities
+  t.is(world.entityManager._entities.length, 6);
+  world.entityManager.processDeferredRemoval();
+  t.is(world.entityManager._entities.length, 2);
 });
 
 /*
@@ -347,8 +569,8 @@ test("reactive", t => {
   t.is(world.systemManager.systems[0].events.entities.barChanged.length, 0);
   t.is(world.systemManager.systems[0].events.entities.foobarChanged.length, 0);
 
-  // Dispose an entity
-  world.entityManager._entities[0].dispose();
+  // remove an entity
+  world.entityManager._entities[0].remove();
   t.is(world.systemManager.systems[0].events.entities.removed.length, 1);
   world.execute(); // After execute, events should be cleared
   t.is(world.systemManager.systems[0].events.entities.removed.length, 0);
@@ -373,7 +595,7 @@ test("reactive", t => {
   world.execute(); // After execute, events should be cleared
   t.is(world.systemManager.systems[0].events.entities.removed.length, 0);
 
-  // Dispose all entities
+  // remove all entities
   world.entityManager.removeAllEntities();
   t.is(world.systemManager.systems[0].events.entities.removed.length, 10);
   world.execute(); // After execute, events should be cleared

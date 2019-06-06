@@ -59,12 +59,12 @@ test("adding/removing components", async t => {
   t.deepEqual(Object.keys(entity.getComponents()), []);
 });
 
-test("dispose entity", async t => {
+test("remove entity", async t => {
   var world = new World();
 
   var entity = world.createEntity();
   entity.addComponent(FooComponent).addComponent(BarComponent);
 
-  entity.dispose();
+  entity.remove();
   t.is(world.entityManager.count(), 0);
 });

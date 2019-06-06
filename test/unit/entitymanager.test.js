@@ -12,3 +12,34 @@ test("entity id", t => {
 
   // @todo Check ids
 });
+
+test("deferred entity remove", t => {
+  var world = new World();
+
+  for (let i = 0; i < 10; i++) {
+    world.createEntity();
+  }
+
+  // Force remove
+  let i = 5;
+  while (i-- > 0) {
+    world.entityManager._entities[i].remove(true);
+  }
+
+  t.is(world.entityManager.count(), 5);
+  t.is(world.entityManager.entitiesToRemove.length, 0);
+
+  // Deferred remove
+  i = 5;
+  while (i-- > 0) {
+    world.entityManager._entities[i].remove();
+  }
+
+  t.is(world.entityManager.count(), 5);
+  t.is(world.entityManager.entitiesToRemove.length, 5);
+
+  world.entityManager.removeDeferred();
+
+  t.is(world.entityManager.count(), 0);
+  t.is(world.entityManager.entitiesToRemove.length, 0);
+});
