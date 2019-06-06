@@ -23,7 +23,7 @@ export class EntityManager {
     this._entityPool = new ObjectPool(Entity);
 
     // Deferred deletion
-    this.componentsToRemove = [];
+    this.entitiesWithComponentsToRemove = [];
     this.entitiesToRemove = [];
   }
 
@@ -88,6 +88,16 @@ export class EntityManager {
     // Check each indexed query to see if we need to remove it
     this._queryManager.onEntityComponentRemoved(entity, Component);
 
+    if (forceRemove) {
+      this._entityRemoveComponentSync(entity, Component, index);
+    } else {
+      if (entity.componentsToRemove.length === 0)
+        this.entitiesWithComponentsToRemove.push(entity);
+      entity.componentsToRemove.push(Component);
+    }
+  }
+
+  _entityRemoveComponentSync(entity, Component, index) {
     // Remove T listing on entity and property ref, then free the component.
     entity._ComponentTypes.splice(index, 1);
     var propName = componentPropertyName(Component);
@@ -115,7 +125,6 @@ export class EntityManager {
    * @param {Bool} forceRemove If you want to remove the component immediately instead of deferred (Default is false)
    */
   removeEntity(entity, forceRemove) {
-    console.log("Remove entity", entity.id);
     var index = this._entities.indexOf(entity);
 
     if (!~index) throw new Error("Tried to remove entity not in list");
@@ -129,8 +138,6 @@ export class EntityManager {
     } else {
       this.entitiesToRemove.push(entity);
     }
-
-    // this._queryManager.onEntityRemoved(entity);
   }
 
   _removeEntitySync(entity, index) {
@@ -162,11 +169,21 @@ export class EntityManager {
 
   processDeferredRemoval() {
     for (let i = 0; i < this.entitiesToRemove.length; i++) {
-      var entity = this.entitiesToRemove[i];
+      let entity = this.entitiesToRemove[i];
       var index = this._entities.indexOf(entity);
       this._removeEntitySync(entity, index);
     }
     this.entitiesToRemove.length = 0;
+
+    for (let i = 0; i < this.entitiesWithComponentsToRemove.length; i++) {
+      let entity = this.entitiesWithComponentsToRemove[i];
+      while (entity.componentsToRemove.length > 0) {
+        var Component = entity.componentsToRemove.pop();
+        this._entityRemoveComponentSync(entity, Component, index);
+      }
+    }
+
+    this.entitiesWithComponentsToRemove.length = 0;
   }
 
   // TAGS

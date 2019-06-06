@@ -33,6 +33,9 @@ export default class Entity {
 
     // Queries where the entity is added
     this.queries = [];
+
+    // Used for deferred removal
+    this.componentsToRemove = [];
   }
 
   // COMPONENTS
@@ -67,6 +70,7 @@ export default class Entity {
     var component = this._components[Component.name];
     for (var i = 0; i < this.queries.length; i++) {
       var query = this.queries[i];
+      console.log(i, query.key);
       if (query.reactive) {
         query.eventDispatcher.dispatchEvent(
           Query.prototype.COMPONENT_CHANGED,

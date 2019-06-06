@@ -16,7 +16,6 @@ export default class QueryManager {
     for (var queryName in this._queries) {
       var query = this._queries[queryName];
       if (entity.queries.indexOf(query) !== -1) {
-        console.log("It's on the query, removing entity", entity.id);
         query.removeEntity(entity);
       }
     }
@@ -76,8 +75,6 @@ export default class QueryManager {
 
       if (!~query.Components.indexOf(Component)) continue;
       if (!query.match(entity)) continue;
-
-      console.log("Removing entity by component!", entity.id, Component.name);
 
       query.removeEntity(entity);
     }
