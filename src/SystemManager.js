@@ -1,3 +1,5 @@
+var performance = typeof performance !== 'undefined' ? performance : {now: () => 0 }
+
 /**
  * @class SystemManager
  */

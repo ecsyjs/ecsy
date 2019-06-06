@@ -21,6 +21,10 @@ export class EntityManager {
     this._queryManager = new QueryManager(this);
     this.eventDispatcher = new EventDispatcher();
     this._entityPool = new ObjectPool(Entity);
+
+    // Deferred deletion
+    this.componentsToRemove = [];
+    this.entitiesToRemove = [];
   }
 
   /**
@@ -64,7 +68,7 @@ export class EntityManager {
       }
     }
 
-    this._queryManager.onEntityAdded(entity, Component);
+    this._queryManager.onEntityComponentAdded(entity, Component);
 
     this.eventDispatcher.dispatchEvent(COMPONENT_ADDED, entity, Component);
   }
@@ -73,15 +77,16 @@ export class EntityManager {
    * Remove a component from an entity
    * @param {Entity} entity Entity which will get removed the component
    * @param {*} Component Component to remove from the entity
+   * @param {Bool} forceRemove If you want to remove the component immediately instead of deferred (Default is false)
    */
-  entityRemoveComponent(entity, Component) {
+  entityRemoveComponent(entity, Component, forceRemove) {
     var index = entity._ComponentTypes.indexOf(Component);
     if (!~index) return;
 
     this.eventDispatcher.dispatchEvent(COMPONENT_REMOVE, entity, Component);
 
     // Check each indexed query to see if we need to remove it
-    this._queryManager.onEntityRemoved(entity, Component);
+    this._queryManager.onEntityComponentRemoved(entity, Component);
 
     // Remove T listing on entity and property ref, then free the component.
     entity._ComponentTypes.splice(index, 1);
@@ -96,29 +101,42 @@ export class EntityManager {
    * Remove all the components from an entity
    * @param {Entity} entity Entity from which the components will be removed
    */
-  entityRemoveAllComponents(entity) {
+  entityRemoveAllComponents(entity, forceRemove) {
     let Components = entity._ComponentTypes;
 
     for (let j = Components.length - 1; j >= 0; j--) {
-      var C = Components[j];
-      entity.removeComponent(C);
+      this.entityRemoveComponent(entity, Components[j], forceRemove);
     }
   }
 
   /**
    * Remove the entity from this manager. It will clear also its components and tags
    * @param {Entity} entity Entity to remove from the manager
+   * @param {Bool} forceRemove If you want to remove the component immediately instead of deferred (Default is false)
    */
-  removeEntity(entity) {
+  removeEntity(entity, forceRemove) {
+    console.log("Remove entity", entity.id);
     var index = this._entities.indexOf(entity);
 
     if (!~index) throw new Error("Tried to remove entity not in list");
 
-    this.entityRemoveAllComponents(entity);
-
     // Remove from entity list
-    this.eventDispatcher.dispatchEvent(ENTITY_REMOVE, entity);
+    this.eventDispatcher.dispatchEvent(ENTITY_REMOVED, entity);
+    this._queryManager.onEntityRemoved(entity);
+
+    if (forceRemove === true) {
+      this._removeEntitySync(entity, index);
+    } else {
+      this.entitiesToRemove.push(entity);
+    }
+
+    // this._queryManager.onEntityRemoved(entity);
+  }
+
+  _removeEntitySync(entity, index) {
     this._entities.splice(index, 1);
+
+    this.entityRemoveAllComponents(entity, true);
 
     // Remove entity from any tag groups and clear the on-entity ref
     entity._tags.length = 0;
@@ -128,7 +146,7 @@ export class EntityManager {
       if (~n) entities.splice(n, 1);
     }
 
-    // Prevent any acecss and free
+    // Prevent any access and free
     entity._world = null;
     this._entityPool.release(entity);
   }
@@ -138,8 +156,17 @@ export class EntityManager {
    */
   removeAllEntities() {
     for (var i = this._entities.length - 1; i >= 0; i--) {
-      this._entities[i].dispose();
+      this._entities[i].remove();
     }
+  }
+
+  processDeferredRemoval() {
+    for (let i = 0; i < this.entitiesToRemove.length; i++) {
+      var entity = this.entitiesToRemove[i];
+      var index = this._entities.indexOf(entity);
+      this._removeEntitySync(entity, index);
+    }
+    this.entitiesToRemove.length = 0;
   }
 
   // TAGS
@@ -155,7 +182,7 @@ export class EntityManager {
 
     for (var x = entities.length - 1; x >= 0; x--) {
       var entity = entities[x];
-      entity.dispose();
+      entity.remove();
     }
   }
 
@@ -238,6 +265,6 @@ export class EntityManager {
 }
 
 const ENTITY_CREATED = "EntityManager#ENTITY_CREATE";
-const ENTITY_REMOVE = "EntityManager#ENTITY_REMOVE";
+const ENTITY_REMOVED = "EntityManager#ENTITY_REMOVED";
 const COMPONENT_ADDED = "EntityManager#COMPONENT_ADDED";
 const COMPONENT_REMOVE = "EntityManager#COMPONENT_REMOVE";

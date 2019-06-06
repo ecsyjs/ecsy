@@ -169,9 +169,9 @@ export default class Entity {
   }
 
   /**
-   * Dispose the entity from the world
+   * Remove the entity from the world
    */
-  dispose() {
-    return this._world.removeEntity(this);
+  remove(forceRemove) {
+    return this._world.removeEntity(this, forceRemove);
   }
 }

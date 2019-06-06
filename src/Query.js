@@ -36,6 +36,8 @@ export default class Query {
     for (var i = 0; i < manager._entities.length; i++) {
       var entity = manager._entities[i];
       if (this.match(entity)) {
+        // @todo ??? this.addEntity(entity); => preventing the event to be generated
+        entity.queries.push(this);
         this.entities.push(entity);
       }
     }
