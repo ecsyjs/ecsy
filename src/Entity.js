@@ -95,8 +95,8 @@ export default class Entity {
    * Remove a component from the entity
    * @param {Component} Component to remove from the entity
    */
-  removeComponent(Component) {
-    this._world.entityRemoveComponent(this, Component);
+  removeComponent(Component, forceRemove) {
+    this._world.entityRemoveComponent(this, Component, forceRemove);
     return this;
   }
 
