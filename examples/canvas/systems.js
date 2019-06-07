@@ -59,13 +59,11 @@ export class IntersectionSystem extends System {
   }
 
   execute() {
-    console.log('!!!!!!!!!!!!TICK');
     let entities = this.queries.entities;
 
     for (var i = 0; i < entities.length; i++) {
       let entity = entities[i];
       if (entity.hasComponent(Intersecting)) {
-        console.log(entity.id, entity.hasComponent(Intersecting), entity.getComponent(Intersecting));
         entity.getMutableComponent(Intersecting).points.length = 0;
       }
 
@@ -90,7 +88,6 @@ export class IntersectionSystem extends System {
         entity.getComponent(Intersecting).points.length === 0
       ) {
         entity.removeComponent(Intersecting);
-        console.log(entity.id, '<<<<<<<<<<<<');
       }
     }
   }
