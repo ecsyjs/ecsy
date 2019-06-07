@@ -125,8 +125,8 @@ export default class Entity {
   /**
    * Remove all the components from the entity
    */
-  removeAllComponents() {
-    return this._world.entityRemoveAllComponents(this);
+  removeAllComponents(forceRemove) {
+    return this._world.entityRemoveAllComponents(this, forceRemove);
   }
 
   // TAGS
