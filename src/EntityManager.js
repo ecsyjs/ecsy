@@ -170,7 +170,7 @@ export class EntityManager {
   processDeferredRemoval() {
     for (let i = 0; i < this.entitiesToRemove.length; i++) {
       let entity = this.entitiesToRemove[i];
-      var index = this._entities.indexOf(entity);
+      let index = this._entities.indexOf(entity);
       this._removeEntitySync(entity, index);
     }
     this.entitiesToRemove.length = 0;
@@ -178,7 +178,8 @@ export class EntityManager {
     for (let i = 0; i < this.entitiesWithComponentsToRemove.length; i++) {
       let entity = this.entitiesWithComponentsToRemove[i];
       while (entity.componentsToRemove.length > 0) {
-        var Component = entity.componentsToRemove.pop();
+        let Component = entity.componentsToRemove.pop();
+        let index = entity._ComponentTypes.indexOf(Component);
         this._entityRemoveComponentSync(entity, Component, index);
       }
     }
