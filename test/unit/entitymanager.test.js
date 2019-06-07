@@ -38,7 +38,7 @@ test("deferred entity remove", t => {
   t.is(world.entityManager.count(), 5);
   t.is(world.entityManager.entitiesToRemove.length, 5);
 
-  world.entityManager.removeDeferred();
+  world.entityManager.processDeferredRemoval();
 
   t.is(world.entityManager.count(), 0);
   t.is(world.entityManager.entitiesToRemove.length, 0);

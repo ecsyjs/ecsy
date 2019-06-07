@@ -679,7 +679,7 @@ test("queries_remove_components_deferred", t => {
   world.entityManager.processDeferredRemoval();
   t.is(world.entityManager.entitiesWithComponentsToRemove.length, 0);
 });
-/*
+
 test("reactive", t => {
   var world = new World();
 
@@ -726,81 +726,88 @@ test("reactive", t => {
       .addComponent(BarComponent);
   }
 
+  var system = world.systemManager.systems[0];
+  var query = system.queries.entities;
+  var events = system.events.entities;
+  var entity0 = world.entityManager._entities[0];
+
   // Entities from the standard query
-  t.is(world.systemManager.systems[0].queries.entities.length, 15);
+  t.is(query.length, 15);
 
   // Added entities
-  t.is(world.systemManager.systems[0].events.entities.added.length, 15);
+  t.is(system.events.entities.added.length, 15);
   world.execute(); // After execute, events should be cleared
-  t.is(world.systemManager.systems[0].events.entities.added.length, 0);
+  t.is(system.events.entities.added.length, 0);
+  system.clearEvents();
 
   // Add a new one
   world
     .createEntity()
     .addComponent(FooComponent)
     .addComponent(BarComponent);
-  t.is(world.systemManager.systems[0].events.entities.added.length, 1);
+
+  t.is(events.added.length, 1);
   world.execute(); // After execute, events should be cleared
-  t.is(world.systemManager.systems[0].events.entities.added.length, 0);
+  t.is(events.added.length, 0);
 
   // Changing
-  world.entityManager._entities[0].getMutableComponent(FooComponent);
-  //t.is(world.systemManager.systems[0].events.entities.changed.length, 1);
-  t.is(world.systemManager.systems[0].events.entities.fooChanged.length, 1);
-  t.is(world.systemManager.systems[0].events.entities.barChanged.length, 0);
+  entity0.getMutableComponent(FooComponent);
+  t.is(events.changed.length, 1);
+  t.is(events.fooChanged.length, 1);
+  t.is(events.barChanged.length, 0);
   world.execute(); // After execute, events should be cleared
-  t.is(world.systemManager.systems[0].events.entities.changed.length, 0);
+  t.is(events.changed.length, 0);
 
-  world.entityManager._entities[0].getMutableComponent(BarComponent);
-  //t.is(world.systemManager.systems[0].events.entities.changed.length, 1);
-  t.is(world.systemManager.systems[0].events.entities.fooChanged.length, 0);
-  t.is(world.systemManager.systems[0].events.entities.barChanged.length, 1);
+  entity0.getMutableComponent(BarComponent);
+  t.is(events.changed.length, 1);
+  t.is(events.fooChanged.length, 0);
+  t.is(events.barChanged.length, 1);
 
   world.execute(); // After execute, events should be cleared
-  t.is(world.systemManager.systems[0].events.entities.changed.length, 0);
-  t.is(world.systemManager.systems[0].events.entities.barChanged.length, 0);
+  t.is(events.changed.length, 0);
+  t.is(events.barChanged.length, 0);
   // Check if the entity is already on the list?
-  world.entityManager._entities[0].getMutableComponent(FooComponent);
-  world.entityManager._entities[0].getMutableComponent(BarComponent);
-  //t.is(world.systemManager.systems[0].events.entities.changed.length, 1);
-  t.is(world.systemManager.systems[0].events.entities.fooChanged.length, 1);
-  t.is(world.systemManager.systems[0].events.entities.barChanged.length, 1);
+  entity0.getMutableComponent(FooComponent);
+  entity0.getMutableComponent(BarComponent);
+  t.is(events.changed.length, 1);
+  t.is(events.fooChanged.length, 1);
+  t.is(events.barChanged.length, 1);
 
   world.execute(); // After execute, events should be cleared
-  t.is(world.systemManager.systems[0].events.entities.changed.length, 0);
-  t.is(world.systemManager.systems[0].events.entities.fooChanged.length, 0);
-  t.is(world.systemManager.systems[0].events.entities.barChanged.length, 0);
+  t.is(events.changed.length, 0);
+  t.is(events.fooChanged.length, 0);
+  t.is(events.barChanged.length, 0);
 
   // remove an entity
-  world.entityManager._entities[0].remove();
-  t.is(world.systemManager.systems[0].events.entities.removed.length, 1);
+  entity0.remove();
+  t.is(events.removed.length, 1);
   world.execute(); // After execute, events should be cleared
-  t.is(world.systemManager.systems[0].events.entities.removed.length, 0);
+  t.is(events.removed.length, 0);
 
   // Removed
-  world.entityManager._entities[0].removeComponent(FooComponent);
-  t.is(world.systemManager.systems[0].events.entities.removed.length, 1);
+  entity0 = world.entityManager._entities[0];
+  entity0.removeComponent(FooComponent);
+  t.is(events.removed.length, 1);
   world.execute(); // After execute, events should be cleared
-  t.is(world.systemManager.systems[0].events.entities.removed.length, 0);
+  t.is(events.removed.length, 0);
 
   // Added componets to the previous one
-  world.entityManager._entities[0].addComponent(FooComponent);
-  t.is(world.systemManager.systems[0].events.entities.added.length, 1);
+  entity0.addComponent(FooComponent);
+  t.is(events.added.length, 1);
   world.execute(); // After execute, events should be cleared
-  t.is(world.systemManager.systems[0].events.entities.added.length, 0);
+  t.is(events.added.length, 0);
 
   // Remove all components from the first 5 entities
   for (i = 0; i < 5; i++) {
     world.entityManager._entities[i].removeAllComponents();
   }
-  t.is(world.systemManager.systems[0].events.entities.removed.length, 5);
+  t.is(events.removed.length, 5);
   world.execute(); // After execute, events should be cleared
-  t.is(world.systemManager.systems[0].events.entities.removed.length, 0);
+  t.is(events.removed.length, 0);
 
   // remove all entities
   world.entityManager.removeAllEntities();
-  t.is(world.systemManager.systems[0].events.entities.removed.length, 10);
+  t.is(events.removed.length, 10);
   world.execute(); // After execute, events should be cleared
-  t.is(world.systemManager.systems[0].events.entities.removed.length, 0);
+  t.is(events.removed.length, 0);
 });
-*/
