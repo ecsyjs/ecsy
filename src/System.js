@@ -91,14 +91,16 @@ export class System {
             const eventMapping = {
               EntityAdded: Query.prototype.ENTITY_ADDED,
               EntityRemoved: Query.prototype.ENTITY_REMOVED,
-              EntityChanged: Query.prototype.ENTITY_CHANGED
+              EntityChanged: Query.prototype.COMPONENT_CHANGED // Query.prototype.ENTITY_CHANGED
             };
 
             if (eventMapping[event.event]) {
               query.eventDispatcher.addEventListener(
                 eventMapping[event.event],
                 entity => {
-                  events[eventName].push(entity);
+                  // @fixme A lot of overhead?
+                  if (events[eventName].indexOf(entity) === -1)
+                    events[eventName].push(entity);
                 }
               );
             } else if (event.event === "ComponentChanged") {

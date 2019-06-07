@@ -33,6 +33,9 @@ export default class Entity {
 
     // Queries where the entity is added
     this.queries = [];
+
+    // Used for deferred removal
+    this.componentsToRemove = [];
   }
 
   // COMPONENTS
@@ -92,8 +95,8 @@ export default class Entity {
    * Remove a component from the entity
    * @param {Component} Component to remove from the entity
    */
-  removeComponent(Component) {
-    this._world.entityRemoveComponent(this, Component);
+  removeComponent(Component, forceRemove) {
+    this._world.entityRemoveComponent(this, Component, forceRemove);
     return this;
   }
 
@@ -122,8 +125,8 @@ export default class Entity {
   /**
    * Remove all the components from the entity
    */
-  removeAllComponents() {
-    return this._world.entityRemoveAllComponents(this);
+  removeAllComponents(forceRemove) {
+    return this._world.entityRemoveAllComponents(this, forceRemove);
   }
 
   // TAGS
@@ -169,9 +172,9 @@ export default class Entity {
   }
 
   /**
-   * Dispose the entity from the world
+   * Remove the entity from the world
    */
-  dispose() {
-    return this._world.removeEntity(this);
+  remove(forceRemove) {
+    return this._world.removeEntity(this, forceRemove);
   }
 }

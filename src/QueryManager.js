@@ -12,12 +12,21 @@ export default class QueryManager {
     this._queries = {};
   }
 
+  onEntityRemoved(entity) {
+    for (var queryName in this._queries) {
+      var query = this._queries[queryName];
+      if (entity.queries.indexOf(query) !== -1) {
+        query.removeEntity(entity);
+      }
+    }
+  }
+
   /**
    * Callback when a component is added to an entity
    * @param {Entity} entity Entity that just got the new component
    * @param {Component} Component Component added to the entity
    */
-  onEntityAdded(entity, Component) {
+  onEntityComponentAdded(entity, Component) {
     // @todo Use bitmask for checking components?
 
     // Check each indexed query to see if we need to add this entity to the list
@@ -52,7 +61,7 @@ export default class QueryManager {
    * @param {Entity} entity Entity to remove the component from
    * @param {Component} Component Component to remove from the entity
    */
-  onEntityRemoved(entity, Component) {
+  onEntityComponentRemoved(entity, Component) {
     for (var queryName in this._queries) {
       var query = this._queries[queryName];
 

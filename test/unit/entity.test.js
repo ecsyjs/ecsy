@@ -18,7 +18,7 @@ test("init", t => {
   t.not(entity.id, prevId);
 });
 
-test("adding/removing components", async t => {
+test("adding/removing components sync", async t => {
   var world = new World();
 
   var entity = world.createEntity();
@@ -42,8 +42,7 @@ test("adding/removing components", async t => {
     "FooComponent",
     "BarComponent"
   ]);
-
-  entity.removeComponent(FooComponent);
+  entity.removeComponent(FooComponent, true);
   t.is(entity.getComponentTypes().length, 1);
   t.false(entity.hasComponent(FooComponent));
   t.true(entity.hasComponent(BarComponent));
@@ -51,7 +50,7 @@ test("adding/removing components", async t => {
   t.deepEqual(Object.keys(entity.getComponents()), ["BarComponent"]);
 
   entity.addComponent(FooComponent);
-  entity.removeAllComponents();
+  entity.removeAllComponents(true);
   t.is(entity.getComponentTypes().length, 0);
   t.false(entity.hasComponent(FooComponent));
   t.false(entity.hasComponent(BarComponent));
@@ -59,12 +58,36 @@ test("adding/removing components", async t => {
   t.deepEqual(Object.keys(entity.getComponents()), []);
 });
 
-test("dispose entity", async t => {
+test("removing components deferred", async t => {
   var world = new World();
 
   var entity = world.createEntity();
-  entity.addComponent(FooComponent).addComponent(BarComponent);
 
-  entity.dispose();
+  // Add a new component and check it exist
+  entity.addComponent(FooComponent);
+
+  entity.removeComponent(FooComponent); // Deferred remove
+  t.is(entity.getComponentTypes().length, 1);
+  t.true(entity.hasComponent(FooComponent));
+  t.false(entity.hasComponent(BarComponent));
+  t.deepEqual(Object.keys(entity.getComponents()), ["FooComponent"]);
+
+  world.entityManager.processDeferredRemoval();
+  t.is(entity.getComponentTypes().length, 0);
+  t.false(entity.hasComponent(FooComponent));
+  t.deepEqual(Object.keys(entity.getComponents()), []);
+});
+
+test("remove entity", async t => {
+  var world = new World();
+
+  // Sync
+  world.createEntity().remove(true);
+  t.is(world.entityManager.count(), 0);
+
+  // Deferred
+  world.createEntity().remove();
+  t.is(world.entityManager.count(), 1);
+  world.entityManager.processDeferredRemoval();
   t.is(world.entityManager.count(), 0);
 });
