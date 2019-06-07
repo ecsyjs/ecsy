@@ -72,6 +72,7 @@ export class World {
    */
   execute(delta, time) {
     this.systemManager.execute(delta, time);
+    this.entityManager.processDeferredRemoval();
   }
 
   /**
