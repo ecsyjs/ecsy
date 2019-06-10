@@ -69,6 +69,7 @@ export class EntityManager {
     }
 
     this._queryManager.onEntityComponentAdded(entity, Component);
+    this.world.componentsManager.componentAddedToEntity(Component);
 
     this.eventDispatcher.dispatchEvent(COMPONENT_ADDED, entity, Component);
   }
@@ -105,6 +106,7 @@ export class EntityManager {
     var component = entity._components[componentName];
     delete entity._components[componentName];
     this.componentsManager._componentPool[propName].release(component);
+    this.world.componentsManager.componentRemovedFromEntity(Component);
   }
 
   /**
