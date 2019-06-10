@@ -1,4 +1,4 @@
-export class Collisionable {}
+export class Collidable {}
 export class Collider {}
 export class Recovering {}
 export class Moving {}

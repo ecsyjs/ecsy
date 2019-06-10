@@ -2,7 +2,7 @@
 import { System } from "../../../build/ecsy.module.js";
 import {
   Object3D,
-  Collisionable,
+  Collidable,
   Collider,
   Recovering,
   Moving,
@@ -161,7 +161,7 @@ export class ColliderSystem extends System {
   init() {
     return {
       queries: {
-        boxes: { components: [Collisionable] },
+        boxes: { components: [Collidable] },
         balls: { components: [Collider] }
       }
     };

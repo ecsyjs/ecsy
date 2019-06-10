@@ -44,7 +44,7 @@
   </script>
   <script type="module">
     import {World} from '../../../build/ecsy.module.js';
-    import {Object3D, Collisionable, Collider, Recovering, Moving, PulsatingScale, Timeout, PulsatingColor, Colliding, Rotating} from './components.mjs';
+    import {Object3D, Collidable, Collider, Recovering, Moving, PulsatingScale, Timeout, PulsatingColor, Colliding, Rotating} from './components.mjs';
     import {RotatingSystem, ColliderSystem, PulsatingColorSystem, PulsatingScaleSystem, MovingSystem,TimeoutSystem} from './systems.mjs';
 
     var world = new World();
@@ -60,7 +60,7 @@
 
     world
       .registerComponent(Object3D)
-      .registerComponent(Collisionable)
+      .registerComponent(Collidable)
       .registerComponent(Collider)
       .registerComponent(Recovering)
       .registerComponent(Moving)
@@ -156,7 +156,7 @@
           entity.addComponent(Moving, {offset: i});
         }
 
-        entity.addComponent(Collisionable);
+        entity.addComponent(Collidable);
         parent.add( mesh );
       }
 

@@ -25,6 +25,13 @@
 
       import {World, System, Not} from '../../../build/ecsy.module.js';
 
+      const names = [ 'Isabel', 'Scot', 'Francene', 'Robert', 'Kizzie', 'Leroy', 'Layla', 'Stella', 'Marianela', 'Devorah'];
+      const sizes = [ 'XS', 'S', 'M', 'L', 'XL' ];
+      const colors = [ 'white', 'red', 'yellow', 'purple', 'pink', 'blue', 'cyan', 'black' ];
+
+      // Components
+      class NPC {}
+
       class Name {
         constructor() {
           this.value = '';
@@ -38,8 +45,7 @@
         }
       }
 
-      class NPC {}
-
+      // Systems
       class NameSystem extends System {
         init() {
           return {
@@ -50,18 +56,6 @@
         }
 
         execute() {
-          const names = [
-            'Isobel',
-            'Scot',
-            'Francene',
-            'America',
-            'Kizzie',
-            'Leroy',
-            'Layla',
-            'Stella',
-            'Marianela',
-            'Devorah'
-          ];
           this.queries.entities.forEach(entity => {
             var name = randomFromArray(names);
             log(`Added name '${name}' to player id=${entity.id}`);
@@ -80,8 +74,6 @@
         }
 
         execute() {
-          const sizes = [ 'XS', 'S', 'M', 'L', 'XL' ];
-          const colors = [ 'white', 'red', 'yellow', 'purple', 'pink', 'blue', 'cyan', 'black' ];
           this.queries.entities.forEach(entity => {
             var size = randomFromArray(sizes);
             var color = randomFromArray(colors);
@@ -91,6 +83,7 @@
         }
       }
 
+      // Initialize our world
       var world = new World();
 
       world
@@ -99,7 +92,6 @@
         .registerComponent(Name)
         .registerSystem(NameSystem)
         .registerSystem(TshirtSystem)
-
 
       // HTML Code to interact with the world
 
