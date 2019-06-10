@@ -73,8 +73,18 @@ export class World {
    * @param {Number} time Elapsed time
    */
   execute(delta, time) {
-    this.systemManager.execute(delta, time);
-    this.entityManager.processDeferredRemoval();
+    if (this.enabled) {
+      this.systemManager.execute(delta, time);
+      this.entityManager.processDeferredRemoval();
+    }
+  }
+
+  stop() {
+    this.enabled = false;
+  }
+
+  play() {
+    this.enabled = true;
   }
 
   /**
