@@ -13,6 +13,8 @@ export class World {
     this.entityManager = new EntityManager(this);
     this.systemManager = new SystemManager(this);
 
+    this.enabled = true;
+
     // Storage for singleton components
     this.components = {};
 
