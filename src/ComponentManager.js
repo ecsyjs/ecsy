@@ -9,6 +9,7 @@ export class ComponentManager {
     this.Components = {};
     this.SingletonComponents = {};
     this._componentPool = {};
+    this.numComponents = {};
   }
 
   /**
@@ -17,6 +18,7 @@ export class ComponentManager {
    */
   registerComponent(Component) {
     this.Components[Component.name] = Component;
+    this.numComponents[Component.name] = 0;
   }
 
   /**
@@ -25,6 +27,18 @@ export class ComponentManager {
    */
   registerSingletonComponent(Component) {
     this.SingletonComponents[Component.name] = Component;
+  }
+
+  componentAddedToEntity(Component) {
+    if (!this.numComponents[Component.name]) {
+      this.numComponents[Component.name] = 1;
+    } else {
+      this.numComponents[Component.name]++;
+    }
+  }
+
+  componentRemovedFromEntity(Component) {
+    this.numComponents[Component.name]--;
   }
 
   /**
