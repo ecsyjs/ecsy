@@ -12,14 +12,16 @@ export class SystemManager {
    * @param {System} System System to register
    */
   registerSystem(System, attributes) {
-    this.systems.push(new System(this.world, attributes));
+    var system = new System(this.world, attributes);
+    system.order = this.systems.length;
+    this.systems.push(system);
     this.sortSystems();
     return this;
   }
 
   sortSystems() {
     this.systems.sort((a, b) => {
-      return b.priority - a.priority;
+      return a.priority - b.priority || a.order - b.order;
     });
   }
 
