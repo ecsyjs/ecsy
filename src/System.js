@@ -67,6 +67,8 @@ export class System {
       this.priority = attributes.priority;
     }
 
+    this.initialized = true;
+
     this.config = this.init ? this.init() : null;
 
     if (!this.config) return;
@@ -103,6 +105,9 @@ export class System {
                     events[eventName].push(entity);
                 }
               );
+              if (event.event === "EntityChanged") {
+                query.reactive = true;
+              }
             } else if (event.event === "ComponentChanged") {
               query.reactive = true;
               query.eventDispatcher.addEventListener(
