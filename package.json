@@ -5,6 +5,7 @@
   "main": "build/ecsy.js",
   "jsnext:main": "build/ecsy.module.js",
   "module": "build/ecsy.module.js",
+  "types": "build/ecsy.d.ts",
   "scripts": {
     "build": "rollup -c",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"http-server -c-1 -p 8080 --cors\"",
