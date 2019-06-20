@@ -2,7 +2,7 @@ import Query from "./Query.js";
 import wrapImmutableComponent from "./WrapImmutableComponent.js";
 
 // @todo Take this out from there or use ENV
-const DEBUG = true;
+const DEBUG = false;
 
 // @todo reset it by world?
 var nextId = 0;
@@ -49,8 +49,7 @@ export default class Entity {
    */
   getComponent(Component) {
     var component = this._components[Component.name];
-    if (DEBUG) return wrapImmutableComponent(Component, component);
-    return component;
+    return DEBUG ? wrapImmutableComponent(Component, component) : component;
   }
 
   getComponents() {
