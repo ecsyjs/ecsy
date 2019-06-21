@@ -35,6 +35,14 @@ export default class ObjectPool {
     // We can provide explicit initing, otherwise we copy the value of the initial component
     if (item.__init) item.__init();
     else if (item.copy) item.copy(this.initialObject);
+    else {
+      for (let name in item) {
+        delete item[name];
+      }
+      for (let name in this.initialObject) {
+        item[name] = this.initialObject[name];
+      }
+    }
 
     return item;
   }

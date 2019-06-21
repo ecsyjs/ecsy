@@ -59,23 +59,64 @@ test("adding/removing components sync", async t => {
 });
 
 test("clearing pooled components", async t => {
+  var world, entity;
+
+  // Component with no constructor
+
   class BazComponent {}
 
-  var world = new World();
+  world = new World();
 
-  var entity = world.createEntity();
+  entity = world.createEntity();
   entity.addComponent(BazComponent, { spam: "eggs" });
+  t.is(entity.getComponent(BazComponent).spam, "eggs", "property should be taken from addComponent args");
+
   entity.remove();
-
-  t.is(entity.getComponent(BazComponent).spam, "eggs");
-
   world.entityManager.processDeferredRemoval();
 
   entity = world.createEntity();
   entity.addComponent(BazComponent);
-  entity.remove();
 
-  t.is(entity.getComponent(BazComponent).spam, undefined);
+  t.is(
+    entity.getComponent(BazComponent).spam,
+    undefined,
+    "property should be cleared since it is not specified in addComponent args"
+  );
+
+  // Component with constructor that sets property
+
+  class PimComponent {
+    constructor() {
+      this.spam = "bacon";
+    }
+  }
+
+  world = new World();
+
+  entity = world.createEntity();
+  entity.addComponent(PimComponent, { spam: "eggs" });
+  t.is(entity.getComponent(PimComponent).spam, "eggs", "property value should be taken from addComponent args");
+
+  entity.remove();
+  world.entityManager.processDeferredRemoval();
+
+  entity = world.createEntity();
+  entity.addComponent(PimComponent);
+
+  t.is(entity.getComponent(PimComponent).spam, "bacon", "property should be reset to value initialized in constructor");
+
+  world = new World();
+
+  entity = world.createEntity();
+  entity.addComponent(PimComponent, { spam: "eggs" });
+
+  entity.remove();
+  world.entityManager.processDeferredRemoval();
+
+  entity = world.createEntity();
+  entity.addComponent(PimComponent, { spam: null });
+
+  t.is(entity.getComponent(PimComponent).spam, null, "property value should be taken from addComponent args");
 });
 
 test("removing components deferred", async t => {
