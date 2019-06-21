@@ -58,11 +58,15 @@ export class EntityManager {
 
     entity._components[Component.name] = component;
 
+    for (let name in component) {
+      delete component[name];
+    }
+
     if (values) {
       if (component.copy) {
         component.copy(values);
       } else {
-        for (var name in values) {
+        for (let name in values) {
           component[name] = values[name];
         }
       }

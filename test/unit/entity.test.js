@@ -58,6 +58,26 @@ test("adding/removing components sync", async t => {
   t.deepEqual(Object.keys(entity.getComponents()), []);
 });
 
+test("clearing pooled components", async t => {
+  class BazComponent {}
+
+  var world = new World();
+
+  var entity = world.createEntity();
+  entity.addComponent(BazComponent, { spam: "eggs" });
+  entity.remove();
+
+  t.is(entity.getComponent(BazComponent).spam, "eggs");
+
+  world.entityManager.processDeferredRemoval();
+
+  entity = world.createEntity();
+  entity.addComponent(BazComponent);
+  entity.remove();
+
+  t.is(entity.getComponent(BazComponent).spam, undefined);
+});
+
 test("removing components deferred", async t => {
   var world = new World();
 
