@@ -69,7 +69,11 @@ test("clearing pooled components", async t => {
 
   entity = world.createEntity();
   entity.addComponent(BazComponent, { spam: "eggs" });
-  t.is(entity.getComponent(BazComponent).spam, "eggs", "property should be taken from addComponent args");
+  t.is(
+    entity.getComponent(BazComponent).spam,
+    "eggs",
+    "property should be taken from addComponent args"
+  );
 
   entity.remove();
   world.entityManager.processDeferredRemoval();
@@ -95,7 +99,11 @@ test("clearing pooled components", async t => {
 
   entity = world.createEntity();
   entity.addComponent(PimComponent, { spam: "eggs" });
-  t.is(entity.getComponent(PimComponent).spam, "eggs", "property value should be taken from addComponent args");
+  t.is(
+    entity.getComponent(PimComponent).spam,
+    "eggs",
+    "property value should be taken from addComponent args"
+  );
 
   entity.remove();
   world.entityManager.processDeferredRemoval();
@@ -103,7 +111,11 @@ test("clearing pooled components", async t => {
   entity = world.createEntity();
   entity.addComponent(PimComponent);
 
-  t.is(entity.getComponent(PimComponent).spam, "bacon", "property should be reset to value initialized in constructor");
+  t.is(
+    entity.getComponent(PimComponent).spam,
+    "bacon",
+    "property should be reset to value initialized in constructor"
+  );
 
   world = new World();
 
@@ -116,7 +128,11 @@ test("clearing pooled components", async t => {
   entity = world.createEntity();
   entity.addComponent(PimComponent, { spam: null });
 
-  t.is(entity.getComponent(PimComponent).spam, null, "property value should be taken from addComponent args");
+  t.is(
+    entity.getComponent(PimComponent).spam,
+    null,
+    "property value should be taken from addComponent args"
+  );
 });
 
 test("removing components deferred", async t => {
