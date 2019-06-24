@@ -21,7 +21,7 @@ export class SystemManager {
 
   sortSystems() {
     this.systems.sort((a, b) => {
-      return b.priority - a.priority || a.order - b.order;
+      return a.priority - b.priority || a.order - b.order;
     });
   }
 
