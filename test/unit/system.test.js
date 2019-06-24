@@ -501,8 +501,8 @@ test("queries_remove_multiple_components", t => {
     }
     execute() {
       this.events.entities.removed.forEach(entity => {
-        t.true(entity.hasComponent(FooComponent));
-        t.true(entity.hasComponent(BarComponent));
+        t.true(entity.hasComponent(FooComponent, true));
+        t.true(entity.hasComponent(BarComponent, true));
       });
 
       // this query should never match
