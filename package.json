@@ -9,7 +9,7 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"http-server -c-1 -p 8080 --cors\"",
-    "lint": "eslint src",
+    "lint": "eslint src test examples",
     "start": "npm run dev",
     "test": "ava",
     "travis": "npm run lint",
