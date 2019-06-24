@@ -102,23 +102,37 @@ export default class Entity {
   /**
    * Check if the entity has a component
    * @param {Component} Component to check
+   * @param {Bool} include Components queued for removal (Default is false)
    */
-  hasComponent(Component) {
-    return !!~this._ComponentTypes.indexOf(Component);
+  hasComponent(Component, includeRemoved = false) {
+    return (
+      !!~this._ComponentTypes.indexOf(Component) &&
+      (includeRemoved || !~this.componentsToRemove.indexOf(Component))
+    );
   }
 
   /**
-   * Check if the entity has a list of components
+   * Check if the entity has all components in a list
    * @param {Array(Component)} Components to check
+   * @param {Bool} include Components queued for removal (Default is false)
    */
-  hasAllComponents(Components) {
-    var result = true;
-
+  hasAllComponents(Components, includeRemoved = false) {
     for (var i = 0; i < Components.length; i++) {
-      result = result && !!~this._ComponentTypes.indexOf(Components[i]);
+      if (!this.hasComponent(Components[i], includeRemoved)) return false;
     }
+    return true;
+  }
 
-    return result;
+  /**
+   * Check if the entity has any components in a list
+   * @param {Array(Component)} Components to check
+   * @param {Bool} include Components queued for removal (Default is false)
+   */
+  hasAnyComponents(Components, includeRemoved = false) {
+    for (var i = 0; i < Components.length; i++) {
+      if (this.hasComponent(Components[i], includeRemoved)) return true;
+    }
+    return false;
   }
 
   /**

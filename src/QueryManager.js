@@ -67,16 +67,23 @@ export default class QueryManager {
 
       if (
         !!~query.NotComponents.indexOf(Component) &&
-        !~query.entities.indexOf(entity)
+        !~query.entities.indexOf(entity) &&
+        query.match(entity)
       ) {
+        // console.log("Query now matches", queryName, entity);
         query.addEntity(entity);
         continue;
       }
 
-      if (!~query.Components.indexOf(Component)) continue;
-      if (!query.match(entity)) continue;
-
-      query.removeEntity(entity);
+      if (
+        !!~query.Components.indexOf(Component) &&
+        !!~query.entities.indexOf(entity) &&
+        !query.match(entity)
+      ) {
+        // console.log("Query no longer matches", queryName, entity);
+        query.removeEntity(entity);
+        continue;
+      }
     }
   }
 

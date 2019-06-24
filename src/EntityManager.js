@@ -86,9 +86,6 @@ export class EntityManager {
 
     this.eventDispatcher.dispatchEvent(COMPONENT_REMOVE, entity, Component);
 
-    // Check each indexed query to see if we need to remove it
-    this._queryManager.onEntityComponentRemoved(entity, Component);
-
     if (forceRemove) {
       this._entityRemoveComponentSync(entity, Component, index);
     } else {
@@ -96,6 +93,9 @@ export class EntityManager {
         this.entitiesWithComponentsToRemove.push(entity);
       entity.componentsToRemove.push(Component);
     }
+
+    // Check each indexed query to see if we need to remove it
+    this._queryManager.onEntityComponentRemoved(entity, Component);
   }
 
   _entityRemoveComponentSync(entity, Component, index) {
