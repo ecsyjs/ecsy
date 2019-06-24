@@ -1,3 +1,4 @@
+/* global THREE */
 export class Movement {
   constructor() {
     this.velocity = new THREE.Vector2();

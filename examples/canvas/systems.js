@@ -144,7 +144,7 @@ export class Renderer extends System {
     }
 
     let intersectingCircles = this.queries.intersectingCircles;
-    for (var i = 0; i < intersectingCircles.length; i++) {
+    for (let i = 0; i < intersectingCircles.length; i++) {
       let intersect = intersectingCircles[i].getComponent(Intersecting);
       for (var j = 0; j < intersect.points.length; j++) {
         var points = intersect.points[j];

@@ -21,4 +21,4 @@ ECSY.RotatingSystem = class RotatingSystem extends ECSY.System {
       transform.rotation.z += rotationSpeed * delta * 3;
     }
   }
-}
+};
