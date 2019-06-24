@@ -471,7 +471,10 @@ test("queries_remove_entities_deferred", t => {
 test("queries_remove_multiple_components", t => {
   var world = new World();
 
-  world.registerComponent(FooComponent).registerComponent(BarComponent);
+  world
+    .registerComponent(FooComponent)
+    .registerComponent(BarComponent)
+    .registerComponent(EmptyComponent);
 
   for (var i = 0; i < 6; i++) {
     var entity = world.createEntity();
@@ -489,6 +492,9 @@ test("queries_remove_multiple_components", t => {
                 event: "EntityRemoved"
               }
             }
+          },
+          notTest: {
+            components: [Not(FooComponent), BarComponent, EmptyComponent]
           }
         }
       };
@@ -498,6 +504,9 @@ test("queries_remove_multiple_components", t => {
         t.true(entity.hasComponent(FooComponent));
         t.true(entity.hasComponent(BarComponent));
       });
+
+      // this query should never match
+      t.is(this.queries.notTest.length, 0);
     }
   }
 
