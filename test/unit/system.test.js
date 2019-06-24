@@ -45,7 +45,7 @@ test("init", t => {
     world.systemManager.systems.map(s => {
       return s.constructor.name;
     }),
-    ["SystemB", "SystemA", "SystemD", "SystemE", "SystemC"]
+    ["SystemC", "SystemA", "SystemD", "SystemE", "SystemB"]
   );
   /*
   world = new World();
