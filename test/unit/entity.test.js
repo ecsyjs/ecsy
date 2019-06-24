@@ -69,11 +69,7 @@ test("clearing pooled components", async t => {
 
   entity = world.createEntity();
   entity.addComponent(BazComponent, { spam: "eggs" });
-  t.is(
-    entity.getComponent(BazComponent).spam,
-    "eggs",
-    "property should be taken from addComponent args"
-  );
+  t.is(entity.getComponent(BazComponent).spam, "eggs", "property should be taken from addComponent args");
 
   entity.remove();
   world.entityManager.processDeferredRemoval();
