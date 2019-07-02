@@ -283,20 +283,11 @@
 	    }
 	  }
 
-	  match(entity) {
-	    var result = true;
-
-	    for (let i = 0; i < this.Components.length; i++) {
-	      result = result && !!~entity._ComponentTypes.indexOf(this.Components[i]);
-	    }
-
-	    // Not components
-	    for (let i = 0; i < this.NotComponents.length; i++) {
-	      result =
-	        result && !~entity._ComponentTypes.indexOf(this.NotComponents[i]);
-	    }
-
-	    return result;
+	  match(entity, includeRemoved = false) {
+	    return (
+	      entity.hasAllComponents(this.Components, includeRemoved) &&
+	      !entity.hasAnyComponents(this.NotComponents, includeRemoved)
+	    );
 	  }
 
 	  /**
@@ -412,23 +403,37 @@
 	  /**
 	   * Check if the entity has a component
 	   * @param {Component} Component to check
+	   * @param {Bool} include Components queued for removal (Default is false)
 	   */
-	  hasComponent(Component) {
-	    return !!~this._ComponentTypes.indexOf(Component);
+	  hasComponent(Component, includeRemoved = false) {
+	    return (
+	      !!~this._ComponentTypes.indexOf(Component) &&
+	      (includeRemoved || !~this.componentsToRemove.indexOf(Component))
+	    );
 	  }
 
 	  /**
-	   * Check if the entity has a list of components
+	   * Check if the entity has all components in a list
 	   * @param {Array(Component)} Components to check
+	   * @param {Bool} include Components queued for removal (Default is false)
 	   */
-	  hasAllComponents(Components) {
-	    var result = true;
-
+	  hasAllComponents(Components, includeRemoved = false) {
 	    for (var i = 0; i < Components.length; i++) {
-	      result = result && !!~this._ComponentTypes.indexOf(Components[i]);
+	      if (!this.hasComponent(Components[i], includeRemoved)) return false;
 	    }
+	    return true;
+	  }
 
-	    return result;
+	  /**
+	   * Check if the entity has any components in a list
+	   * @param {Array(Component)} Components to check
+	   * @param {Bool} include Components queued for removal (Default is false)
+	   */
+	  hasAnyComponents(Components, includeRemoved = false) {
+	    for (var i = 0; i < Components.length; i++) {
+	      if (this.hasComponent(Components[i], includeRemoved)) return true;
+	    }
+	    return false;
 	  }
 
 	  /**
@@ -627,16 +632,23 @@
 
 	      if (
 	        !!~query.NotComponents.indexOf(Component) &&
-	        !~query.entities.indexOf(entity)
+	        !~query.entities.indexOf(entity) &&
+	        query.match(entity)
 	      ) {
+	        // console.log("Query now matches", queryName, entity);
 	        query.addEntity(entity);
 	        continue;
 	      }
 
-	      if (!~query.Components.indexOf(Component)) continue;
-	      if (!query.match(entity)) continue;
-
-	      query.removeEntity(entity);
+	      if (
+	        !!~query.Components.indexOf(Component) &&
+	        !!~query.entities.indexOf(entity) &&
+	        !query.match(entity)
+	      ) {
+	        // console.log("Query no longer matches", queryName, entity);
+	        query.removeEntity(entity);
+	        continue;
+	      }
 	    }
 	  }
 
@@ -747,9 +759,6 @@
 
 	    this.eventDispatcher.dispatchEvent(COMPONENT_REMOVE, entity, Component);
 
-	    // Check each indexed query to see if we need to remove it
-	    this._queryManager.onEntityComponentRemoved(entity, Component);
-
 	    if (forceRemove) {
 	      this._entityRemoveComponentSync(entity, Component, index);
 	    } else {
@@ -757,6 +766,9 @@
 	        this.entitiesWithComponentsToRemove.push(entity);
 	      entity.componentsToRemove.push(Component);
 	    }
+
+	    // Check each indexed query to see if we need to remove it
+	    this._queryManager.onEntityComponentRemoved(entity, Component);
 	  }
 
 	  _entityRemoveComponentSync(entity, Component, index) {

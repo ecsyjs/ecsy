@@ -73,20 +73,11 @@ export default class Query {
     }
   }
 
-  match(entity) {
-    var result = true;
-
-    for (let i = 0; i < this.Components.length; i++) {
-      result = result && !!~entity._ComponentTypes.indexOf(this.Components[i]);
-    }
-
-    // Not components
-    for (let i = 0; i < this.NotComponents.length; i++) {
-      result =
-        result && !~entity._ComponentTypes.indexOf(this.NotComponents[i]);
-    }
-
-    return result;
+  match(entity, includeRemoved = false) {
+    return (
+      entity.hasAllComponents(this.Components, includeRemoved) &&
+      !entity.hasAnyComponents(this.NotComponents, includeRemoved)
+    );
   }
 
   /**
