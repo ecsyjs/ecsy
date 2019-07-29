@@ -67,7 +67,8 @@ test("Detecting Pool", t => {
   class PoolTagComponent extends TagComponent {}
 
   t.true(
-    componentManager.getComponentsPool(NoPoolComponent) instanceof DummyObjectPool
+    componentManager.getComponentsPool(NoPoolComponent) instanceof
+      DummyObjectPool
   );
   t.true(
     componentManager.getComponentsPool(PoolComponent) instanceof ObjectPool

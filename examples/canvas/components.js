@@ -6,8 +6,8 @@ export class Movement {
   }
 
   reset() {
-    this.velocity.set(0,0);
-    this.acceleration.set(0,0);
+    this.velocity.set(0, 0);
+    this.acceleration.set(0, 0);
   }
 }
 
@@ -20,10 +20,10 @@ export class Circle {
   }
 
   reset() {
-    this.position.set(0,0);
+    this.position.set(0, 0);
     this.radius = 0;
-    this.velocity.set(0,0);
-    this.acceleration.set(0,0);
+    this.velocity.set(0, 0);
+    this.acceleration.set(0, 0);
   }
 }
 
