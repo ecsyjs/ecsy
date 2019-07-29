@@ -175,7 +175,7 @@ export default class Entity {
   /**
    * Initialize the entity. To be used when returning an entity to the pool
    */
-  __init() {
+  reset() {
     this.id = nextId++;
     this._world = null;
     this._ComponentTypes.length = 0;

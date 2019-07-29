@@ -33,7 +33,7 @@ export default class ObjectPool {
     var item = this.freeList.pop();
 
     // We can provide explicit initing, otherwise we copy the value of the initial component
-    if (item.__init) item.__init();
+    if (item.reset) item.reset();
     else if (item.copy) item.copy(this.initialObject);
     else {
       for (let name in item) {
