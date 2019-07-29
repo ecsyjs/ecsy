@@ -5,9 +5,9 @@ export class Movement {
     this.acceleration = new THREE.Vector2();
   }
 
-  copy(src) {
-    this.velocity.copy(src.velocity);
-    this.acceleration.copy(src.acceleration);
+  reset() {
+    this.velocity.set(0,0);
+    this.acceleration.set(0,0);
   }
 }
 
@@ -19,11 +19,11 @@ export class Circle {
     this.acceleration = new THREE.Vector2();
   }
 
-  copy(src) {
-    this.position.copy(src.position);
-    this.radius = src.radius;
-    this.velocity.copy(src.velocity);
-    this.acceleration.copy(src.acceleration);
+  reset() {
+    this.position.set(0,0);
+    this.radius = 0;
+    this.velocity.set(0,0);
+    this.acceleration.set(0,0);
   }
 }
 
@@ -44,5 +44,9 @@ export class DemoSettings {
 export class Intersecting {
   constructor() {
     this.points = [];
+  }
+
+  reset() {
+    this.points.length = 0;
   }
 }
