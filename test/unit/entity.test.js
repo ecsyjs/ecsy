@@ -8,12 +8,12 @@ import { FooComponent, BarComponent } from "../helpers/components";
  * - tags
  */
 
-test("init", t => {
+test("reset", t => {
   var world = new World();
 
   var entity = world.createEntity();
   var prevId = entity.id;
-  entity.__init();
+  entity.reset();
 
   t.not(entity.id, prevId);
 });
