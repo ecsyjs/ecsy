@@ -51,10 +51,7 @@ export class ComponentManager {
     var componentName = componentPropertyName(Component);
 
     if (!this._componentPool[componentName]) {
-      if (
-        Component.prototype.reset ||
-        Component.prototype instanceof TagComponent
-      ) {
+      if (Component.prototype.reset) {
         this._componentPool[componentName] = new ObjectPool(Component);
       } else {
         console.warn(

@@ -1,1 +1,3 @@
-export class TagComponent {}
+export class TagComponent {
+  reset() {}
+}
