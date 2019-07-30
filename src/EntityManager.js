@@ -15,9 +15,6 @@ export class EntityManager {
     // All the entities in this instance
     this._entities = [];
 
-    // Map between tag and entities
-    this._tags = {};
-
     this._queryManager = new QueryManager(this);
     this.eventDispatcher = new EventDispatcher();
     this._entityPool = new ObjectPool(Entity);
@@ -122,7 +119,7 @@ export class EntityManager {
   }
 
   /**
-   * Remove the entity from this manager. It will clear also its components and tags
+   * Remove the entity from this manager. It will clear also its components
    * @param {Entity} entity Entity to remove from the manager
    * @param {Bool} forceRemove If you want to remove the component immediately instead of deferred (Default is false)
    */
@@ -146,14 +143,6 @@ export class EntityManager {
     this._entities.splice(index, 1);
 
     this.entityRemoveAllComponents(entity, true);
-
-    // Remove entity from any tag groups and clear the on-entity ref
-    entity._tags.length = 0;
-    for (var tag in this._tags) {
-      var entities = this._tags[tag];
-      var n = entities.indexOf(entity);
-      if (~n) entities.splice(n, 1);
-    }
 
     // Prevent any access and free
     entity._world = null;
@@ -187,58 +176,6 @@ export class EntityManager {
     }
 
     this.entitiesWithComponentsToRemove.length = 0;
-  }
-
-  // TAGS
-
-  /**
-   * Remove all the entities that has the specified tag
-   * @param {String} tag Tag to filter the entities to be removed
-   */
-  removeEntitiesByTag(tag) {
-    var entities = this._tags[tag];
-
-    if (!entities) return;
-
-    for (var x = entities.length - 1; x >= 0; x--) {
-      var entity = entities[x];
-      entity.remove();
-    }
-  }
-
-  /**
-   * Add tag to an entity
-   * @param {Entity} entity Entity which will get the tag
-   * @param {String} tag Tag to add to the entity
-   */
-  entityAddTag(entity, tag) {
-    var entities = this._tags[tag];
-
-    if (!entities) entities = this._tags[tag] = [];
-
-    // Don't add if already there
-    if (~entities.indexOf(entity)) return;
-
-    // Add to our tag index AND the list on the entity
-    entities.push(entity);
-    entity._tags.push(tag);
-  }
-
-  /**
-   * Remove a tag from an entity
-   * @param {Entity} entity Entity that will get removed the tag
-   * @param {String} tag Tag to remove
-   */
-  entityRemoveTag(entity, tag) {
-    var entities = this._tags[tag];
-    if (!entities) return;
-
-    var index = entities.indexOf(entity);
-    if (!~index) return;
-
-    // Remove from our index AND the list on the entity
-    entities.splice(index, 1);
-    entity._tags.splice(entity._tags.indexOf(tag), 1);
   }
 
   /**

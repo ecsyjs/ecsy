@@ -45,9 +45,6 @@ declare module "ecsy" {
     ): boolean;
     hasAllComponents(Components: ComponentConstructor<Component>[]): boolean;
     removeAllComponents(Components: ComponentConstructor<Component>[]): void;
-    hasTag(tag: string): boolean;
-    addTag(tag: string): this;
-    removeTag(tag: string): this;
     remove(forceRemove?: boolean): void;
   }
 
@@ -157,9 +154,6 @@ declare module "ecsy" {
     removeEntity(entity: Entity, forceRemove?: boolean): void;
     removeAllEntities(): void;
     processDeferredRemoval(): void;
-    removeEntitiesByTag(tag: string): void;
-    entityAddTag(entity: Entity, tag: string): void;
-    entityRemoveTag(entity: Entity, tag: string): void;
     queryComponents(Components: ComponentConstructor<Component>): Query;
     count(): number;
     stats(): EntityManagerStats;

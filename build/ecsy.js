@@ -32,7 +32,7 @@
 
 	  sortSystems() {
 	    this.systems.sort((a, b) => {
-	      return b.priority - a.priority || a.order - b.order;
+	      return a.priority - b.priority || a.order - b.order;
 	    });
 	  }
 
@@ -329,9 +329,6 @@
 	    // Instance of the components
 	    this._components = {};
 
-	    // List of tags this entity has
-	    this._tags = [];
-
 	    // Queries where the entity is added
 	    this.queries = [];
 
@@ -443,34 +440,6 @@
 	    return this._world.entityRemoveAllComponents(this, forceRemove);
 	  }
 
-	  // TAGS
-
-	  /**
-	   * Check if the entity has a tag
-	   * @param {String} tag Tag to check
-	   */
-	  hasTag(tag) {
-	    return !!~this._tags.indexOf(tag);
-	  }
-
-	  /**
-	   * Add a tag to this entity
-	   * @param {String} tag Tag to add to this entity
-	   */
-	  addTag(tag) {
-	    this._world.entityAddTag(this, tag);
-	    return this;
-	  }
-
-	  /**
-	   * Remove a tag from the entity
-	   * @param {String} tag Tag to remove from the entity
-	   */
-	  removeTag(tag) {
-	    this._world.entityRemoveTag(this, tag);
-	    return this;
-	  }
-
 	  // EXTRAS
 
 	  /**
@@ -482,7 +451,6 @@
 	    this._ComponentTypes.length = 0;
 	    this.queries.length = 0;
 	    this._components = {};
-	    this._tags.length = 0;
 	  }
 
 	  /**
@@ -688,9 +656,6 @@
 	    // All the entities in this instance
 	    this._entities = [];
 
-	    // Map between tag and entities
-	    this._tags = {};
-
 	    this._queryManager = new QueryManager(this);
 	    this.eventDispatcher = new EventDispatcher();
 	    this._entityPool = new ObjectPool(Entity);
@@ -795,7 +760,7 @@
 	  }
 
 	  /**
-	   * Remove the entity from this manager. It will clear also its components and tags
+	   * Remove the entity from this manager. It will clear also its components
 	   * @param {Entity} entity Entity to remove from the manager
 	   * @param {Bool} forceRemove If you want to remove the component immediately instead of deferred (Default is false)
 	   */
@@ -819,14 +784,6 @@
 	    this._entities.splice(index, 1);
 
 	    this.entityRemoveAllComponents(entity, true);
-
-	    // Remove entity from any tag groups and clear the on-entity ref
-	    entity._tags.length = 0;
-	    for (var tag in this._tags) {
-	      var entities = this._tags[tag];
-	      var n = entities.indexOf(entity);
-	      if (~n) entities.splice(n, 1);
-	    }
 
 	    // Prevent any access and free
 	    entity._world = null;
@@ -860,58 +817,6 @@
 	    }
 
 	    this.entitiesWithComponentsToRemove.length = 0;
-	  }
-
-	  // TAGS
-
-	  /**
-	   * Remove all the entities that has the specified tag
-	   * @param {String} tag Tag to filter the entities to be removed
-	   */
-	  removeEntitiesByTag(tag) {
-	    var entities = this._tags[tag];
-
-	    if (!entities) return;
-
-	    for (var x = entities.length - 1; x >= 0; x--) {
-	      var entity = entities[x];
-	      entity.remove();
-	    }
-	  }
-
-	  /**
-	   * Add tag to an entity
-	   * @param {Entity} entity Entity which will get the tag
-	   * @param {String} tag Tag to add to the entity
-	   */
-	  entityAddTag(entity, tag) {
-	    var entities = this._tags[tag];
-
-	    if (!entities) entities = this._tags[tag] = [];
-
-	    // Don't add if already there
-	    if (~entities.indexOf(entity)) return;
-
-	    // Add to our tag index AND the list on the entity
-	    entities.push(entity);
-	    entity._tags.push(tag);
-	  }
-
-	  /**
-	   * Remove a tag from an entity
-	   * @param {Entity} entity Entity that will get removed the tag
-	   * @param {String} tag Tag to remove
-	   */
-	  entityRemoveTag(entity, tag) {
-	    var entities = this._tags[tag];
-	    if (!entities) return;
-
-	    var index = entities.indexOf(entity);
-	    if (!~index) return;
-
-	    // Remove from our index AND the list on the entity
-	    entities.splice(index, 1);
-	    entity._tags.splice(entity._tags.indexOf(tag), 1);
 	  }
 
 	  /**

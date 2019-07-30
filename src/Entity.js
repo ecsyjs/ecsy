@@ -28,9 +28,6 @@ export default class Entity {
     // Instance of the components
     this._components = {};
 
-    // List of tags this entity has
-    this._tags = [];
-
     // Queries where the entity is added
     this.queries = [];
 
@@ -142,34 +139,6 @@ export default class Entity {
     return this._world.entityRemoveAllComponents(this, forceRemove);
   }
 
-  // TAGS
-
-  /**
-   * Check if the entity has a tag
-   * @param {String} tag Tag to check
-   */
-  hasTag(tag) {
-    return !!~this._tags.indexOf(tag);
-  }
-
-  /**
-   * Add a tag to this entity
-   * @param {String} tag Tag to add to this entity
-   */
-  addTag(tag) {
-    this._world.entityAddTag(this, tag);
-    return this;
-  }
-
-  /**
-   * Remove a tag from the entity
-   * @param {String} tag Tag to remove from the entity
-   */
-  removeTag(tag) {
-    this._world.entityRemoveTag(this, tag);
-    return this;
-  }
-
   // EXTRAS
 
   /**
@@ -181,7 +150,6 @@ export default class Entity {
     this._ComponentTypes.length = 0;
     this.queries.length = 0;
     this._components = {};
-    this._tags.length = 0;
   }
 
   /**
