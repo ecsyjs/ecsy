@@ -5,7 +5,6 @@ import { FooComponent, BarComponent } from "../helpers/components";
 /**
  * TODO
  * - IDs
- * - tags
  */
 
 test("init", t => {
