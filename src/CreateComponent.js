@@ -1,15 +1,4 @@
-/**
- * Try to infer the type of the value
- * @param {*} value
- * @return {String} Type of the attribute
- */
-export function inferType(value) {
-  if (Array.isArray(value)) {
-    return "array";
-  }
-
-  return typeof value;
-}
+import { inferType } from "./Types";
 
 var typeDefinition = {};
 
@@ -33,6 +22,7 @@ export function defineType(name, definition, override) {
 }
 
 // Define the simple data types on javascript
+
 defineType("number", {
   isSimpleType: true,
   default: 0,
