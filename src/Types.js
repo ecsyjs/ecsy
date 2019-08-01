@@ -1,29 +1,24 @@
-var typeDefinition = {};
-
-export function registerType(TypeDefinition, override) {
-  if (TypeDefinition.name in typeDefinition && !override) {
-    console.warn(
-      `Trying to define an existing type '${
-        TypeDefinition.name
-      }' without 'override = true'`
-    );
-    return;
-  }
-
-  // @todo Check the definition
-
-  typeDefinition[TypeDefinition.name] = TypeDefinition;
-}
+import { Types } from "./StandardTypes";
 
 /**
  * Try to infer the type of the value
  * @param {*} value
  * @return {String} Type of the attribute
  */
+var standardTypes = {
+  number: Types.Number,
+  boolean: Types.Boolean,
+  string: Types.String
+};
+
 export function inferType(value) {
   if (Array.isArray(value)) {
-    return Array;
+    return Types.Array;
   }
 
-  return typeof value;
+  if (standardTypes[typeof value]) {
+    return standardTypes[typeof value];
+  } else {
+    return null;
+  }
 }
