@@ -3,6 +3,7 @@ var Types = {};
 
 Types.Number = createType({
   baseType: Number,
+  isSimpleType: true,
   create: defaultValue => {
     return typeof defaultValue !== "undefined" ? defaultValue : 0;
   },
@@ -20,6 +21,7 @@ Types.Number = createType({
 
 Types.Boolean = createType({
   baseType: Boolean,
+  isSimpleType: true,
   create: defaultValue => {
     return typeof defaultValue !== "undefined" ? defaultValue : false;
   },
@@ -37,6 +39,7 @@ Types.Boolean = createType({
 
 Types.String = createType({
   baseType: String,
+  isSimpleType: true,
   create: defaultValue => {
     return typeof defaultValue !== "undefined" ? defaultValue : "";
   },
@@ -54,7 +57,11 @@ Types.String = createType({
 
 Types.Array = createType({
   baseType: Array,
-  create: () => {
+  create: defaultValue => {
+    if (typeof defaultValue !== "undefined") {
+      return defaultValue.slice();
+    }
+
     return [];
   },
   reset: (src, key, defaultValue) => {
@@ -66,6 +73,9 @@ Types.Array = createType({
   },
   clear: (src, key) => {
     src[key].length = 0;
+  },
+  copy: (src, dst, key) => {
+    src[key] = dst[key].slice();
   }
 });
 

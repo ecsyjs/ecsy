@@ -34,7 +34,7 @@
 
       MYTYPES.Vector3 = createType({
         baseType: Vector3,
-        create: (defaultValue) => {
+        create: defaultValue => {
           var v = new Vector3(0, 0, 0);
           if (typeof defaultValue !== "undefined") {
             v.copy(defaultValue);
@@ -54,9 +54,10 @@
       });
 
       var schema = {
-        float: { default: 0 }, // Inferred type
-        float2: { default: 0, type: Types.Number },
-        vector3: { default: new Vector3(1,2,3), type: MYTYPES.Vector3 }
+        float: { default: 0.1 }, // Inferred type
+        float2: { default: 0.2, type: Types.Number },
+        vector3: { default: new Vector3(1,2,3), type: MYTYPES.Vector3 },
+        array: { default: [1,2,3], type: Types.Array }
       };
 
       var ComponentA = createComponent(schema, "ComponentA");
@@ -68,6 +69,9 @@
       ca.float = 0.5;
       cb.vector3.set(4,5,6);
       cb.float = 1.5;
+      debugger;
+      cb.clear();
+      cb.reset();
 
       console.log('ca', ca.vector3, ca.float);
       console.log('cb', cb.vector3, cb.float);

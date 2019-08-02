@@ -37,9 +37,9 @@ export function createComponent(schema, name) {
     var type = attr.type;
     if (!type) {
       console.warn(
-        `Unknown type definition for attribute '${key}' with type '${schema[
-          key
-        ].type}'`
+        `Unknown type definition for attribute '${key}' with type '${
+          schema[key].type
+        }'`
       );
       knownTypes = false;
     }
@@ -60,8 +60,14 @@ export function createComponent(schema, name) {
         let type = schema[key].type;
         if (type.isSimpleType) {
           this[key] = src[key];
-        } else {
+        } else if (type.copy) {
           type.copy(this, src, key);
+        } else {
+          // @todo Detect that it's not possible to copy all the attributes
+          // and just avoid creating the copy function
+          console.warn(
+            `Unknown copy function for attribute '${key}' data type`
+          );
         }
       }
     };
@@ -77,7 +83,7 @@ export function createComponent(schema, name) {
     Component.prototype.clear = function() {
       for (let key in schema) {
         let type = schema[key].type;
-        if (type.reset) type.clear(this, key);
+        if (type.clear) type.clear(this, key);
       }
     };
 

@@ -1,18 +1,18 @@
 import test from "ava";
 import { createComponent } from "../../src/CreateComponent";
 import { createType } from "../../src/CreateType";
+import { inferType } from "../../src/Types";
+import { Types } from "../../src/StandardTypes";
 
-/*
 test("inferType", t => {
-  t.is(inferType(2), "number");
-  t.is(inferType(2.3), "number");
-  t.is(inferType("hello"), "string");
-  t.is(inferType([]), "array");
-  t.is(inferType({}), "object");
-  t.is(inferType(null), "object");
-  t.is(inferType(undefined), "undefined");
+  t.is(inferType(2), Types.Number);
+  t.is(inferType(2.3), Types.Number);
+  t.is(inferType("hello"), Types.String);
+  t.is(inferType([]), Types.Array);
+  t.is(inferType({}), null);
+  t.is(inferType(null), null);
+  t.is(inferType(undefined), null);
 });
-*/
 
 class Vector3 {
   constructor(x, y, z) {
@@ -62,30 +62,33 @@ CustomTypes.Vector3 = createType({
 test("resetClear", t => {
   var schema = {
     number: { default: 0.5 },
-    //array: { default: [1, 2, 3], type: Array },
-    vector3: { default: new Vector3(1, 2, 3), type: CustomTypes.Vector3 }
+    array: { default: [1, 2, 3] },
+    vector3: { default: new Vector3(4, 5, 6), type: CustomTypes.Vector3 }
   };
 
   var ComponentA = createComponent(schema, "ComponentA");
   var c1 = new ComponentA();
 
-  //t.deepEqual(c1.vector3.toArray(), [1, 2, 3]);
+  t.deepEqual(c1.array, [1, 2, 3]);
+  t.deepEqual(c1.vector3.toArray(), [4, 5, 6]);
   t.is(c1.number, 0.5);
-  /*
+
   c1.clear();
   t.deepEqual(c1.array, []);
   t.deepEqual(c1.number, 0);
+  t.deepEqual(c1.vector3.toArray(), [0, 0, 0]);
+  t.is(c1.number, 0);
 
   c1.reset();
   t.deepEqual(c1.array, [1, 2, 3]);
   t.deepEqual(c1.number, 0.5);
-  */
+  t.deepEqual(c1.vector3.toArray(), [4, 5, 6]);
+  t.is(c1.number, 0.5);
 });
 
-/*
 test("copy", t => {
   var schema = {
-    value: { default: 0.5, min: 10, max: 20 },
+    value: { default: 0.5 },
     array: { default: [] }
   };
 
@@ -109,4 +112,3 @@ test("copy", t => {
   t.is(c2.value, 10);
   t.deepEqual(c2.array, [1, 2, 3]);
 });
-*/
