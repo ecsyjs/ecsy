@@ -54,6 +54,14 @@ export function createComponent(schema, name) {
       let attr = schema[key];
       Component.prototype[key] = attr.default;
     }
+
+    var nopFunctions = ["copy", "reset", "clear"];
+
+    nopFunctions.forEach(fun => {
+      Component.prototype[fun] = () => {
+        console.warn(`'${fun}' function is a nop for this component as the type definition of some attributes on the schema are unknown.`);
+      };
+    });
   } else {
     Component.prototype.copy = function(src) {
       for (let key in schema) {
