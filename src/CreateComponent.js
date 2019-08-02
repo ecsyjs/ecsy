@@ -36,18 +36,14 @@ export function createComponent(schema, name) {
 
     var type = attr.type;
     if (!type) {
-      console.warn(
-        `Unknown type definition for attribute '${key}' with type '${
-          schema[key].type
-        }'`
-      );
+      console.warn(`Unknown type definition for attribute '${key}'`);
       knownTypes = false;
     }
   }
 
   if (!knownTypes) {
     console.warn(
-      `This component can't use pooling because some data types are not registered. Please use 'defineType' to register them`
+      `This component can't use pooling because some data types are not registered. Please provide a type created with 'createType'`
     );
 
     for (var key in schema) {
@@ -59,7 +55,9 @@ export function createComponent(schema, name) {
 
     nopFunctions.forEach(fun => {
       Component.prototype[fun] = () => {
-        console.warn(`'${fun}' function is a nop for this component as the type definition of some attributes on the schema are unknown.`);
+        console.warn(
+          `'${fun}' function is a nop for this component as the type definition of some attributes on the schema are unknown.`
+        );
       };
     });
   } else {

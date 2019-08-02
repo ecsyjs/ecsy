@@ -1,7 +1,6 @@
 import ObjectPool from "./ObjectPool.js";
 import DummyObjectPool from "./DummyObjectPool.js";
 import { componentPropertyName } from "./Utils.js";
-import { TagComponent } from "./TagComponent.js";
 
 /**
  * @class ComponentManager

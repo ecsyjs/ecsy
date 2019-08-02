@@ -11,12 +11,11 @@ export function createType(typeDefinition) {
   });
 
   if (undefinedFunctions.length > 0) {
-    console.error(
+    throw new Error(
       `createType expect type definition to implements the following functions: ${undefinedFunctions.join(
         ", "
       )}`
     );
-    return null;
   }
 
   typeDefinition.isType = true;

@@ -1,40 +1,7 @@
 import test from "ava";
 import { createComponent } from "../../src/CreateComponent";
 import { createType } from "../../src/CreateType";
-import { inferType } from "../../src/Types";
-import { Types } from "../../src/StandardTypes";
-
-test("inferType", t => {
-  t.is(inferType(2), Types.Number);
-  t.is(inferType(2.3), Types.Number);
-  t.is(inferType("hello"), Types.String);
-  t.is(inferType([]), Types.Array);
-  t.is(inferType({}), null);
-  t.is(inferType(null), null);
-  t.is(inferType(undefined), null);
-});
-
-class Vector3 {
-  constructor(x, y, z) {
-    this.set(x, y, z);
-  }
-
-  copy(src) {
-    this.x = src.x;
-    this.y = src.y;
-    this.z = src.z;
-  }
-
-  set(x, y, z) {
-    this.x = x;
-    this.y = y;
-    this.z = z;
-  }
-
-  toArray() {
-    return [this.x, this.y, this.z];
-  }
-}
+import { Vector3 } from "../helpers/customtypes";
 
 var CustomTypes = {};
 
@@ -59,9 +26,33 @@ CustomTypes.Vector3 = createType({
   }
 });
 
+test("Unknown types", t => {
+  var schema = {
+    vector3: { default: new Vector3(4, 5, 6) } /* unknown type */
+  };
+
+  var ComponentA = createComponent(schema, "ComponentA");
+  var c1 = new ComponentA();
+
+  t.deepEqual(c1.vector3.toArray(), [4, 5, 6]);
+  c1.clear(); /* nop */
+  t.deepEqual(c1.vector3.toArray(), [4, 5, 6]);
+  c1.reset(); /* nop */
+  t.deepEqual(c1.vector3.toArray(), [4, 5, 6]);
+
+  c1.vector3.set(1, 2, 3);
+  t.deepEqual(c1.vector3.toArray(), [1, 2, 3]);
+  c1.clear(); /* nop */
+  t.deepEqual(c1.vector3.toArray(), [1, 2, 3]);
+  c1.reset(); /* nop */
+  t.deepEqual(c1.vector3.toArray(), [1, 2, 3]);
+});
+
 test("resetClear", t => {
   var schema = {
     number: { default: 0.5 },
+    string: { default: "foo" },
+    bool: { default: true },
     array: { default: [1, 2, 3] },
     vector3: { default: new Vector3(4, 5, 6), type: CustomTypes.Vector3 }
   };
@@ -69,21 +60,51 @@ test("resetClear", t => {
   var ComponentA = createComponent(schema, "ComponentA");
   var c1 = new ComponentA();
 
+  t.is(c1.number, 0.5);
+  t.is(c1.string, "foo");
+  t.true(c1.bool);
   t.deepEqual(c1.array, [1, 2, 3]);
   t.deepEqual(c1.vector3.toArray(), [4, 5, 6]);
-  t.is(c1.number, 0.5);
 
+  // clear
   c1.clear();
-  t.deepEqual(c1.array, []);
-  t.deepEqual(c1.number, 0);
-  t.deepEqual(c1.vector3.toArray(), [0, 0, 0]);
-  t.is(c1.number, 0);
 
+  t.deepEqual(c1.number, 0);
+  t.is(c1.string, "");
+  t.false(c1.bool);
+  t.deepEqual(c1.array, []);
+  t.deepEqual(c1.vector3.toArray(), [0, 0, 0]);
+
+  // reset
   c1.reset();
-  t.deepEqual(c1.array, [1, 2, 3]);
-  t.deepEqual(c1.number, 0.5);
-  t.deepEqual(c1.vector3.toArray(), [4, 5, 6]);
+
   t.is(c1.number, 0.5);
+  t.is(c1.string, "foo");
+  t.true(c1.bool);
+  t.deepEqual(c1.array, [1, 2, 3]);
+  t.deepEqual(c1.vector3.toArray(), [4, 5, 6]);
+
+  // custom set
+  c1.number = 2;
+  c1.string = "bar";
+  c1.bool = false;
+  c1.array = [7, 8, 9];
+  c1.vector3.set(10, 11, 12);
+
+  t.is(c1.number, 2);
+  t.is(c1.string, "bar");
+  t.false(c1.bool);
+  t.deepEqual(c1.array, [7, 8, 9]);
+  t.deepEqual(c1.vector3.toArray(), [10, 11, 12]);
+
+  // reset
+  c1.reset();
+
+  t.is(c1.number, 0.5);
+  t.is(c1.string, "foo");
+  t.true(c1.bool);
+  t.deepEqual(c1.array, [1, 2, 3]);
+  t.deepEqual(c1.vector3.toArray(), [4, 5, 6]);
 });
 
 test("copy", t => {
