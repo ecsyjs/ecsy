@@ -434,7 +434,7 @@ class Entity {
   /**
    * Initialize the entity. To be used when returning an entity to the pool
    */
-  __init() {
+  reset() {
     this.id = nextId++;
     this._world = null;
     this._ComponentTypes.length = 0;
@@ -454,7 +454,8 @@ class Entity {
  * @class ObjectPool
  */
 class ObjectPool {
-  constructor(T) {
+  // @todo Add initial size
+  constructor(T, initialSize) {
     this.freeList = [];
     this.count = 0;
     this.T = T;
@@ -473,7 +474,9 @@ class ObjectPool {
           return new T();
         };
 
-    this.initialObject = this.createElement();
+    if (typeof initialSize !== "undefined") {
+      this.expand(initialSize);
+    }
   }
 
   aquire() {
@@ -484,22 +487,11 @@ class ObjectPool {
 
     var item = this.freeList.pop();
 
-    // We can provide explicit initing, otherwise we copy the value of the initial component
-    if (item.__init) item.__init();
-    else if (item.copy) item.copy(this.initialObject);
-    else {
-      for (let name in item) {
-        delete item[name];
-      }
-      for (let name in this.initialObject) {
-        item[name] = this.initialObject[name];
-      }
-    }
-
     return item;
   }
 
   release(item) {
+    item.reset();
     this.freeList.push(item);
   }
 
@@ -857,6 +849,39 @@ const COMPONENT_ADDED = "EntityManager#COMPONENT_ADDED";
 const COMPONENT_REMOVE = "EntityManager#COMPONENT_REMOVE";
 
 /**
+ * @class DummyObjectPool
+ */
+class DummyObjectPool {
+  constructor(T) {
+    this.count = 0;
+    this.used = 0;
+    this.T = T;
+  }
+
+  aquire() {
+    this.used++;
+    this.count++;
+    return new this.T();
+  }
+
+  release() {
+    this.used--;
+  }
+
+  totalSize() {
+    return this.count;
+  }
+
+  totalFree() {
+    return Infinity;
+  }
+
+  totalUsed() {
+    return this.used;
+  }
+}
+
+/**
  * @class ComponentManager
  */
 class ComponentManager {
@@ -904,7 +929,16 @@ class ComponentManager {
     var componentName = componentPropertyName(Component);
 
     if (!this._componentPool[componentName]) {
-      this._componentPool[componentName] = new ObjectPool(Component);
+      if (Component.prototype.reset) {
+        this._componentPool[componentName] = new ObjectPool(Component);
+      } else {
+        console.warn(
+          `Component '${
+            Component.name
+          }' won't benefit from pooling because 'reset' method was not implemeneted.`
+        );
+        this._componentPool[componentName] = new DummyObjectPool(Component);
+      }
     }
 
     return this._componentPool[componentName];
@@ -1179,35 +1213,244 @@ function Not(Component) {
   };
 }
 
-class FloatValidator {
-  static validate(n) {
-    return Number(n) === n && n % 1 !== 0;
+class Component {}
+
+class TagComponent {
+  reset() {}
+}
+
+function createType(typeDefinition) {
+  var mandatoryFunctions = [
+    "create",
+    "reset",
+    "clear"
+    /*"copy"*/
+  ];
+
+  var undefinedFunctions = mandatoryFunctions.filter(f => {
+    return !typeDefinition[f];
+  });
+
+  if (undefinedFunctions.length > 0) {
+    throw new Error(
+      `createType expect type definition to implements the following functions: ${undefinedFunctions.join(
+        ", "
+      )}`
+    );
+  }
+
+  typeDefinition.isType = true;
+  return typeDefinition;
+}
+
+var Types = {};
+
+Types.Number = createType({
+  baseType: Number,
+  isSimpleType: true,
+  create: defaultValue => {
+    return typeof defaultValue !== "undefined" ? defaultValue : 0;
+  },
+  reset: (src, key, defaultValue) => {
+    if (typeof defaultValue !== "undefined") {
+      src[key] = defaultValue;
+    } else {
+      src[key] = 0;
+    }
+  },
+  clear: (src, key) => {
+    src[key] = 0;
+  }
+});
+
+Types.Boolean = createType({
+  baseType: Boolean,
+  isSimpleType: true,
+  create: defaultValue => {
+    return typeof defaultValue !== "undefined" ? defaultValue : false;
+  },
+  reset: (src, key, defaultValue) => {
+    if (typeof defaultValue !== "undefined") {
+      src[key] = defaultValue;
+    } else {
+      src[key] = false;
+    }
+  },
+  clear: (src, key) => {
+    src[key] = false;
+  }
+});
+
+Types.String = createType({
+  baseType: String,
+  isSimpleType: true,
+  create: defaultValue => {
+    return typeof defaultValue !== "undefined" ? defaultValue : "";
+  },
+  reset: (src, key, defaultValue) => {
+    if (typeof defaultValue !== "undefined") {
+      src[key] = defaultValue;
+    } else {
+      src[key] = "";
+    }
+  },
+  clear: (src, key) => {
+    src[key] = "";
+  }
+});
+
+Types.Array = createType({
+  baseType: Array,
+  create: defaultValue => {
+    if (typeof defaultValue !== "undefined") {
+      return defaultValue.slice();
+    }
+
+    return [];
+  },
+  reset: (src, key, defaultValue) => {
+    if (typeof defaultValue !== "undefined") {
+      src[key] = defaultValue.slice();
+    } else {
+      src[key].length = 0;
+    }
+  },
+  clear: (src, key) => {
+    src[key].length = 0;
+  },
+  copy: (src, dst, key) => {
+    src[key] = dst[key].slice();
+  }
+});
+
+/**
+ * Try to infer the type of the value
+ * @param {*} value
+ * @return {String} Type of the attribute
+ */
+var standardTypes = {
+  number: Types.Number,
+  boolean: Types.Boolean,
+  string: Types.String
+};
+
+function inferType(value) {
+  if (Array.isArray(value)) {
+    return Types.Array;
+  }
+
+  if (standardTypes[typeof value]) {
+    return standardTypes[typeof value];
+  } else {
+    return null;
   }
 }
 
-var SchemaTypes = {
-  float: FloatValidator
-  /*
-  array
-  bool
-  func
-  number
-  object
-  string
-  symbol
+function createComponent(schema, name) {
+  //var Component = new Function(`return function ${name}() {}`)();
+  for (let key in schema) {
+    let type = schema[key].type;
+    if (!type) {
+      schema[key].type = inferType(schema[key].default);
+    }
+  }
 
-  any
-  arrayOf
-  element
-  elementType
-  instanceOf
-  node
-  objectOf
-  oneOf
-  oneOfType
-  shape
-  exact
-*/
-};
+  var Component = function() {
+    for (let key in schema) {
+      var attr = schema[key];
+      let type = attr.type;
+      if (type && type.isType) {
+        this[key] = type.create(attr.default);
+      } else {
+        this[key] = attr.default;
+      }
+    }
+  };
 
-export { Not, SchemaTypes, System, World };
+  if (typeof name !== "undefined") {
+    Object.defineProperty(Component, "name", { value: name });
+  }
+
+  Component.prototype.schema = schema;
+
+  var knownTypes = true;
+  for (let key in schema) {
+    var attr = schema[key];
+    if (!attr.type) {
+      attr.type = inferType(attr.default);
+    }
+
+    var type = attr.type;
+    if (!type) {
+      console.warn(`Unknown type definition for attribute '${key}'`);
+      knownTypes = false;
+    }
+  }
+
+  if (!knownTypes) {
+    console.warn(
+      `This component can't use pooling because some data types are not registered. Please provide a type created with 'createType'`
+    );
+
+    for (var key in schema) {
+      let attr = schema[key];
+      Component.prototype[key] = attr.default;
+    }
+
+    var nopFunctions = ["copy", "reset", "clear"];
+
+    nopFunctions.forEach(fun => {
+      Component.prototype[fun] = () => {
+        console.warn(
+          `'${fun}' function is a nop for this component as the type definition of some attributes on the schema are unknown.`
+        );
+      };
+    });
+  } else {
+    Component.prototype.copy = function(src) {
+      for (let key in schema) {
+        let type = schema[key].type;
+        if (type.isSimpleType) {
+          this[key] = src[key];
+        } else if (type.copy) {
+          type.copy(this, src, key);
+        } else {
+          // @todo Detect that it's not possible to copy all the attributes
+          // and just avoid creating the copy function
+          console.warn(
+            `Unknown copy function for attribute '${key}' data type`
+          );
+        }
+      }
+    };
+
+    Component.prototype.reset = function() {
+      for (let key in schema) {
+        let attr = schema[key];
+        let type = attr.type;
+        if (type.reset) type.reset(this, key, attr.default);
+      }
+    };
+
+    Component.prototype.clear = function() {
+      for (let key in schema) {
+        let type = schema[key].type;
+        if (type.clear) type.clear(this, key);
+      }
+    };
+
+    for (let key in schema) {
+      let attr = schema[key];
+      let type = attr.type;
+      Component.prototype[key] = attr.default;
+
+      if (type.reset) {
+        type.reset(Component.prototype, key, attr.default);
+      }
+    }
+  }
+
+  return Component;
+}
+
+export { Component, Not, System, TagComponent, Types, World, createComponent, createType };
