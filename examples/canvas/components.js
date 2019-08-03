@@ -1,8 +1,9 @@
-/* global THREE */
+import { Vector2 } from "./math.js";
+
 export class Movement {
   constructor() {
-    this.velocity = new THREE.Vector2();
-    this.acceleration = new THREE.Vector2();
+    this.velocity = new Vector2();
+    this.acceleration = new Vector2();
   }
 
   reset() {
@@ -13,10 +14,10 @@ export class Movement {
 
 export class Circle {
   constructor() {
-    this.position = new THREE.Vector2();
+    this.position = new Vector2();
     this.radius = 0;
-    this.velocity = new THREE.Vector2();
-    this.acceleration = new THREE.Vector2();
+    this.velocity = new Vector2();
+    this.acceleration = new Vector2();
   }
 
   reset() {
