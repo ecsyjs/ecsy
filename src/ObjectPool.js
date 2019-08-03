@@ -2,7 +2,8 @@
  * @class ObjectPool
  */
 export default class ObjectPool {
-  constructor(T) {
+  // @todo Add initial size
+  constructor(T, initialSize) {
     this.freeList = [];
     this.count = 0;
     this.T = T;
@@ -21,7 +22,9 @@ export default class ObjectPool {
           return new T();
         };
 
-    this.initialObject = this.createElement();
+    if (typeof initialSize !== "undefined") {
+      this.expand(initialSize);
+    }
   }
 
   aquire() {
@@ -32,22 +35,11 @@ export default class ObjectPool {
 
     var item = this.freeList.pop();
 
-    // We can provide explicit initing, otherwise we copy the value of the initial component
-    if (item.__init) item.__init();
-    else if (item.copy) item.copy(this.initialObject);
-    else {
-      for (let name in item) {
-        delete item[name];
-      }
-      for (let name in this.initialObject) {
-        item[name] = this.initialObject[name];
-      }
-    }
-
     return item;
   }
 
   release(item) {
+    item.reset();
     this.freeList.push(item);
   }
 
