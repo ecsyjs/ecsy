@@ -1,4 +1,4 @@
-import { inferType } from "./Types";
+import { inferType } from "./InferType";
 
 export function createComponent(schema, name) {
   //var Component = new Function(`return function ${name}() {}`)();

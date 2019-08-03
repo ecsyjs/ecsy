@@ -1,5 +1,5 @@
 import test from "ava";
-import { inferType } from "../../src/Types";
+import { inferType } from "../../src/InferType";
 import { Types } from "../../src/StandardTypes";
 
 test("inferType", t => {
