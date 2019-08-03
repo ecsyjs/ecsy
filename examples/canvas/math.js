@@ -4,7 +4,7 @@ export class Vector2 {
     this.y = 0;
   }
 
-  set(x,y) {
+  set(x, y) {
     this.x = x;
     this.y = y;
   }
