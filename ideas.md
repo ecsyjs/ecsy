@@ -5,3 +5,23 @@ Events:
 - onEvent attribute on a component to be used for example to trigger the paint/teleport action, how to define it
 - this.component inside systems
 - Component that doesn't need reset() but want to benefit from Pool? => nop
+- Declare dependencies on execute:
+
+```javascript
+class System {
+  init() {
+    return {
+      queries: {/* ... */},
+      dependencies: {
+        singleton: [
+          ThreeRenderer
+        ],
+        systems: [
+          SystemB,
+          SystemC
+        ]
+      }
+    };
+  }
+}
+```

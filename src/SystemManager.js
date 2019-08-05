@@ -44,7 +44,7 @@ export class SystemManager {
   execute(delta, time) {
     this.systems.forEach(system => {
       if (system.enabled && system.initialized) {
-        if (system.execute) {
+        if (system.execute && system.meetDependencies()) {
           let startTime = performance.now();
           system.execute(delta, time);
           system.executeTime = performance.now() - startTime;

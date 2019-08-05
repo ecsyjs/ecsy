@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Dependencies</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <link rel="stylesheet" href="">
+  </head>
+  <body>
+    <script type="module">
+      import {World, System, Not} from '../../../build/ecsy.module.js';
+
+      class ComponentA {}
+      class ComponentB {}
+      class ComponentC /* singleton */ {}
+
+      class SystemA extends System {
+        init() {
+          return {
+            queries: {
+              entities: {components: [ComponentA]}
+            },
+            dependencies: {
+              singleton: [ComponentC]
+            }
+          };
+        }
+
+        execute(delta) {
+          console.log('Executing SystemA');
+        }
+      }
+
+      var world = new World();
+
+      world
+        .registerComponent(ComponentA)
+        .registerComponent(ComponentB)
+        .registerSingletonComponent(ComponentC)
+        .registerSystem(SystemA);
+
+      function update() {
+        var time = performance.now();
+        var delta = time - lastTime;
+        world.execute(delta, time);
+        lastTime = time;
+        requestAnimationFrame(update);
+      }
+
+      var lastTime = performance.now();
+      update();
+
+      window.world = world;
+      window.ComponentC = ComponentC;
+    </script>
+  </body>
+</html>

@@ -133,6 +133,39 @@ export class System {
         });
       }
     }
+
+    var dependencies = this.config.dependencies;
+    if (dependencies) {
+      this.dependenciesToCheck = {};
+
+      if (dependencies.singleton) {
+        this.dependenciesToCheck.singleton = dependencies.singleton.slice();
+      }
+    }
+  }
+
+  meetDependencies() {
+    if (!this.dependenciesToCheck) return true;
+
+    // Singleton
+    if (
+      this.dependenciesToCheck.singleton &&
+      this.dependenciesToCheck.singleton.length > 0
+    ) {
+      this.dependenciesToCheck.singleton = this.dependenciesToCheck.singleton.filter(
+        d => {
+          for (let id in this.world.components) {
+            if (this.world.components[id] instanceof d) {
+              return false;
+            }
+          }
+          return true;
+        }
+      );
+      return this.dependenciesToCheck.singleton.length === 0;
+    }
+
+    return true;
   }
 
   stop() {
