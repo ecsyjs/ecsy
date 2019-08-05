@@ -23,7 +23,8 @@
               entities: {components: [ComponentA]}
             },
             dependencies: {
-              singleton: [ComponentC]
+              singleton: [ComponentC],
+              system: [SystemB]
             }
           };
         }
@@ -33,13 +34,28 @@
         }
       }
 
+      class SystemB extends System {
+        init() {
+          return {
+            queries: {
+              entities: {components: [ComponentB]}
+            }
+          };
+        }
+
+        execute(delta) {
+         console.log('Executing SystemB');
+        }
+      }
+
       var world = new World();
 
       world
         .registerComponent(ComponentA)
         .registerComponent(ComponentB)
         .registerSingletonComponent(ComponentC)
-        .registerSystem(SystemA);
+        .registerSystem(SystemA)
+        .registerSystem(SystemB);
 
       function update() {
         var time = performance.now();
@@ -54,6 +70,7 @@
 
       window.world = world;
       window.ComponentC = ComponentC;
+      window.SystemA = SystemA;
     </script>
   </body>
 </html>

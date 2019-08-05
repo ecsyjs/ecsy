@@ -141,11 +141,17 @@ export class System {
       if (dependencies.singleton) {
         this.dependenciesToCheck.singleton = dependencies.singleton.slice();
       }
+
+      if (dependencies.system) {
+        this.dependenciesToCheck.system = dependencies.system.slice();
+      }
     }
   }
 
   meetDependencies() {
     if (!this.dependenciesToCheck) return true;
+
+    var success = true;
 
     // Singleton
     if (
@@ -162,10 +168,28 @@ export class System {
           return true;
         }
       );
-      return this.dependenciesToCheck.singleton.length === 0;
+      success &= this.dependenciesToCheck.singleton.length === 0;
     }
 
-    return true;
+    // System
+    if (
+      this.dependenciesToCheck.system &&
+      this.dependenciesToCheck.system.length > 0
+    ) {
+      this.dependenciesToCheck.system = this.dependenciesToCheck.system.filter(
+        d => {
+          for (let i = 0; i < this.world.systemManager.systems.length; i++) {
+            if (this.world.systemManager.systems[i] instanceof d) {
+              return false;
+            }
+          }
+          return true;
+        }
+      );
+      success &= this.dependenciesToCheck.system.length === 0;
+    }
+
+    return success;
   }
 
   stop() {
