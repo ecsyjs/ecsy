@@ -90,7 +90,7 @@ export default class QueryManager {
    * @param {Component} Components Components that the query should have
    */
   getQuery(Components, single) {
-    var key = queryKey(Components);
+    var key = queryKey(Components) + (single === true ? "-single" : "");
     var query = this._queries[key];
     if (!query) {
       this._queries[key] = query = new Query(Components, this._world, single);
