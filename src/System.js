@@ -16,49 +16,6 @@ export class System {
     return true;
   }
 
-  toJSON() {
-    var json = {
-      name: this.constructor.name,
-      enabled: this.enabled,
-      executeTime: this.executeTime,
-      priority: this.priority,
-      queries: {},
-      events: {}
-    };
-
-    if (this.config) {
-      var queries = this.config.queries;
-      for (let queryName in queries) {
-        let query = queries[queryName];
-        json.queries[queryName] = {
-          key: this._queries[queryName].key
-        };
-        if (query.events) {
-          let events = (json.queries[queryName]["events"] = {});
-          for (let eventName in query.events) {
-            let event = query.events[eventName];
-            events[eventName] = {
-              eventName: event.event,
-              numEntities: this.events[queryName][eventName].length
-            };
-            if (event.components) {
-              events[eventName].components = event.components.map(c => c.name);
-            }
-          }
-        }
-      }
-
-      let events = this.config.events;
-      for (let eventName in events) {
-        json.events[eventName] = {
-          eventName: events[eventName]
-        };
-      }
-    }
-
-    return json;
-  }
-
   constructor(world, attributes) {
     this.world = world;
     this.enabled = true;
@@ -93,12 +50,16 @@ export class System {
         if (!Components || Components.length === 0) {
           throw new Error("'components' attribute can't be empty in a query");
         }
-        var query = this.world.entityManager.queryComponents(Components);
+        var query = this.world.entityManager.queryComponents(
+          Components,
+          queryConfig.single === true
+        );
         this._queries[name] = query;
-        this.queries[name] = query.entities;
         if (queryConfig.mandatory === true) {
           this._mandatoryQueries.push(query);
         }
+        this.queries[name] =
+          queryConfig.single === true ? query.entity : query.entities;
 
         if (queryConfig.events) {
           this.events[name] = {};
@@ -171,6 +132,49 @@ export class System {
         }
       }
     }
+  }
+
+  toJSON() {
+    var json = {
+      name: this.constructor.name,
+      enabled: this.enabled,
+      executeTime: this.executeTime,
+      priority: this.priority,
+      queries: {},
+      events: {}
+    };
+
+    if (this.config) {
+      var queries = this.config.queries;
+      for (let queryName in queries) {
+        let query = queries[queryName];
+        json.queries[queryName] = {
+          key: this._queries[queryName].key
+        };
+        if (query.events) {
+          let events = (json.queries[queryName]["events"] = {});
+          for (let eventName in query.events) {
+            let event = query.events[eventName];
+            events[eventName] = {
+              eventName: event.event,
+              numEntities: this.events[queryName][eventName].length
+            };
+            if (event.components) {
+              events[eventName].components = event.components.map(c => c.name);
+            }
+          }
+        }
+      }
+
+      let events = this.config.events;
+      for (let eventName in events) {
+        json.events[eventName] = {
+          eventName: events[eventName]
+        };
+      }
+    }
+
+    return json;
   }
 }
 
