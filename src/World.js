@@ -1,7 +1,6 @@
 import { SystemManager } from "./SystemManager.js";
 import { EntityManager } from "./EntityManager.js";
 import { ComponentManager } from "./ComponentManager.js";
-import { componentPropertyName } from "./Utils.js";
 import EventDispatcher from "./EventDispatcher.js";
 
 /**
