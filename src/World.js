@@ -15,8 +15,8 @@ export class World {
 
     this.enabled = true;
 
-    // Storage for singleton components
-    this.components = {};
+    // for singleton components
+    this._entity = this.createEntity();
 
     this.eventQueues = {};
     this.eventDispatcher = new EventDispatcher();
@@ -40,13 +40,25 @@ export class World {
   }
 
   /**
-   * Register a singleton component
-   * @param {Component} Component Singleton component
+   * Add a component to the world's entity
+   * @param {Component} Component component
    */
-  registerSingletonComponent(Component) {
-    this.componentsManager.registerSingletonComponent(Component);
-    this.components[componentPropertyName(Component)] = new Component();
+  addComponent(Component) {
+    this._entity.addComponent(Component);
     return this;
+  }
+
+  removeComponent(Component, forceRemove) {
+    this._entity.removeComponent(Component, forceRemove);
+    return this;
+  }
+
+  getComponent(Component) {
+    return this._entity.getComponent(Component);
+  }
+
+  getMutableComponent(Component) {
+    return this._entity.getMutableComponent(Component);
   }
 
   /**

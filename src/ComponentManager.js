@@ -8,7 +8,6 @@ import { componentPropertyName } from "./Utils.js";
 export class ComponentManager {
   constructor() {
     this.Components = {};
-    this.SingletonComponents = {};
     this._componentPool = {};
     this.numComponents = {};
   }
@@ -20,14 +19,6 @@ export class ComponentManager {
   registerComponent(Component) {
     this.Components[Component.name] = Component;
     this.numComponents[Component.name] = 0;
-  }
-
-  /**
-   * Register a singleton component
-   * @param {Component} Component Component to register as singleton
-   */
-  registerSingletonComponent(Component) {
-    this.SingletonComponents[Component.name] = Component;
   }
 
   componentAddedToEntity(Component) {

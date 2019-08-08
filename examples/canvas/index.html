@@ -22,8 +22,8 @@
       var world = new World();
 
       world
-        .registerSingletonComponent(CanvasContext)
-        .registerSingletonComponent(DemoSettings)
+        .addComponent(CanvasContext) // Singleton component
+        .addComponent(DemoSettings)
         .registerComponent(Circle)
         .registerComponent(Movement)
         .registerComponent(Intersecting)
@@ -35,7 +35,7 @@
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
 
-      var canvasComponent = world.components.canvasContext;
+      var canvasComponent = world.getMutableComponent(CanvasContext);
       canvasComponent.ctx = canvas.getContext("2d");
       canvasComponent.width = canvas.width;
       canvasComponent.height = canvas.height;
