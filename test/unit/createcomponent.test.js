@@ -35,16 +35,34 @@ test("Unknown types", t => {
   var c1 = new ComponentA();
 
   t.deepEqual(c1.vector3.toArray(), [4, 5, 6]);
-  c1.clear(); /* nop */
+  let error = t.throws(() => {
+    c1.clear();
+  }, Error);
+  t.is(error.message, "c1.clear is not a function");
+
   t.deepEqual(c1.vector3.toArray(), [4, 5, 6]);
-  c1.reset(); /* nop */
+
+  t.deepEqual(c1.vector3.toArray(), [4, 5, 6]);
+  error = t.throws(() => {
+    c1.reset();
+  }, Error);
+  t.is(error.message, "c1.reset is not a function");
   t.deepEqual(c1.vector3.toArray(), [4, 5, 6]);
 
   c1.vector3.set(1, 2, 3);
   t.deepEqual(c1.vector3.toArray(), [1, 2, 3]);
-  c1.clear(); /* nop */
+
+  error = t.throws(() => {
+    c1.clear();
+  }, Error);
+  t.is(error.message, "c1.clear is not a function");
+
   t.deepEqual(c1.vector3.toArray(), [1, 2, 3]);
-  c1.reset(); /* nop */
+  error = t.throws(() => {
+    c1.reset();
+  }, Error);
+  t.is(error.message, "c1.reset is not a function");
+
   t.deepEqual(c1.vector3.toArray(), [1, 2, 3]);
 });
 
