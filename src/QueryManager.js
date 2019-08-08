@@ -70,7 +70,6 @@ export default class QueryManager {
         !~query.entities.indexOf(entity) &&
         query.match(entity)
       ) {
-        // console.log("Query now matches", queryName, entity);
         query.addEntity(entity);
         continue;
       }
@@ -80,7 +79,6 @@ export default class QueryManager {
         !!~query.entities.indexOf(entity) &&
         !query.match(entity)
       ) {
-        // console.log("Query no longer matches", queryName, entity);
         query.removeEntity(entity);
         continue;
       }
