@@ -143,11 +143,12 @@ test("removing components deferred", async t => {
   entity.addComponent(FooComponent);
 
   entity.removeComponent(FooComponent); // Deferred remove
-  t.is(entity.getComponentTypes().length, 1);
+  t.is(entity.getComponentTypes().length, 0);
   t.true(entity.hasComponent(FooComponent, true));
   t.false(entity.hasComponent(FooComponent));
   t.false(entity.hasComponent(BarComponent));
-  t.deepEqual(Object.keys(entity.getComponents()), ["FooComponent"]);
+  t.deepEqual(Object.keys(entity.getComponents()), []);
+  t.deepEqual(Object.keys(entity.getComponentsToRemove()), ["FooComponent"]);
 
   world.entityManager.processDeferredRemoval();
   t.is(entity.getComponentTypes().length, 0);
