@@ -24,6 +24,10 @@ export class EntityManager {
     this.entitiesToRemove = [];
   }
 
+  getEntity(index) {
+    return this._entities[index + 1]; // Avoid returning world entity at 0
+  }
+
   /**
    * Create a new entity
    */
@@ -192,7 +196,7 @@ export class EntityManager {
    * Return number of entities
    */
   count() {
-    return this._entities.length;
+    return this._entities.length - 1; // world.entity should not count
   }
 
   /**

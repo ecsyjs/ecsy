@@ -2,6 +2,7 @@ import { SystemManager } from "./SystemManager.js";
 import { EntityManager } from "./EntityManager.js";
 import { ComponentManager } from "./ComponentManager.js";
 import EventDispatcher from "./EventDispatcher.js";
+import Entity from "./Entity.js";
 
 /**
  * @class World
@@ -14,8 +15,12 @@ export class World {
 
     this.enabled = true;
 
-    // for singleton components
-    this._entity = this.createEntity();
+    // "Singleton" entity to store world components
+    // Created directly to avoid using pooling and interfere with
+    // the rest of the components and alter stats
+    // this._entity = this.createEntity();
+    this._entity = new Entity(this.entityManager);
+    this.entityManager._entities.push(this._entity);
 
     this.eventQueues = {};
     this.eventDispatcher = new EventDispatcher();

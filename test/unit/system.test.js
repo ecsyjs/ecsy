@@ -240,12 +240,12 @@ test("queries_not", t => {
   t.is(queries.emptyNotBarFoo.length, 0);
 
   // Adding BarComponent to entity0 will remove it from the queries Not(BarComponent)
-  world.entityManager._entities[0].addComponent(BarComponent);
+  world.entityManager.getEntity(0).addComponent(BarComponent);
   t.is(queries.fooNotBar.length, 4);
   t.is(queries.emptyNotBar.length, 4);
 
   // Removing BarComponent from entity0 will add it from the queries Not(BarComponent)
-  world.entityManager._entities[0].removeComponent(BarComponent);
+  world.entityManager.getEntity(0).removeComponent(BarComponent);
   t.is(queries.fooNotBar.length, 5);
   t.is(queries.emptyNotBar.length, 5);
 });
@@ -462,11 +462,11 @@ test("queries_remove_entities_deferred", t => {
   t.is(entitiesRemovedB.length, 2);
 
   // Process the deferred removals of entities
-  t.is(world.entityManager._entities.length, 6);
+  t.is(world.entityManager.count(), 6);
   t.is(world.entityManager._entityPool.totalUsed(), 6);
   world.entityManager.processDeferredRemoval();
   t.is(world.entityManager._entityPool.totalUsed(), 2);
-  t.is(world.entityManager._entities.length, 2);
+  t.is(world.entityManager.count(), 2);
 });
 
 test("queries_remove_multiple_components", t => {
@@ -519,36 +519,36 @@ test("queries_remove_multiple_components", t => {
 
   // Remove one entity => entityRemoved x1
   t.is(entitiesA.length, 6);
-  world.entityManager._entities[0].remove();
+  world.entityManager.getEntity(0).remove();
   t.is(entitiesA.length, 5);
   t.is(entitiesRemovedA.length, 1);
   systemA.execute();
   systemA.clearEvents();
 
   // Remove both components => entityRemoved x1
-  world.entityManager._entities[1].removeComponent(FooComponent);
+  world.entityManager.getEntity(1).removeComponent(FooComponent);
   t.is(entitiesA.length, 4);
   t.is(entitiesRemovedA.length, 1);
   systemA.execute();
 
   // Remove second component => It will be the same result
-  world.entityManager._entities[1].removeComponent(BarComponent);
+  world.entityManager.getEntity(1).removeComponent(BarComponent);
   t.is(entitiesA.length, 4);
   t.is(entitiesRemovedA.length, 1);
   systemA.execute();
   systemA.clearEvents();
 
   // Remove entity and component deferred
-  world.entityManager._entities[2].remove();
-  world.entityManager._entities[2].removeComponent(FooComponent);
-  world.entityManager._entities[2].removeComponent(BarComponent);
+  world.entityManager.getEntity(2).remove();
+  world.entityManager.getEntity(2).removeComponent(FooComponent);
+  world.entityManager.getEntity(2).removeComponent(BarComponent);
   t.is(entitiesA.length, 3);
   t.is(entitiesRemovedA.length, 1);
   systemA.execute();
   systemA.clearEvents();
 
   // Check deferred queues
-  t.is(world.entityManager._entities.length, 6);
+  t.is(world.entityManager.count(), 6);
   t.is(world.entityManager.entitiesToRemove.length, 2);
   t.is(world.entityManager.entitiesWithComponentsToRemove.length, 2);
 
@@ -556,7 +556,7 @@ test("queries_remove_multiple_components", t => {
   world.entityManager.processDeferredRemoval();
   t.is(world.entityManager.entitiesWithComponentsToRemove.length, 0);
   t.is(world.entityManager._entityPool.totalUsed(), 4);
-  t.is(world.entityManager._entities.length, 4);
+  t.is(world.entityManager.count(), 4);
   t.is(world.entityManager.entitiesToRemove.length, 0);
 });
 
@@ -739,7 +739,7 @@ test("reactive", t => {
   var system = world.systemManager.systems[0];
   var query = system.queries.entities;
   var events = system.events.entities;
-  var entity0 = world.entityManager._entities[0];
+  var entity0 = world.entityManager.getEntity(0);
 
   // Entities from the standard query
   t.is(query.length, 15);
@@ -795,7 +795,7 @@ test("reactive", t => {
   t.is(events.removed.length, 0);
 
   // Removed
-  entity0 = world.entityManager._entities[0];
+  entity0 = world.entityManager.getEntity(0);
   entity0.removeComponent(FooComponent);
   t.is(events.removed.length, 1);
   world.execute(); // After execute, events should be cleared
@@ -809,7 +809,7 @@ test("reactive", t => {
 
   // Remove all components from the first 5 entities
   for (i = 0; i < 5; i++) {
-    world.entityManager._entities[i].removeAllComponents();
+    world.entityManager.getEntity(i).removeAllComponents();
   }
   t.is(events.removed.length, 5);
   world.execute(); // After execute, events should be cleared
