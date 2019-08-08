@@ -55,7 +55,6 @@ export default class Entity {
     return this._componentsToRemove[Component.name];
   }
 
-
   getComponents() {
     return this._components;
   }
