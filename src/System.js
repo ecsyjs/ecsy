@@ -4,6 +4,18 @@
 import Query from "./Query.js";
 
 export class System {
+  canExecute() {
+    if (this._mandatoryQueries.length === 0) return true;
+
+    for (let i = 0; i < this._mandatoryQueries.length; i++) {
+      if (this._mandatoryQueries[i].entities.length === 0) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   toJSON() {
     var json = {
       name: this.constructor.name,
@@ -67,6 +79,8 @@ export class System {
       this.priority = attributes.priority;
     }
 
+    this._mandatoryQueries = [];
+
     this.initialized = true;
 
     this.config = this.init ? this.init() : null;
@@ -82,6 +96,9 @@ export class System {
         var query = this.world.entityManager.queryComponents(Components);
         this._queries[name] = query;
         this.queries[name] = query.entities;
+        if (queryConfig.mandatory === true) {
+          this._mandatoryQueries.push(query);
+        }
 
         if (queryConfig.events) {
           this.events[name] = {};

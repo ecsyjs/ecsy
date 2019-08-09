@@ -1,4 +1,4 @@
-var performance =
+global.performance =
   typeof performance !== "undefined" ? performance : { now: () => 0 };
 
 import test from "ava";
@@ -9,7 +9,7 @@ import {
   EmptyComponent
 } from "../helpers/components";
 
-test("init", t => {
+test("Initialize", t => {
   var world = new World();
 
   class SystemA extends System {}
@@ -67,7 +67,7 @@ test("init", t => {
   world.execute();
 });
 
-test("empty_queries", t => {
+test("Empty queries", t => {
   var world = new World();
 
   class SystemEmpty0 extends System {}
@@ -132,7 +132,7 @@ test("empty_queries", t => {
   t.is(error2.message, "'components' attribute can't be empty in a query");
 });
 
-test("queries", t => {
+test("Queries", t => {
   var world = new World();
 
   world.registerComponent(FooComponent).registerComponent(BarComponent);
@@ -187,7 +187,7 @@ test("queries", t => {
   t.is(world.systemManager.systems[2].queries.entities.length, 5);
 });
 
-test("queries_not", t => {
+test("Queries with 'Not' operator", t => {
   var world = new World();
 
   world.registerComponent(FooComponent).registerComponent(BarComponent);
@@ -250,7 +250,7 @@ test("queries_not", t => {
   t.is(queries.emptyNotBar.length, 5);
 });
 
-test("queries_remove_entities_sync", t => {
+test("Queries with sync removal", t => {
   var world = new World();
 
   world.registerComponent(FooComponent).registerComponent(BarComponent);
@@ -340,7 +340,7 @@ test("queries_remove_entities_sync", t => {
   t.is(entitiesRemovedB.length, 8);
 });
 
-test("queries_remove_entities_deferred", t => {
+test("Queries with deferred removal", t => {
   var world = new World();
 
   world.registerComponent(FooComponent).registerComponent(BarComponent);
@@ -469,7 +469,7 @@ test("queries_remove_entities_deferred", t => {
   t.is(world.entityManager._entities.length, 2);
 });
 
-test("queries_remove_multiple_components", t => {
+test("Queries removing multiple components", t => {
   var world = new World();
 
   world
@@ -560,7 +560,7 @@ test("queries_remove_multiple_components", t => {
   t.is(world.entityManager.entitiesToRemove.length, 0);
 });
 
-test("queries_remove_components_deferred", t => {
+test("Querries removing deferred components", t => {
   var world = new World();
 
   world.registerComponent(FooComponent).registerComponent(BarComponent);
@@ -690,7 +690,7 @@ test("queries_remove_components_deferred", t => {
   t.is(world.entityManager.entitiesWithComponentsToRemove.length, 0);
 });
 
-test("reactive", t => {
+test("Reactive", t => {
   var world = new World();
 
   class ReactiveSystem extends System {
@@ -820,4 +820,81 @@ test("reactive", t => {
   t.is(events.removed.length, 10);
   world.execute(); // After execute, events should be cleared
   t.is(events.removed.length, 0);
+});
+
+test("Queries with 'mandatory' parameter", t => {
+  var counter = {
+    a: 0,
+    b: 0,
+    c: 0
+  };
+
+  class SystemA extends System {
+    init() {
+      return {
+        queries: {
+          entities: { components: [FooComponent], mandatory: false }
+        }
+      };
+    }
+
+    execute() {
+      counter.a++;
+    }
+  }
+
+  class SystemB extends System {
+    init() {
+      return {
+        queries: {
+          entities: { components: [FooComponent], mandatory: true }
+        }
+      };
+    }
+
+    execute() {
+      counter.b++;
+    }
+  }
+
+  class SystemC extends System {
+    init() {
+      return {
+        queries: {
+          entities: { components: [BarComponent], mandatory: true }
+        }
+      };
+    }
+
+    execute() {
+      counter.c++;
+    }
+  }
+
+  // -------
+  var world = new World();
+  var entity = world.createEntity();
+
+  world
+    .registerSystem(SystemA) // FooComponent
+    .registerSystem(SystemB) // Mandatory FooComponent
+    .registerSystem(SystemC); // Mandatory BarComponent
+
+  world.execute();
+  t.deepEqual(counter, { a: 1, b: 0, c: 0 });
+
+  entity.addComponent(FooComponent);
+
+  world.execute();
+  t.deepEqual(counter, { a: 2, b: 1, c: 0 });
+
+  entity.addComponent(BarComponent);
+
+  world.execute();
+  t.deepEqual(counter, { a: 3, b: 2, c: 1 });
+
+  entity.removeComponent(FooComponent);
+
+  world.execute();
+  t.deepEqual(counter, { a: 4, b: 2, c: 2 });
 });
