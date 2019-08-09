@@ -1,5 +1,11 @@
 import { System } from "../../build/ecsy.module.js";
-import { Movement, Circle, Intersecting } from "./components.js";
+import {
+  CanvasContext,
+  DemoSettings,
+  Movement,
+  Circle,
+  Intersecting
+} from "./components.js";
 import { fillCircle, drawLine, intersection } from "./utils.js";
 
 export class MovementSystem extends System {
@@ -12,9 +18,10 @@ export class MovementSystem extends System {
   }
 
   execute(delta) {
-    let canvasWidth = this.world.components.canvasContext.width;
-    let canvasHeight = this.world.components.canvasContext.height;
-    let multiplier = this.world.components.demoSettings.speedMultiplier;
+    let canvasWidth = this.world.entity.getComponent(CanvasContext).width;
+    let canvasHeight = this.world.entity.getComponent(CanvasContext).height;
+    let multiplier = this.world.entity.getComponent(DemoSettings)
+      .speedMultiplier;
 
     let entities = this.queries.entities;
     for (var i = 0; i < entities.length; i++) {
@@ -117,7 +124,7 @@ export class Renderer extends System {
   }
 
   execute() {
-    let canvasComponent = this.world.components.canvasContext;
+    let canvasComponent = this.world.entity.getComponent(CanvasContext);
     let ctx = canvasComponent.ctx;
     let canvasWidth = canvasComponent.width;
     let canvasHeight = canvasComponent.height;
