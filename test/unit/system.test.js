@@ -898,35 +898,3 @@ test("Queries with 'mandatory' parameter", t => {
   world.execute();
   t.deepEqual(counter, { a: 4, b: 2, c: 2 });
 });
-
-test("Query single", t => {
-  var world = new World();
-
-  world
-    .registerComponent(FooComponent)
-    .registerComponent(BarComponent)
-    .registerComponent(EmptyComponent);
-
-  var entity = world.createEntity();
-  entity.addComponent(FooComponent).addComponent(BarComponent);
-
-  class SystemA extends System {
-    init() {
-      return {
-        queries: {
-          entity: {
-            components: [FooComponent, BarComponent],
-            single: true
-          }
-        }
-      };
-    }
-  }
-
-  world.registerSystem(SystemA);
-
-  var systemA = world.systemManager.systems[0];
-
-  // Remove one entity => entityRemoved x1
-  t.is(systemA.queries.entity, entity);
-});

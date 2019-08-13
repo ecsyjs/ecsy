@@ -8,7 +8,7 @@ export default class Query {
   /**
    * @param {Array(Component)} Components List of types of components to query
    */
-  constructor(Components, manager, single) {
+  constructor(Components, manager) {
     this.Components = [];
     this.NotComponents = [];
 
@@ -24,10 +24,7 @@ export default class Query {
       throw new Error("Can't create a query without components");
     }
 
-    this.single = single === true;
-
     this.entities = [];
-    this.entity = null;
 
     this.eventDispatcher = new EventDispatcher();
 
@@ -41,10 +38,6 @@ export default class Query {
       var entity = manager._entities[i];
       if (this.match(entity)) {
         // @todo ??? this.addEntity(entity); => preventing the event to be generated
-        if (this.single) {
-          this.entity = entity;
-          return;
-        }
         entity.queries.push(this);
         this.entities.push(entity);
       }
@@ -57,11 +50,7 @@ export default class Query {
    */
   addEntity(entity) {
     entity.queries.push(this);
-    if (this.single) {
-      this.entity = entity;
-    } else {
-      this.entities.push(entity);
-    }
+    this.entities.push(entity);
 
     this.eventDispatcher.dispatchEvent(Query.prototype.ENTITY_ADDED, entity);
   }
@@ -71,31 +60,17 @@ export default class Query {
    * @param {Entity} entity
    */
   removeEntity(entity) {
-    if (this.single) {
-      // @todo Check ID?
-      if (this.entity === entity) {
-        this.entity = null;
-        let index = entity.queries.indexOf(this);
-        entity.queries.splice(index, 1);
+    let index = this.entities.indexOf(entity);
+    if (~index) {
+      this.entities.splice(index, 1);
 
-        this.eventDispatcher.dispatchEvent(
-          Query.prototype.ENTITY_REMOVED,
-          entity
-        );
-      }
-    } else {
-      let index = this.entities.indexOf(entity);
-      if (~index) {
-        this.entities.splice(index, 1);
+      index = entity.queries.indexOf(this);
+      entity.queries.splice(index, 1);
 
-        index = entity.queries.indexOf(this);
-        entity.queries.splice(index, 1);
-
-        this.eventDispatcher.dispatchEvent(
-          Query.prototype.ENTITY_REMOVED,
-          entity
-        );
-      }
+      this.eventDispatcher.dispatchEvent(
+        Query.prototype.ENTITY_REMOVED,
+        entity
+      );
     }
   }
 
