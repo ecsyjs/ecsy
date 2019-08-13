@@ -9,10 +9,7 @@ export class System {
 
     for (let i = 0; i < this._mandatoryQueries.length; i++) {
       var query = this._mandatoryQueries[i];
-      if (
-        (query.single && query.entity === null) ||
-        (!query.single && query.entities.length === 0)
-      ) {
+      if (query.entities.length === 0) {
         return false;
       }
     }
@@ -54,16 +51,12 @@ export class System {
         if (!Components || Components.length === 0) {
           throw new Error("'components' attribute can't be empty in a query");
         }
-        var query = this.world.entityManager.queryComponents(
-          Components,
-          queryConfig.single === true
-        );
+        var query = this.world.entityManager.queryComponents(Components);
         this._queries[name] = query;
         if (queryConfig.mandatory === true) {
           this._mandatoryQueries.push(query);
         }
-        this.queries[name] =
-          queryConfig.single === true ? query.entity : query.entities;
+        this.queries[name] = query.entities;
 
         if (queryConfig.events) {
           this.events[name] = {};

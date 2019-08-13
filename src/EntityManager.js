@@ -182,8 +182,8 @@ export class EntityManager {
    * Get a query based on a list of components
    * @param {Array(Component)} Components List of components that will form the query
    */
-  queryComponents(Components, single) {
-    return this._queryManager.getQuery(Components, single);
+  queryComponents(Components) {
+    return this._queryManager.getQuery(Components);
   }
 
   // EXTRAS
