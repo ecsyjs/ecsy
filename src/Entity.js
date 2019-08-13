@@ -111,11 +111,10 @@ export default class Entity {
   /**
    * Check if the entity has all components in a list
    * @param {Array(Component)} Components to check
-   * @param {Bool} include Components queued for removal (Default is false)
    */
-  hasAllComponents(Components, includeRemoved = false) {
+  hasAllComponents(Components) {
     for (var i = 0; i < Components.length; i++) {
-      if (!this.hasComponent(Components[i], includeRemoved)) return false;
+      if (!this.hasComponent(Components[i])) return false;
     }
     return true;
   }
@@ -123,11 +122,10 @@ export default class Entity {
   /**
    * Check if the entity has any components in a list
    * @param {Array(Component)} Components to check
-   * @param {Bool} include Components queued for removal (Default is false)
    */
-  hasAnyComponents(Components, includeRemoved = false) {
+  hasAnyComponents(Components) {
     for (var i = 0; i < Components.length; i++) {
-      if (this.hasComponent(Components[i], includeRemoved)) return true;
+      if (this.hasComponent(Components[i])) return true;
     }
     return false;
   }

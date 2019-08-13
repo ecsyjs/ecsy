@@ -74,10 +74,10 @@ export default class Query {
     }
   }
 
-  match(entity, includeRemoved = false) {
+  match(entity) {
     return (
-      entity.hasAllComponents(this.Components, includeRemoved) &&
-      !entity.hasAnyComponents(this.NotComponents, includeRemoved)
+      entity.hasAllComponents(this.Components) &&
+      !entity.hasAnyComponents(this.NotComponents)
     );
   }
 
