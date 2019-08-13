@@ -12,16 +12,17 @@ export class MovementSystem extends System {
   init() {
     return {
       queries: {
-        entities: { components: [Circle, Movement] }
+        entities: { components: [Circle, Movement] },
+        context: { components: [CanvasContext, DemoSettings], mandatory: true }
       }
     };
   }
 
   execute(delta) {
-    let canvasWidth = this.world.entity.getComponent(CanvasContext).width;
-    let canvasHeight = this.world.entity.getComponent(CanvasContext).height;
-    let multiplier = this.world.entity.getComponent(DemoSettings)
-      .speedMultiplier;
+    var context = this.queries.context[0];
+    let canvasWidth = context.getComponent(CanvasContext).width;
+    let canvasHeight = context.getComponent(CanvasContext).height;
+    let multiplier = context.getComponent(DemoSettings).speedMultiplier;
 
     let entities = this.queries.entities;
     for (var i = 0; i < entities.length; i++) {
@@ -118,13 +119,15 @@ export class Renderer extends System {
     return {
       queries: {
         circles: { components: [Circle] },
-        intersectingCircles: { components: [Intersecting] }
+        intersectingCircles: { components: [Intersecting] },
+        context: { components: [CanvasContext], mandatory: true }
       }
     };
   }
 
   execute() {
-    let canvasComponent = this.world.entity.getComponent(CanvasContext);
+    var context = this.queries.context[0];
+    let canvasComponent = context.getComponent(CanvasContext);
     let ctx = canvasComponent.ctx;
     let canvasWidth = canvasComponent.width;
     let canvasHeight = canvasComponent.height;
