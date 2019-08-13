@@ -116,9 +116,12 @@
         .registerComponent(Rotating)
         .registerComponent(Pulsating)
         .registerComponent(Transform)
-        .registerSingletonComponent(InputState)
         .registerSystem(MyReactiveSystem)
         .registerSystem(MyNot);
+
+      // Used for singleton components
+      var singletonEntity = world.createEntity();
+      singletonEntity.addComponent(InputState);
 
       for (var i = 0; i < 10; i++) {
         var entity = world.createEntity();
