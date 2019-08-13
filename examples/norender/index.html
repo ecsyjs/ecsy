@@ -120,8 +120,8 @@
         .registerSystem(MyNot);
 
       // Used for singleton components
-      world.entity = world.createEntity();
-      world.entity.addComponent(InputState);
+      var singletonEntity = world.createEntity();
+      singletonEntity.addComponent(InputState);
 
       for (var i = 0; i < 10; i++) {
         var entity = world.createEntity();

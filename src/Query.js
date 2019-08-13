@@ -27,6 +27,7 @@ export default class Query {
     this.single = single === true;
 
     this.entities = [];
+    this.entity = null;
 
     this.eventDispatcher = new EventDispatcher();
 

@@ -8,7 +8,11 @@ export class System {
     if (this._mandatoryQueries.length === 0) return true;
 
     for (let i = 0; i < this._mandatoryQueries.length; i++) {
-      if (this._mandatoryQueries[i].entities.length === 0) {
+      var query = this._mandatoryQueries[i];
+      if (
+        (query.single && query.entity === null) ||
+        (!query.single && query.entities.length === 0)
+      ) {
         return false;
       }
     }
