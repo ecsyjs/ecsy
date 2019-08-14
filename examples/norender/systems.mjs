@@ -1,5 +1,5 @@
 import { Rotating, Transform } from "./components.mjs";
-import { System } from "../../../build/ecsy.module.js";
+import { System } from "../../build/ecsy.module.js";
 
 export class RotatingSystem extends System {
   init() {
