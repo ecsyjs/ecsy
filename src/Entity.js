@@ -4,7 +4,6 @@ import wrapImmutableComponent from "./WrapImmutableComponent.js";
 // @todo Take this out from there or use ENV
 const DEBUG = false;
 
-// @todo reset it by world?
 var nextId = 0;
 
 /**
@@ -35,6 +34,8 @@ export default class Entity {
 
     // Used for deferred removal
     this._ComponentTypesToRemove = [];
+
+    this.alive = false;
   }
 
   // COMPONENTS
