@@ -86,9 +86,16 @@ export class EntityManager {
     if (forceRemove) {
       this._entityRemoveComponentSync(entity, Component, index);
     } else {
-      if (entity.componentsToRemove.length === 0)
+      if (entity._ComponentTypesToRemove.length === 0)
         this.entitiesWithComponentsToRemove.push(entity);
-      entity.componentsToRemove.push(Component);
+
+      entity._ComponentTypes.splice(index, 1);
+      entity._ComponentTypesToRemove.push(Component);
+
+      var componentName = getName(Component);
+      entity._componentsToRemove[componentName] =
+        entity._components[componentName];
+      delete entity._components[componentName];
     }
 
     // Check each indexed query to see if we need to remove it
@@ -133,16 +140,19 @@ export class EntityManager {
     this._queryManager.onEntityRemoved(entity);
 
     if (forceRemove === true) {
-      this._removeEntitySync(entity, index);
+      this._removeEntitySync(entity, index, true);
     } else {
+      this.entityRemoveAllComponents(entity);
       this.entitiesToRemove.push(entity);
     }
   }
 
-  _removeEntitySync(entity, index) {
+  _removeEntitySync(entity, index, removeAllComponents) {
     this._entities.splice(index, 1);
 
-    this.entityRemoveAllComponents(entity, true);
+    if (removeAllComponents) {
+      this.entityRemoveAllComponents(entity, true);
+    }
 
     // Prevent any access and free
     entity._world = null;
@@ -162,16 +172,23 @@ export class EntityManager {
     for (let i = 0; i < this.entitiesToRemove.length; i++) {
       let entity = this.entitiesToRemove[i];
       let index = this._entities.indexOf(entity);
-      this._removeEntitySync(entity, index);
+      this._removeEntitySync(entity, index, false);
     }
     this.entitiesToRemove.length = 0;
 
     for (let i = 0; i < this.entitiesWithComponentsToRemove.length; i++) {
       let entity = this.entitiesWithComponentsToRemove[i];
-      while (entity.componentsToRemove.length > 0) {
-        let Component = entity.componentsToRemove.pop();
-        let index = entity._ComponentTypes.indexOf(Component);
-        this._entityRemoveComponentSync(entity, Component, index);
+      while (entity._ComponentTypesToRemove.length > 0) {
+        let Component = entity._ComponentTypesToRemove.pop();
+
+        var propName = componentPropertyName(Component);
+        var componentName = getName(Component);
+        var component = entity._componentsToRemove[componentName];
+        delete entity._componentsToRemove[componentName];
+        this.componentsManager._componentPool[propName].release(component);
+        //this.world.componentsManager.componentRemovedFromEntity(Component);
+
+        //this._entityRemoveComponentSync(entity, Component, index);
       }
     }
 

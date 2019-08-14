@@ -28,11 +28,13 @@ export default class Entity {
     // Instance of the components
     this._components = {};
 
+    this._componentsToRemove = {};
+
     // Queries where the entity is added
     this.queries = [];
 
     // Used for deferred removal
-    this.componentsToRemove = [];
+    this._ComponentTypesToRemove = [];
   }
 
   // COMPONENTS
@@ -49,8 +51,16 @@ export default class Entity {
     return DEBUG ? wrapImmutableComponent(Component, component) : component;
   }
 
+  getRemovedComponent(Component) {
+    return this._componentsToRemove[Component.name];
+  }
+
   getComponents() {
     return this._components;
+  }
+
+  getComponentsToRemove() {
+    return this._componentsToRemove;
   }
 
   getComponentTypes() {
@@ -101,11 +111,12 @@ export default class Entity {
    * @param {Component} Component to check
    * @param {Bool} include Components queued for removal (Default is false)
    */
-  hasComponent(Component, includeRemoved = false) {
-    return (
-      !!~this._ComponentTypes.indexOf(Component) &&
-      (includeRemoved || !~this.componentsToRemove.indexOf(Component))
-    );
+  hasComponent(Component) {
+    return !!~this._ComponentTypes.indexOf(Component);
+  }
+
+  hasRemovedComponent(Component) {
+    return !!~this._ComponentTypesToRemove.indexOf(Component);
   }
 
   /**

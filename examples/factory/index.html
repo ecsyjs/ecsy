@@ -105,7 +105,7 @@
         var entity = randomEntity();
         if (!entity) return;
         log(`> Removing name '${entity.getComponent(Name).value}' from player id=${entity.id}`);
-        entity.removeComponent(Name, true);
+        entity.removeComponent(Name);
       });
 
       document.getElementById('removeTshirt').addEventListener('click', () => {
@@ -113,7 +113,7 @@
         if (!entity) return;
         var tshirt = entity.getComponent(Tshirt);
         log(`> Removing '${tshirt.color}' '${tshirt.size}' from player id=${entity.id}`);
-        entity.removeComponent(Tshirt, true);
+        entity.removeComponent(Tshirt);
       });
 
       // Utils
