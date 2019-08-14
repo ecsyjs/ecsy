@@ -140,16 +140,19 @@ export class EntityManager {
     this._queryManager.onEntityRemoved(entity);
 
     if (forceRemove === true) {
-      this._removeEntitySync(entity, index);
+      this._removeEntitySync(entity, index, true);
     } else {
+      this.entityRemoveAllComponents(entity);
       this.entitiesToRemove.push(entity);
     }
   }
 
-  _removeEntitySync(entity, index) {
+  _removeEntitySync(entity, index, removeAllComponents) {
     this._entities.splice(index, 1);
 
-    this.entityRemoveAllComponents(entity, true);
+    if (removeAllComponents) {
+      this.entityRemoveAllComponents(entity, true);
+    }
 
     // Prevent any access and free
     entity._world = null;
@@ -169,7 +172,7 @@ export class EntityManager {
     for (let i = 0; i < this.entitiesToRemove.length; i++) {
       let entity = this.entitiesToRemove[i];
       let index = this._entities.indexOf(entity);
-      this._removeEntitySync(entity, index);
+      this._removeEntitySync(entity, index, false);
     }
     this.entitiesToRemove.length = 0;
 

@@ -144,7 +144,8 @@ test("removing components deferred", async t => {
 
   entity.removeComponent(FooComponent); // Deferred remove
   t.is(entity.getComponentTypes().length, 0);
-  t.true(entity.hasComponent(FooComponent, true));
+  t.true(entity.hasRemovedComponent(FooComponent));
+  t.false(entity.hasComponent(FooComponent));
   t.false(entity.hasComponent(FooComponent));
   t.false(entity.hasComponent(BarComponent));
   t.deepEqual(Object.keys(entity.getComponents()), []);

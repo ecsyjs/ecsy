@@ -111,11 +111,12 @@ export default class Entity {
    * @param {Component} Component to check
    * @param {Bool} include Components queued for removal (Default is false)
    */
-  hasComponent(Component, includeRemoved = false) {
-    return (
-      !!~this._ComponentTypes.indexOf(Component) ||
-      (includeRemoved && !!~this._ComponentTypesToRemove.indexOf(Component))
-    );
+  hasComponent(Component) {
+    return !!~this._ComponentTypes.indexOf(Component);
+  }
+
+  hasRemovedComponent(Component) {
+    return !!~this._ComponentTypesToRemove.indexOf(Component);
   }
 
   /**

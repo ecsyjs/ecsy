@@ -502,8 +502,8 @@ test("Queries removing multiple components", t => {
     }
     execute() {
       this.events.entities.removed.forEach(entity => {
-        t.true(entity.hasComponent(FooComponent, true));
-        t.true(entity.hasComponent(BarComponent, true));
+        t.false(entity.hasComponent(FooComponent));
+        t.true(entity.hasRemovedComponent(FooComponent));
       });
 
       // this query should never match
@@ -530,7 +530,6 @@ test("Queries removing multiple components", t => {
   t.is(entitiesA.length, 4);
   t.is(entitiesRemovedA.length, 1);
   systemA.execute();
-
   // Remove second component => It will be the same result
   world.entityManager._entities[1].removeComponent(BarComponent);
   t.is(entitiesA.length, 4);
@@ -550,7 +549,7 @@ test("Queries removing multiple components", t => {
   // Check deferred queues
   t.is(world.entityManager._entities.length, 6);
   t.is(world.entityManager.entitiesToRemove.length, 2);
-  t.is(world.entityManager.entitiesWithComponentsToRemove.length, 2);
+  t.is(world.entityManager.entitiesWithComponentsToRemove.length, 3);
 
   t.is(world.entityManager._entityPool.totalUsed(), 6);
   world.entityManager.processDeferredRemoval();
