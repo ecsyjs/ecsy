@@ -1,4 +1,5 @@
 /**
+ * @private
  * @class EventDispatcher
  */
 export default class EventDispatcher {

@@ -5,6 +5,7 @@ import EventDispatcher from "./EventDispatcher.js";
 import { componentPropertyName, getName } from "./Utils.js";
 
 /**
+ * @private
  * @class EntityManager
  */
 export class EntityManager {

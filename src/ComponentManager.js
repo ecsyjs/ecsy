@@ -3,6 +3,7 @@ import DummyObjectPool from "./DummyObjectPool.js";
 import { componentPropertyName } from "./Utils.js";
 
 /**
+ * @private
  * @class ComponentManager
  */
 export class ComponentManager {
