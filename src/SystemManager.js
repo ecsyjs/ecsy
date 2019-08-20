@@ -1,4 +1,5 @@
 /**
+ * @private
  * @class SystemManager
  */
 export class SystemManager {

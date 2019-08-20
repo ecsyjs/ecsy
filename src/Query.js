@@ -2,6 +2,7 @@ import EventDispatcher from "./EventDispatcher.js";
 import { queryKey } from "./Utils.js";
 
 /**
+ * @private
  * @class Query
  */
 export default class Query {

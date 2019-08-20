@@ -1,5 +1,8 @@
 import { inferType } from "./InferType";
 
+/**
+ * Create a component class from a schema
+ */
 export function createComponent(schema, name) {
   //var Component = new Function(`return function ${name}() {}`)();
   for (let key in schema) {

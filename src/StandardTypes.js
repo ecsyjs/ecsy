@@ -1,4 +1,8 @@
 import { createType } from "./CreateType";
+
+/**
+ * Standard types
+ */
 var Types = {};
 
 Types.Number = createType({

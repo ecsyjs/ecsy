@@ -1,8 +1,8 @@
+import Query from "./Query.js";
+
 /**
  * @class System
  */
-import Query from "./Query.js";
-
 export class System {
   canExecute() {
     if (this._mandatoryQueries.length === 0) return true;
@@ -175,6 +175,9 @@ export class System {
   }
 }
 
+/**
+ * Negate a component query
+ */
 export function Not(Component) {
   return {
     operator: "not",

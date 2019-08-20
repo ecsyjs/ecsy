@@ -1,4 +1,5 @@
 /**
+ * @private
  * @class ObjectPool
  */
 export default class ObjectPool {

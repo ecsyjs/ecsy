@@ -2,6 +2,7 @@ import Query from "./Query.js";
 import { queryKey } from "./Utils.js";
 
 /**
+ * @private
  * @class QueryManager
  */
 export default class QueryManager {

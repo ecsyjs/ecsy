@@ -1,6 +1,7 @@
 /**
  * Return the name of a component
  * @param {Component} Component
+ * @private
  */
 export function getName(Component) {
   return Component.name;
@@ -9,6 +10,7 @@ export function getName(Component) {
 /**
  * Return a valid property name for the Component
  * @param {Component} Component
+ * @private
  */
 export function componentPropertyName(Component) {
   var name = getName(Component);
@@ -18,6 +20,7 @@ export function componentPropertyName(Component) {
 /**
  * Get a key from a list of components
  * @param {Array(Component)} Components Array of components to generate the key
+ * @private
  */
 export function queryKey(Components) {
   var names = [];

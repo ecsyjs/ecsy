@@ -1,4 +1,5 @@
 /**
+ * @private
  * @class DummyObjectPool
  */
 export default class DummyObjectPool {
