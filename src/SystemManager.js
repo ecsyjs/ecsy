@@ -4,7 +4,7 @@
  */
 export class SystemManager {
   constructor(world) {
-    this.systems = [];
+    this._systems = [];
     this.world = world;
   }
 
@@ -14,16 +14,31 @@ export class SystemManager {
    */
   registerSystem(System, attributes) {
     var system = new System(this.world, attributes);
-    system.order = this.systems.length;
-    this.systems.push(system);
+    system.order = this._systems.length;
+    this._systems.push(system);
     this.sortSystems();
     return this;
   }
 
   sortSystems() {
-    this.systems.sort((a, b) => {
+    this._systems.sort((a, b) => {
       return a.priority - b.priority || a.order - b.order;
     });
+  }
+
+  /**
+   * Return a registered system based on its class
+   * @param {System} System
+   */
+  getSystem(System) {
+    return this._systems.find(s => s instanceof System);
+  }
+
+  /**
+   * Return all the systems registered
+   */
+  getSystems() {
+    return this._systems;
   }
 
   /**
@@ -31,10 +46,10 @@ export class SystemManager {
    * @param {System} System System to remove
    */
   removeSystem(System) {
-    var index = this.systems.indexOf(System);
+    var index = this._systems.indexOf(System);
     if (!~index) return;
 
-    this.systems.splice(index, 1);
+    this._systems.splice(index, 1);
   }
 
   /**
@@ -43,7 +58,7 @@ export class SystemManager {
    * @param {Number} time Elapsed time
    */
   execute(delta, time) {
-    this.systems.forEach(system => {
+    this._systems.forEach(system => {
       if (system.enabled && system.initialized) {
         if (system.execute && system.canExecute()) {
           let startTime = performance.now();
@@ -60,12 +75,12 @@ export class SystemManager {
    */
   stats() {
     var stats = {
-      numSystems: this.systems.length,
+      numSystems: this._systems.length,
       systems: {}
     };
 
-    for (var i = 0; i < this.systems.length; i++) {
-      var system = this.systems[i];
+    for (var i = 0; i < this._systems.length; i++) {
+      var system = this._systems[i];
       var systemStats = (stats.systems[system.constructor.name] = {
         queries: {}
       });
