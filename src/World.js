@@ -62,6 +62,13 @@ export class World {
   }
 
   /**
+   * Get all the systems registered
+   */
+  getSystems() {
+    return this.systemManager.getSystems();
+  }
+
+  /**
    * Update the systems per frame
    * @param {Number} delta Delta time since the last call
    * @param {Number} time Elapsed time

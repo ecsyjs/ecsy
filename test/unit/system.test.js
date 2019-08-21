@@ -27,7 +27,7 @@ test("Initialize", t => {
     .registerSystem(SystemE);
 
   t.deepEqual(
-    world.systemManager.systems.map(s => {
+    world.systemManager.getSystems().map(s => {
       return s.constructor.name;
     }),
     ["SystemA", "SystemB", "SystemC", "SystemD", "SystemE"]
@@ -42,7 +42,7 @@ test("Initialize", t => {
     .registerSystem(SystemE);
 
   t.deepEqual(
-    world.systemManager.systems.map(s => {
+    world.systemManager.getSystems().map(s => {
       return s.constructor.name;
     }),
     ["SystemC", "SystemA", "SystemD", "SystemE", "SystemB"]
@@ -57,7 +57,7 @@ test("Initialize", t => {
     .registerSystem(SystemE, { after: SystemB });
 
   t.deepEqual(
-    world.systemManager.systems.map(s => {
+    world.systemManager.getSystems().map(s => {
       return s.constructor.name;
     }),
     ["SystemB", "SystemE", "SystemC", "SystemA", "SystemD"]
@@ -115,10 +115,10 @@ test("Empty queries", t => {
     .registerSystem(SystemEmpty2)
     .registerSystem(SystemEmpty3);
 
-  t.deepEqual(world.systemManager.systems[0].queries, {});
-  t.deepEqual(world.systemManager.systems[1].queries, {});
-  t.deepEqual(world.systemManager.systems[2].queries, {});
-  t.deepEqual(world.systemManager.systems[3].queries, {});
+  t.deepEqual(world.systemManager.getSystems()[0].queries, {});
+  t.deepEqual(world.systemManager.getSystems()[1].queries, {});
+  t.deepEqual(world.systemManager.getSystems()[2].queries, {});
+  t.deepEqual(world.systemManager.getSystems()[3].queries, {});
 
   const error = t.throws(() => {
     world.registerSystem(SystemEmpty4);
@@ -180,11 +180,11 @@ test("Queries", t => {
     .registerSystem(SystemBoth);
 
   // Foo
-  t.is(world.systemManager.systems[0].queries.entities.length, 10);
+  t.is(world.systemManager.getSystems()[0].queries.entities.length, 10);
   // Bar
-  t.is(world.systemManager.systems[1].queries.entities.length, 10);
+  t.is(world.systemManager.getSystems()[1].queries.entities.length, 10);
   // Both
-  t.is(world.systemManager.systems[2].queries.entities.length, 5);
+  t.is(world.systemManager.getSystems()[2].queries.entities.length, 5);
 });
 
 test("Queries with 'Not' operator", t => {
@@ -233,7 +233,7 @@ test("Queries with 'Not' operator", t => {
   }
 
   world.registerSystem(SystemNotBar);
-  var queries = world.systemManager.systems[0].queries;
+  var queries = world.systemManager.getSystems()[0].queries;
 
   t.is(queries.fooNotBar.length, 5);
   t.is(queries.emptyNotBar.length, 5);
@@ -310,8 +310,8 @@ test("Queries with sync removal", t => {
 
   world.registerSystem(SystemA).registerSystem(SystemB);
 
-  var systemA = world.systemManager.systems[0];
-  var systemB = world.systemManager.systems[1];
+  var systemA = world.systemManager.getSystems()[0];
+  var systemB = world.systemManager.getSystems()[1];
 
   var entitiesA = systemA.queries.entities;
   var entitiesB = systemA.queries.entities;
@@ -418,9 +418,9 @@ test("Queries with deferred removal", t => {
     .registerSystem(SystemFB)
     .registerSystem(SystemB);
 
-  var systemF = world.systemManager.systems[0];
-  var systemFB = world.systemManager.systems[1];
-  var systemB = world.systemManager.systems[2];
+  var systemF = world.systemManager.getSystems()[0];
+  var systemFB = world.systemManager.getSystems()[1];
+  var systemB = world.systemManager.getSystems()[2];
 
   var entitiesF = systemF.queries.entities;
   var entitiesFB = systemFB.queries.entities;
@@ -513,7 +513,7 @@ test("Queries removing multiple components", t => {
 
   world.registerSystem(SystemA);
 
-  var systemA = world.systemManager.systems[0];
+  var systemA = world.systemManager.getSystems()[0];
   var entitiesA = systemA.queries.entities;
   var entitiesRemovedA = systemA.events.entities.removed;
 
@@ -636,9 +636,9 @@ test("Querries removing deferred components", t => {
     .registerSystem(SystemFB)
     .registerSystem(SystemB);
 
-  var systemF = world.systemManager.systems[0];
-  var systemFB = world.systemManager.systems[1];
-  var systemB = world.systemManager.systems[2];
+  var systemF = world.systemManager.getSystems()[0];
+  var systemFB = world.systemManager.getSystems()[1];
+  var systemB = world.systemManager.getSystems()[2];
 
   var entitiesF = systemF.queries.entities;
   var entitiesFB = systemFB.queries.entities;
@@ -735,7 +735,7 @@ test("Reactive", t => {
       .addComponent(BarComponent);
   }
 
-  var system = world.systemManager.systems[0];
+  var system = world.systemManager.getSystems()[0];
   var query = system.queries.entities;
   var events = system.events.entities;
   var entity0 = world.entityManager._entities[0];
