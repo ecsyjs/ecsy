@@ -27,6 +27,14 @@ export class SystemManager {
   }
 
   /**
+   * Return a system based on its class
+   * @param {System} System
+   */
+  getSystem(System) {
+    return this.systems.find(s => s instanceof System);
+  }
+
+  /**
    * Remove a system
    * @param {System} System System to remove
    */

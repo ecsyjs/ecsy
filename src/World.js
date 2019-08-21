@@ -54,6 +54,14 @@ export class World {
   }
 
   /**
+   * Get the instance
+   * @param {System} System
+   */
+  getSystem(SystemClass) {
+    return this.systemManager.getSystem(SystemClass);
+  }
+
+  /**
    * Update the systems per frame
    * @param {Number} delta Delta time since the last call
    * @param {Number} time Elapsed time
