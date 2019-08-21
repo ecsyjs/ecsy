@@ -54,7 +54,7 @@ export class World {
   }
 
   /**
-   * Get the instance
+   * Return a registered system based on its class
    * @param {System} System
    */
   getSystem(SystemClass) {

@@ -27,7 +27,7 @@ export class SystemManager {
   }
 
   /**
-   * Return a system based on its class
+   * Return a registered system based on its class
    * @param {System} System
    */
   getSystem(System) {

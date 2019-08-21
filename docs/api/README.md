@@ -21,7 +21,7 @@ Register a system
 
 ### getSystem
 
-Get the instance
+Return a registered system based on its class
 
 #### Parameters
 
