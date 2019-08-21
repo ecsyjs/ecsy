@@ -19,6 +19,19 @@ Register a system
 -   `System` **[System][1]** 
 -   `attributes`  
 
+### getSystem
+
+Get the instance
+
+#### Parameters
+
+-   `SystemClass`  
+-   `System` **[System][1]** 
+
+### getSystems
+
+Get all the systems registered
+
 ### execute
 
 Update the systems per frame

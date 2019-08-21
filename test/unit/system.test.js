@@ -897,3 +897,21 @@ test("Queries with 'mandatory' parameter", t => {
   world.execute();
   t.deepEqual(counter, { a: 4, b: 2, c: 2 });
 });
+
+test("Get Systems", t => {
+  var world = new World();
+
+  class SystemA extends System {}
+  class SystemB extends System {}
+  class SystemC extends System {}
+
+  // Register empty system
+  world.registerSystem(SystemA).registerSystem(SystemB);
+
+  t.true(world.getSystem(SystemA) instanceof SystemA);
+  t.true(world.getSystem(SystemB) instanceof SystemB);
+  t.true(typeof world.getSystem(SystemC) === "undefined");
+
+  var systems = world.getSystems();
+  t.deepEqual(systems, world.systemManager._systems);
+});
