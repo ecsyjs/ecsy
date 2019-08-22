@@ -1,9 +1,10 @@
 /**
+ * @private
  * @class SystemManager
  */
 class SystemManager {
   constructor(world) {
-    this.systems = [];
+    this._systems = [];
     this.world = world;
   }
 
@@ -13,16 +14,31 @@ class SystemManager {
    */
   registerSystem(System, attributes) {
     var system = new System(this.world, attributes);
-    system.order = this.systems.length;
-    this.systems.push(system);
+    system.order = this._systems.length;
+    this._systems.push(system);
     this.sortSystems();
     return this;
   }
 
   sortSystems() {
-    this.systems.sort((a, b) => {
+    this._systems.sort((a, b) => {
       return a.priority - b.priority || a.order - b.order;
     });
+  }
+
+  /**
+   * Return a registered system based on its class
+   * @param {System} System
+   */
+  getSystem(System) {
+    return this._systems.find(s => s instanceof System);
+  }
+
+  /**
+   * Return all the systems registered
+   */
+  getSystems() {
+    return this._systems;
   }
 
   /**
@@ -30,10 +46,10 @@ class SystemManager {
    * @param {System} System System to remove
    */
   removeSystem(System) {
-    var index = this.systems.indexOf(System);
+    var index = this._systems.indexOf(System);
     if (!~index) return;
 
-    this.systems.splice(index, 1);
+    this._systems.splice(index, 1);
   }
 
   /**
@@ -42,7 +58,7 @@ class SystemManager {
    * @param {Number} time Elapsed time
    */
   execute(delta, time) {
-    this.systems.forEach(system => {
+    this._systems.forEach(system => {
       if (system.enabled && system.initialized) {
         if (system.execute && system.canExecute()) {
           let startTime = performance.now();
@@ -59,12 +75,12 @@ class SystemManager {
    */
   stats() {
     var stats = {
-      numSystems: this.systems.length,
+      numSystems: this._systems.length,
       systems: {}
     };
 
-    for (var i = 0; i < this.systems.length; i++) {
-      var system = this.systems[i];
+    for (var i = 0; i < this._systems.length; i++) {
+      var system = this._systems[i];
       var systemStats = (stats.systems[system.constructor.name] = {
         queries: {}
       });
@@ -78,6 +94,7 @@ class SystemManager {
 }
 
 /**
+ * @private
  * @class EventDispatcher
  */
 class EventDispatcher {
@@ -162,6 +179,7 @@ class EventDispatcher {
 /**
  * Return the name of a component
  * @param {Component} Component
+ * @private
  */
 function getName(Component) {
   return Component.name;
@@ -170,6 +188,7 @@ function getName(Component) {
 /**
  * Return a valid property name for the Component
  * @param {Component} Component
+ * @private
  */
 function componentPropertyName(Component) {
   var name = getName(Component);
@@ -179,6 +198,7 @@ function componentPropertyName(Component) {
 /**
  * Get a key from a list of components
  * @param {Array(Component)} Components Array of components to generate the key
+ * @private
  */
 function queryKey(Components) {
   var names = [];
@@ -201,6 +221,7 @@ function queryKey(Components) {
 }
 
 /**
+ * @private
  * @class Query
  */
 class Query {
@@ -461,6 +482,7 @@ class Entity {
 }
 
 /**
+ * @private
  * @class ObjectPool
  */
 class ObjectPool {
@@ -526,6 +548,7 @@ class ObjectPool {
 }
 
 /**
+ * @private
  * @class QueryManager
  */
 class QueryManager {
@@ -635,6 +658,7 @@ class QueryManager {
 }
 
 /**
+ * @private
  * @class EntityManager
  */
 class EntityManager {
@@ -874,6 +898,7 @@ const COMPONENT_ADDED = "EntityManager#COMPONENT_ADDED";
 const COMPONENT_REMOVE = "EntityManager#COMPONENT_REMOVE";
 
 /**
+ * @private
  * @class DummyObjectPool
  */
 class DummyObjectPool {
@@ -907,6 +932,7 @@ class DummyObjectPool {
 }
 
 /**
+ * @private
  * @class ComponentManager
  */
 class ComponentManager {
@@ -1010,6 +1036,21 @@ class World {
   }
 
   /**
+   * Return a registered system based on its class
+   * @param {System} System
+   */
+  getSystem(SystemClass) {
+    return this.systemManager.getSystem(SystemClass);
+  }
+
+  /**
+   * Get all the systems registered
+   */
+  getSystems() {
+    return this.systemManager.getSystems();
+  }
+
+  /**
    * Update the systems per frame
    * @param {Number} delta Delta time since the last call
    * @param {Number} time Elapsed time
@@ -1052,7 +1093,6 @@ class World {
 /**
  * @class System
  */
-
 class System {
   canExecute() {
     if (this._mandatoryQueries.length === 0) return true;
@@ -1225,6 +1265,9 @@ class System {
   }
 }
 
+/**
+ * Negate a component query
+ */
 function Not(Component) {
   return {
     operator: "not",
@@ -1234,10 +1277,16 @@ function Not(Component) {
 
 class Component {}
 
+/**
+ * @class
+ */
 class TagComponent {
   reset() {}
 }
 
+/**
+ * Use createType to create custom type definitions.
+ */
 function createType(typeDefinition) {
   var mandatoryFunctions = [
     "create",
@@ -1262,6 +1311,9 @@ function createType(typeDefinition) {
   return typeDefinition;
 }
 
+/**
+ * Standard types
+ */
 var Types = {};
 
 Types.Number = createType({
@@ -1342,17 +1394,18 @@ Types.Array = createType({
   }
 });
 
-/**
- * Try to infer the type of the value
- * @param {*} value
- * @return {String} Type of the attribute
- */
 var standardTypes = {
   number: Types.Number,
   boolean: Types.Boolean,
   string: Types.String
 };
 
+/**
+ * Try to infer the type of the value
+ * @param {*} value
+ * @return {String} Type of the attribute
+ * @private
+ */
 function inferType(value) {
   if (Array.isArray(value)) {
     return Types.Array;
@@ -1365,6 +1418,9 @@ function inferType(value) {
   }
 }
 
+/**
+ * Create a component class from a schema
+ */
 function createComponent(schema, name) {
   //var Component = new Function(`return function ${name}() {}`)();
   for (let key in schema) {
