@@ -1,4 +1,5 @@
 # Logs
+.vscode
 .DS_Store
 logs
 *.log
