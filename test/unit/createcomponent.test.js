@@ -232,3 +232,60 @@ test("Array of vector3 type", t => {
   c1.clear();
   t.is(c1.v3array.length, 0);
 });
+
+test("boolean", t => {
+  var schema = {
+    bool: { default: true },
+    bool2: { default: false }
+  };
+
+  var ComponentA = createComponent(schema, "ComponentA");
+  var c1 = new ComponentA();
+
+  t.true(c1.bool);
+  t.false(c1.bool2);
+
+  c1.bool = false;
+  c1.bool2 = true;
+
+  t.false(c1.bool);
+  t.true(c1.bool2);
+
+  c1.reset();
+
+  t.true(c1.bool);
+  t.false(c1.bool2);
+
+  c1.clear();
+
+  t.false(c1.bool);
+  t.false(c1.bool2);
+});
+
+test("Copy with different number of parameters", t => {
+  var schema = {
+    value1: { default: 1 },
+    value2: { default: 2 },
+    value3: { default: 3 }
+  };
+
+  var ComponentA = createComponent(schema, "ComponentA");
+  var c1 = new ComponentA();
+
+  t.is(c1.value1, 1);
+  t.is(c1.value2, 2);
+  t.is(c1.value3, 3);
+
+  c1.copy({ value1: 11, value2: 22 });
+
+  t.is(c1.value1, 11);
+  t.is(c1.value2, 22);
+  t.is(c1.value3, 3);
+
+  c1.copy({ value1: 11, value2: 22, value3: 33, value4: 44 });
+
+  t.is(c1.value1, 11);
+  t.is(c1.value2, 22);
+  t.is(c1.value3, 33);
+  t.is(c1.value4, undefined);
+});
