@@ -1485,17 +1485,19 @@
 	  } else {
 	    Component.prototype.copy = function(src) {
 	      for (let key in schema) {
-	        let type = schema[key].type;
-	        if (type.isSimpleType) {
-	          this[key] = src[key];
-	        } else if (type.copy) {
-	          type.copy(this, src, key);
-	        } else {
-	          // @todo Detect that it's not possible to copy all the attributes
-	          // and just avoid creating the copy function
-	          console.warn(
-	            `Unknown copy function for attribute '${key}' data type`
-	          );
+	        if (src[key]) {
+	          let type = schema[key].type;
+	          if (type.isSimpleType) {
+	            this[key] = src[key];
+	          } else if (type.copy) {
+	            type.copy(this, src, key);
+	          } else {
+	            // @todo Detect that it's not possible to copy all the attributes
+	            // and just avoid creating the copy function
+	            console.warn(
+	              `Unknown copy function for attribute '${key}' data type`
+	            );
+	          }
 	        }
 	      }
 	    };
