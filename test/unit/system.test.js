@@ -915,3 +915,23 @@ test("Get Systems", t => {
   var systems = world.getSystems();
   t.deepEqual(systems, world.systemManager._systems);
 });
+
+test("Systems without queries", t => {
+  var world = new World();
+
+  var counter = 0;
+  class SystemA extends System {
+    execute() {
+      counter++;
+    }
+  }
+
+  // Register empty system
+  world.registerSystem(SystemA);
+
+  t.is(counter, 0);
+  for (var i = 0; i < 10; i++) {
+    world.execute();
+  }
+  t.is(counter, 10);
+});
