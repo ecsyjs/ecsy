@@ -56,7 +56,7 @@
         }
 
         execute() {
-          this.queries.entities.forEach(entity => {
+          this.queries.entities.results.forEach(entity => {
             var name = randomFromArray(names);
             log(`Added name '${name}' to player id=${entity.id}`);
             entity.addComponent(Name, {value: name});
@@ -74,7 +74,7 @@
         }
 
         execute() {
-          this.queries.entities.forEach(entity => {
+          this.queries.entities.results.forEach(entity => {
             var size = randomFromArray(sizes);
             var color = randomFromArray(colors);
             log(`Added '${color}' '${size}' tshirt to player id=${entity.id}`);
