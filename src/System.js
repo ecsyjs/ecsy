@@ -67,7 +67,6 @@ export class System {
           changed: Query.prototype.COMPONENT_CHANGED // Query.prototype.ENTITY_CHANGED
         };
 
-        window.query = query;
         if (queryConfig.listen) {
           validEvents.forEach(eventName => {
             // Is the event enabled on this system's query?
@@ -97,9 +96,9 @@ export class System {
                     ] = []);
                     query.eventDispatcher.addEventListener(
                       Query.prototype.COMPONENT_CHANGED,
-                      (entity, component) => {
+                      (entity, changedComponent) => {
                         if (
-                          Components.indexOf(component.constructor) !== -1 &&
+                          changedComponent.constructor === component &&
                           eventList.indexOf(entity) === -1
                         ) {
                           eventList.push(entity);
