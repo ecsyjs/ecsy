@@ -1,4 +1,5 @@
 import Query from "./Query.js";
+import { componentPropertyName } from "./Utils.js";
 
 /**
  * @class System
@@ -42,19 +43,88 @@ export class System {
     this.initialized = true;
 
     if (this.constructor.queries) {
-      for (var name in this.constructor.queries) {
-        var queryConfig = this.constructor.queries[name];
+      for (var queryName in this.constructor.queries) {
+        var queryConfig = this.constructor.queries[queryName];
         var Components = queryConfig.components;
         if (!Components || Components.length === 0) {
           throw new Error("'components' attribute can't be empty in a query");
         }
         var query = this.world.entityManager.queryComponents(Components);
-        this._queries[name] = query;
+        this._queries[queryName] = query;
         if (queryConfig.mandatory === true) {
           this._mandatoryQueries.push(query);
         }
-        this.queries[name] = query.entities;
+        this.queries[queryName] = {
+          results: query.entities
+        };
 
+        // Reactive configuration added/removed/changed
+        var validEvents = ["added", "removed", "changed"];
+
+        const eventMapping = {
+          added: Query.prototype.ENTITY_ADDED,
+          removed: Query.prototype.ENTITY_REMOVED,
+          changed: Query.prototype.COMPONENT_CHANGED // Query.prototype.ENTITY_CHANGED
+        };
+
+        window.query = query;
+        if (queryConfig.listen) {
+          validEvents.forEach(eventName => {
+            // Is the event enabled on this system's query?
+            if (queryConfig.listen[eventName]) {
+              let event = queryConfig.listen[eventName];
+
+              if (eventName === "changed") {
+                query.reactive = true;
+                if (event === true) {
+                  // Any change on the entity from the components in the query
+                  let eventList = (this.queries[queryName][eventName] = []);
+                  query.eventDispatcher.addEventListener(
+                    Query.prototype.COMPONENT_CHANGED,
+                    entity => {
+                      // Avoid duplicates
+                      if (eventList.indexOf(entity) === -1) {
+                        eventList.push(entity);
+                      }
+                    }
+                  );
+                } else {
+                  // Checking just specific components
+                  let changedList = (this.queries[queryName][eventName] = {});
+                  event.forEach(component => {
+                    let eventList = (changedList[
+                      componentPropertyName(component)
+                    ] = []);
+                    query.eventDispatcher.addEventListener(
+                      Query.prototype.COMPONENT_CHANGED,
+                      (entity, component) => {
+                        if (
+                          Components.indexOf(component.constructor) !== -1 &&
+                          eventList.indexOf(entity) === -1
+                        ) {
+                          eventList.push(entity);
+                        }
+                      }
+                    );
+                  });
+                }
+              } else {
+                let eventList = (this.queries[queryName][eventName] = []);
+
+                query.eventDispatcher.addEventListener(
+                  eventMapping[eventName],
+                  entity => {
+                    // @fixme overhead?
+                    if (eventList.indexOf(entity) === -1)
+                      eventList.push(entity);
+                  }
+                );
+              }
+            }
+          });
+        }
+
+        /*
         if (queryConfig.events) {
           this.events[name] = {};
           let events = this.events[name];
@@ -93,15 +163,16 @@ export class System {
             }
           }
         }
+        */
       }
     }
     /*
     if (this.config.events) {
-      for (let name in this.config.events) {
-        var event = this.config.events[name];
-        this.events[name] = [];
+      for (let eventName in this.config.events) {
+        var event = this.config.events[eventName];
+        this.events[eventName] = [];
         this.world.addEventListener(event, data => {
-          this.events[name].push(data);
+          this.events[eventName].push(data);
         });
       }
     }
@@ -116,16 +187,27 @@ export class System {
     this.enabled = true;
   }
 
+  // @question rename to clear queues?
   clearEvents() {
-    for (var name in this.events) {
-      var event = this.events[name];
-      if (Array.isArray(event)) {
-        this.events[name].length = 0;
-      } else {
-        for (name in event) {
-          event[name].length = 0;
+    for (let queryName in this.queries) {
+      var query = this.queries[queryName];
+      if (query.added) query.added.length = 0;
+      if (query.removed) query.removed.length = 0;
+      if (query.changed) {
+        if (Array.isArray(query.changed)) {
+          query.changed.length = 0;
+        } else {
+          for (name in query.changed) {
+            query.changed[name].length = 0;
+          }
         }
       }
+      // @todo add changed
+    }
+
+    // @question Standard events TBD?
+    for (var name in this.events) {
+      this.events[name].length = 0;
     }
   }
 

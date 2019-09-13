@@ -54,58 +54,76 @@
         init() {
           return {
             queries: {
-              entities: {
+              transformRotating: {
                 components: [Transform, Rotating],
-                events: {
-                  added: {
-                    event: "EntityAdded"
-                  },
-                  removed: {
-                    event: "EntityRemoved"
-                  },
-                  changed: {
-                    event: "EntityChanged"
-                  },
-                  transformChanged: {
-                    event: "ComponentChanged",
-                    components: [Transform]
-                  },
-                  rotatingChanged: {
-                    event: "ComponentChanged",
-                    components: [Rotating]
-                  }
+                listen: {
+                  added: true,
+                  removed: true,
+                  changed: true
+                }
+              },
+              rotating: {
+                components: [Rotating],
+                listen: {
+                  added: true,
+                  removed: true,
+                  changed: true
+                }
+              },
+              transformRotating2: {
+                components: [Transform, Rotating],
+                listen: {
+                  added: true,
+                  removed: true,
+                  changed: [Transform]
                 }
               }
-            },
-            events: {
-              onColliding: "SphereColliding"
             }
           }
         }
 
         execute() {
-          if (this.events.entities.added.length > 0) {
-            // console.log('OnAdded', this.events.entities.added);
+          // Transform&Rotating
+          if (this.queries.transformRotating.results.length > 0) {
+            //console.log('results', this.queries.transformRotating.results);
           }
 
-          if (this.events.entities.removed.length > 0) {
-            // console.log('Onremoved', this.events.entities.removed);
+          if (this.queries.transformRotating.added.length > 0) {
+            console.log('Transform&Rotating OnAdded', this.queries.transformRotating.added);
           }
 
-          if (this.events.entities.changed.length > 0) {
-            // console.log('Onchanged', this.events.entities.changed);
+          if (this.queries.transformRotating.removed.length > 0) {
+            console.log('Transform&Rotating Onremoved', this.queries.transformRotating.removed);
           }
 
-          if (this.events.entities.transformChanged.length > 0) {
-            // console.log('OntransformChanged', this.events.entities.transformChanged);
+          if (this.queries.transformRotating.changed.length > 0) {
+            console.log('Transform&Rotating Onchanged', this.queries.transformRotating.changed);
           }
 
-          if (this.events.entities.rotatingChanged.length > 0) {
-            // console.log('OnrotatingChanged', this.events.entities.rotatingChanged);
+          // Transform&Rotating2
+          if (this.queries.transformRotating2.added.length > 0) {
+            console.log('Transform&Rotating2 OnAdded', this.queries.transformRotating2.added);
           }
 
-          if (this.events.onColliding.length > 0) {
-            // console.log('onColliding', this.events.onColliding);
+          if (this.queries.transformRotating2.removed.length > 0) {
+            console.log('Transform&Rotating2 Onremoved', this.queries.transformRotating2.removed);
+          }
+
+          if (this.queries.transformRotating2.changed.transform.length > 0) {
+            console.log('Transform&Rotating2 Onchanged[Transform]', this.queries.transformRotating2.changed.transform);
+          }
+
+          // Rotating
+          if (this.queries.rotating.added.length > 0) {
+            console.log('Rotating OnAdded', this.queries.rotating.added);
+          }
+
+          if (this.queries.rotating.removed.length > 0) {
+            console.log('Rotating Onremoved', this.queries.rotating.removed);
+          }
+
+          if (this.queries.rotating.changed.length > 0) {
+            console.log('Rotating Onchanged', this.queries.rotating.changed);
           }
         }
       }
@@ -117,7 +135,7 @@
         .registerComponent(Pulsating)
         .registerComponent(Transform)
         .registerSystem(MyReactiveSystem)
-        .registerSystem(MyNot);
+        //.registerSystem(MyNot);
 
       // Used for singleton components
       var singletonEntity = world.createEntity();
