@@ -650,7 +650,7 @@ test("Reactive", t => {
   t.is(query.changed.fooComponent.length, 1);
   t.is(query.changed.barComponent.length, 0);
   world.execute(); // After execute, events should be cleared
-//  t.is(query.changed.length, 0);
+  //  t.is(query.changed.length, 0);
 
   entity0.getMutableComponent(BarComponent);
   //t.is(query.changed.length, 1);
