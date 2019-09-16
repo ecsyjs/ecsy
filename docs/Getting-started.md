@@ -18,17 +18,17 @@ world = new World();
 By definition components are just objects that hold data. So we can use any way to define them, for example ES6 syntax (recommended):
 ```javascript
 class Acceleration {
-	constructor() {
-		this.value = 0.1;
-	}
+  constructor() {
+    this.value = 0.1;
+  }
 }
 
 class Position {
-	constructor() {
-		this.x = 0;
-		this.y = 0;
-		this.z = 0;
-	}
+  constructor() {
+    this.x = 0;
+    this.y = 0;
+    this.z = 0;
+  }
 }
 ```
 
@@ -38,14 +38,14 @@ More on how to create components LINK
 Having our world and some components already defined lets us create entities and attach theses components to them:
 ```javascript
 var entityA = world
-	.createEntity()
-	.addComponent(Position);
+  .createEntity()
+  .addComponent(Position);
 
 for (let i = 0; i < 10; i++) {
-	world
-		.createEntity();
-		.addComponent(Acceleration)
-		.addComponent(Position, { x: Math.random() * 10, y: Math.random() * 10, z: 0});
+  world
+    .createEntity();
+    .addComponent(Acceleration)
+    .addComponent(Position, { x: Math.random() * 10, y: Math.random() * 10, z: 0});
 }
 ```
 With that we have just created 11 entities. 10 with the `Acceleration` and `Position` components, and one just with the `Position` component.
@@ -61,47 +61,47 @@ We could also define the queries of entities in which we are interested in proce
 Let's first create a system that will just loop through all the entities that has a `Position` component (11 in our example) and log theirs position.
 ```javascript
 class PositionLogSystem extends System {
-	init() { /* Do whatever you need here */ }
-	// This method will get called on every frame by default
-	execute(delta, time) {
-		// Iterate through all the entities on the query
-		this.queries.position.forEach(entity => {
+  init() { /* Do whatever you need here */ }
+  // This method will get called on every frame by default
+  execute(delta, time) {
+    // Iterate through all the entities on the query
+    this.queries.position.forEach(entity => {
       var position = entity.getComponent(Position);
       console.log(`Entity with ID: ${entity.id} has component Position={x: ${position.x}, y: ${position.y}, z: ${position.z}}`);
-		});
-	}
+    });
+  }
 }
 
 // Define a query of entities that have the "Position" component
 System.queries = {
-	position: {
-		components: [Position]
-	}
+  position: {
+    components: [Position]
+  }
 }
 ```
 
 
 ```javascript
 class MovableSystem extends System {
-	init() { /* Do whatever you need here */ }
-	// This method will get called on every frame by default
-	execute(delta, time) {
-		// Iterate through all the entities on the query
-		this.queries.moving.forEach(entity => {
-			var acceleration = entity.getComponent(Acceleration).value;
-			var position = entity.getMutableComponent(Position);
-			position.x += acceleration * delta;
-			position.y += acceleration * delta;
-			position.z += acceleration * delta;
-		});
-	}
+  init() { /* Do whatever you need here */ }
+  // This method will get called on every frame by default
+  execute(delta, time) {
+    // Iterate through all the entities on the query
+    this.queries.moving.forEach(entity => {
+      var acceleration = entity.getComponent(Acceleration).value;
+      var position = entity.getMutableComponent(Position);
+      position.x += acceleration * delta;
+      position.y += acceleration * delta;
+      position.z += acceleration * delta;
+    });
+  }
 }
 
 // Define a query of entities that have "Acceleration" and "Position" components
 System.queries = {
-	moving: {
-		components: [Acceleration, Position]
-	}
+  moving: {
+    components: [Acceleration, Position]
+  }
 }
 ```
 
@@ -123,15 +123,15 @@ This system's query `moving` hold a list to the entities that has both `Accelera
 Please notice also that we could create an arbitrary number of queries if needed and process them in  `execute`, eg:
 ```javascript
 class SystemDemo extends System {
-	execute() {
-		this.queries.boxes.forEach(entity => { /* do things */});
-		this.queries.balls.forEach(entity => { /* do things */});
-	}
+  execute() {
+    this.queries.boxes.forEach(entity => { /* do things */});
+    this.queries.balls.forEach(entity => { /* do things */});
+  }
 }
 
 SystemDemo.queries = {
-	boxes: { components: [Box] },
-	balls: { components: [Ball] },
+  boxes: { components: [Box] },
+  balls: { components: [Ball] },
 };
 ```
 
@@ -139,15 +139,15 @@ SystemDemo.queries = {
 Now you just need to invoke `world.execute()` per frame. Currently ECSY doesn't provide a default scheduler so you must do it yourself. eg:
 ```javascript
 function  run() {
-	// Compute delta and elapsed time
-	var  time = performance.now();
-	var  delta = time - lastTime;
+  // Compute delta and elapsed time
+  var  time = performance.now();
+  var  delta = time - lastTime;
 
-	// Run all the systems
-	world.execute(delta, time);
+  // Run all the systems
+  world.execute(delta, time);
 
-	lastTime = time;
-	requestAnimationFrame(animate);
+  lastTime = time;
+  requestAnimationFrame(animate);
 }
 
 var  lastTime = performance.now();
@@ -161,79 +161,79 @@ import {World, System} from 'ecsy';
 
 // Components
 class Acceleration {
-	constructor() {
-		this.value = 0.1;
-	}
+  constructor() {
+    this.value = 0.1;
+  }
 }
 
 class Position {
-	constructor() {
-		this.x = 0;
-		this.y = 0;
-		this.z = 0;
-	}
+  constructor() {
+    this.x = 0;
+    this.y = 0;
+    this.z = 0;
+  }
 }
 
 // Create world
 var world = new World();
 
 var entityA = world
-	.createEntity()
-	.addComponent(Position);
+  .createEntity()
+  .addComponent(Position);
 
 for (let i = 0; i < 10; i++) {
-	world
-		.createEntity();
-		.addComponent(Acceleration)
-		.addComponent(Position, { x: Math.random() * 10, y: Math.random() * 10, z: 0});
+  world
+    .createEntity();
+    .addComponent(Acceleration)
+    .addComponent(Position, { x: Math.random() * 10, y: Math.random() * 10, z: 0});
 }
 
 // Systems
 class MovableSystem extends System {
-	init() { // Do whatever you need here }
-	// This method will get called on every frame by default
-	execute(delta, time) {
-		// Iterate through all the entities on the query
-		this.queries.moving.forEach(entity => {
-			var acceleration = entity.getComponent(Acceleration).value;
-			var position = entity.getMutableComponent(Position);
-			position.x += acceleration * delta;
-			position.y += acceleration * delta;
-			position.z += acceleration * delta;
-		});
-	}
+  init() { // Do whatever you need here }
+  // This method will get called on every frame by default
+  execute(delta, time) {
+    // Iterate through all the entities on the query
+    this.queries.moving.forEach(entity => {
+      var acceleration = entity.getComponent(Acceleration).value;
+      var position = entity.getMutableComponent(Position);
+      position.x += acceleration * delta;
+      position.y += acceleration * delta;
+      position.z += acceleration * delta;
+    });
+  }
 }
 
 // Define a query of entities that have "Acceleration" and "Position" components
 System.queries = {
-	moving: {
-		components: [Acceleration, Position]
-	}
+  moving: {
+    components: [Acceleration, Position]
+  }
 }
 
 // Initialize entities
 var entityA = world
-	.createEntity()
-	.addComponent(Position);
+  .createEntity()
+  .addComponent(Position);
 
 for (let i = 0; i < 10; i++) {
-	world
-		.createEntity();
-		.addComponent(Acceleration)
-		.addComponent(Position, { x: Math.random() * 10, y: Math.random() * 10, z: 0});
+  world
+    .createEntity();
+    .addComponent(Acceleration)
+    .addComponent(Position, { x: Math.random() * 10, y: Math.random() * 10, z: 0});
 }
 
 // Run!
 function run() {
-	// Compute delta and elapsed time
-	var time = performance.now();
-	var delta = time - lastTime;
+  // Compute delta and elapsed time
+  var time = performance.now();
+  var delta = time - lastTime;
 
-	// Run all the systems
-	world.execute(delta, time);
+  // Run all the systems
+  world.execute(delta, time);
 
-	lastTime = time;
-	requestAnimationFrame(animate);
+  lastTime = time;
+  requestAnimationFrame(animate);
 }
 
 var lastTime = performance.now();
