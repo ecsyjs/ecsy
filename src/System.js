@@ -41,8 +41,6 @@ export class System {
 
     this.initialized = true;
 
-    if (this.init) this.init(); // @fixme get this out from
-
     if (this.constructor.queries) {
       for (var name in this.constructor.queries) {
         var queryConfig = this.constructor.queries[name];

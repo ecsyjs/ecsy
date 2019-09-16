@@ -14,6 +14,7 @@ export class SystemManager {
    */
   registerSystem(System, attributes) {
     var system = new System(this.world, attributes);
+    if (system.init) system.init();
     system.order = this._systems.length;
     this._systems.push(system);
     this.sortSystems();
