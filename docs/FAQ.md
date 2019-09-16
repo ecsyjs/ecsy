@@ -1,0 +1,4 @@
+# FAQ
+
+## Question
+Answer
