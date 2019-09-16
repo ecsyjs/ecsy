@@ -8,3 +8,7 @@
 	font-weight: normal;
 	text-decoration: underline;
 }
+.back-link {
+	color: grey;
+	padding-left: 1em;
+}
