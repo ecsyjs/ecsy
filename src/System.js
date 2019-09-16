@@ -97,7 +97,7 @@ export class System {
         }
       }
     }
-/*
+    /*
     if (this.config.events) {
       for (let name in this.config.events) {
         var event = this.config.events[name];
