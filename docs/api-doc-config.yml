@@ -1,3 +1,4 @@
+# This yaml config is used to control the order of links in the table of contents.
 toc:
     - World
     - Entity
