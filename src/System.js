@@ -1,5 +1,4 @@
 import Query from "./Query.js";
-import { componentPropertyName } from "./Utils.js";
 
 /**
  * @class System
