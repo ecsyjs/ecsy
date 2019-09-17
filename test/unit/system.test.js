@@ -8,7 +8,7 @@ import {
   BarComponent,
   EmptyComponent
 } from "../helpers/components";
-
+/*
 test("Initialize", t => {
   var world = new World();
 
@@ -47,87 +47,48 @@ test("Initialize", t => {
     }),
     ["SystemC", "SystemA", "SystemD", "SystemE", "SystemB"]
   );
-  /*
-  world = new World();
-  world
-    .registerSystem(SystemA, { before: SystemC })
-    .registerSystem(SystemB)
-    .registerSystem(SystemC, { after: SystemE })
-    .registerSystem(SystemD)
-    .registerSystem(SystemE, { after: SystemB });
-
-  t.deepEqual(
-    world.systemManager.getSystems().map(s => {
-      return s.constructor.name;
-    }),
-    ["SystemB", "SystemE", "SystemC", "SystemA", "SystemD"]
-  );
-*/
-
   world.execute();
 });
+*/
 
 test("Empty queries", t => {
   var world = new World();
 
-  class SystemEmpty0 extends System {}
+  // System 1
+  class SystemEmpty1 extends System {}
 
-  class SystemEmpty1 extends System {
-    init() {}
-  }
+  // System 2
+  class SystemEmpty2 extends System {}
 
-  class SystemEmpty2 extends System {
-    init() {
-      return {};
-    }
-  }
+  SystemEmpty2.queries = {};
 
-  class SystemEmpty3 extends System {
-    init() {
-      return { queries: {} };
-    }
-  }
+  // System 3
+  class SystemEmpty3 extends System {}
 
-  class SystemEmpty4 extends System {
-    init() {
-      return {
-        queries: {
-          entities: {}
-        }
-      };
-    }
-  }
+  SystemEmpty3.queries = {
+    entities: {}
+  };
 
-  class SystemEmpty5 extends System {
-    init() {
-      return {
-        queries: {
-          entities: { components: [] }
-        }
-      };
-    }
-  }
+  // System 4
+  class SystemEmpty4 extends System {}
+
+  SystemEmpty4.queries = {
+    entities: { components: [] }
+  };
 
   // Register empty system
-  world
-    .registerSystem(SystemEmpty0)
-    .registerSystem(SystemEmpty1)
-    .registerSystem(SystemEmpty2)
-    .registerSystem(SystemEmpty3);
+  world.registerSystem(SystemEmpty1).registerSystem(SystemEmpty2);
 
-  t.deepEqual(world.systemManager.getSystems()[0].queries, {});
-  t.deepEqual(world.systemManager.getSystems()[1].queries, {});
-  t.deepEqual(world.systemManager.getSystems()[2].queries, {});
-  t.deepEqual(world.systemManager.getSystems()[3].queries, {});
+  t.deepEqual(world.systemManager.getSystem(SystemEmpty1).queries, {});
+  t.deepEqual(world.systemManager.getSystem(SystemEmpty2).queries, {});
 
   const error = t.throws(() => {
-    world.registerSystem(SystemEmpty4);
+    world.registerSystem(SystemEmpty3);
   }, Error);
 
   t.is(error.message, "'components' attribute can't be empty in a query");
-
   const error2 = t.throws(() => {
-    world.registerSystem(SystemEmpty5);
+    world.registerSystem(SystemEmpty4);
   }, Error);
   t.is(error2.message, "'components' attribute can't be empty in a query");
 });
@@ -144,35 +105,23 @@ test("Queries", t => {
     entity.addComponent(EmptyComponent);
   }
 
-  class SystemFoo extends System {
-    init() {
-      return {
-        queries: {
-          entities: { components: [FooComponent] }
-        }
-      };
-    }
-  }
+  class SystemFoo extends System {}
 
-  class SystemBar extends System {
-    init() {
-      return {
-        queries: {
-          entities: { components: [BarComponent] }
-        }
-      };
-    }
-  }
+  SystemFoo.queries = {
+    entities: { components: [FooComponent] }
+  };
 
-  class SystemBoth extends System {
-    init() {
-      return {
-        queries: {
-          entities: { components: [FooComponent, BarComponent] }
-        }
-      };
-    }
-  }
+  class SystemBar extends System {}
+
+  SystemBar.queries = {
+    entities: { components: [BarComponent] }
+  };
+
+  class SystemBoth extends System {}
+
+  SystemBoth.queries = {
+    entities: { components: [FooComponent, BarComponent] }
+  };
 
   world
     .registerSystem(SystemFoo)
@@ -202,15 +151,11 @@ test("Queries with 'Not' operator", t => {
     entity.addComponent(EmptyComponent);
   }
 
-  class SystemNotNot extends System {
-    init() {
-      return {
-        queries: {
-          notFoo: { components: [Not(FooComponent), Not(BarComponent)] }
-        }
-      };
-    }
-  }
+  class SystemNotNot extends System {}
+
+  SystemNotNot.queries = {
+    notFoo: { components: [Not(FooComponent), Not(BarComponent)] }
+  };
 
   const error = t.throws(() => {
     world.registerSystem(SystemNotNot);
@@ -218,19 +163,15 @@ test("Queries with 'Not' operator", t => {
 
   t.is(error.message, "Can't create a query without components");
 
-  class SystemNotBar extends System {
-    init() {
-      return {
-        queries: {
-          fooNotBar: { components: [FooComponent, Not(BarComponent)] },
-          emptyNotBar: { components: [EmptyComponent, Not(BarComponent)] },
-          emptyNotBarFoo: {
-            components: [EmptyComponent, Not(BarComponent), Not(FooComponent)]
-          }
-        }
-      };
+  class SystemNotBar extends System {}
+
+  SystemNotBar.queries = {
+    fooNotBar: { components: [FooComponent, Not(BarComponent)] },
+    emptyNotBar: { components: [EmptyComponent, Not(BarComponent)] },
+    emptyNotBarFoo: {
+      components: [EmptyComponent, Not(BarComponent), Not(FooComponent)]
     }
-  }
+  };
 
   world.registerSystem(SystemNotBar);
   var queries = world.systemManager.getSystems()[0].queries;
@@ -263,20 +204,6 @@ test("Queries with sync removal", t => {
   }
 
   class SystemA extends System {
-    init() {
-      return {
-        queries: {
-          entities: {
-            components: [FooComponent],
-            events: {
-              removed: {
-                event: "EntityRemoved"
-              }
-            }
-          }
-        }
-      };
-    }
     execute() {
       var entities = this.queries.entities;
       for (var i = 0; i < entities.length; i++) {
@@ -285,21 +212,18 @@ test("Queries with sync removal", t => {
     }
   }
 
-  class SystemB extends System {
-    init() {
-      return {
-        queries: {
-          entities: {
-            components: [FooComponent],
-            events: {
-              removed: {
-                event: "EntityRemoved"
-              }
-            }
-          }
+  SystemA.queries = {
+    entities: {
+      components: [FooComponent],
+      events: {
+        removed: {
+          event: "EntityRemoved"
         }
-      };
+      }
     }
+  };
+
+  class SystemB extends System {
     execute() {
       var entities = this.queries.entities;
       for (var i = 0, l = entities.length; i < l; i++) {
@@ -307,6 +231,17 @@ test("Queries with sync removal", t => {
       }
     }
   }
+
+  SystemB.queries = {
+    entities: {
+      components: [FooComponent],
+      events: {
+        removed: {
+          event: "EntityRemoved"
+        }
+      }
+    }
+  };
 
   world.registerSystem(SystemA).registerSystem(SystemB);
 
@@ -352,41 +287,24 @@ test("Queries with deferred removal", t => {
   }
 
   class SystemF extends System {
-    init() {
-      return {
-        queries: {
-          entities: {
-            components: [FooComponent],
-            events: {
-              removed: {
-                event: "EntityRemoved"
-              }
-            }
-          }
-        }
-      };
-    }
     execute() {
       this.queries.entities[1].remove();
       this.queries.entities[0].remove();
     }
   }
 
-  class SystemFB extends System {
-    init() {
-      return {
-        queries: {
-          entities: {
-            components: [FooComponent, BarComponent],
-            events: {
-              removed: {
-                event: "EntityRemoved"
-              }
-            }
-          }
+  SystemF.queries = {
+    entities: {
+      components: [FooComponent],
+      events: {
+        removed: {
+          event: "EntityRemoved"
         }
-      };
+      }
     }
+  };
+
+  class SystemFB extends System {
     execute() {
       // @todo Instead of removing backward should it work also forward?
       var entities = this.queries.entities;
@@ -396,22 +314,29 @@ test("Queries with deferred removal", t => {
     }
   }
 
-  class SystemB extends System {
-    init() {
-      return {
-        queries: {
-          entities: {
-            components: [BarComponent],
-            events: {
-              removed: {
-                event: "EntityRemoved"
-              }
-            }
-          }
+  SystemFB.queries = {
+    entities: {
+      components: [FooComponent, BarComponent],
+      events: {
+        removed: {
+          event: "EntityRemoved"
         }
-      };
+      }
     }
-  }
+  };
+
+  class SystemB extends System {}
+
+  SystemB.queries = {
+    entities: {
+      components: [BarComponent],
+      events: {
+        removed: {
+          event: "EntityRemoved"
+        }
+      }
+    }
+  };
 
   world
     .registerSystem(SystemF)
@@ -483,23 +408,6 @@ test("Queries removing multiple components", t => {
   }
 
   class SystemA extends System {
-    init() {
-      return {
-        queries: {
-          entities: {
-            components: [FooComponent, BarComponent],
-            events: {
-              removed: {
-                event: "EntityRemoved"
-              }
-            }
-          },
-          notTest: {
-            components: [Not(FooComponent), BarComponent, EmptyComponent]
-          }
-        }
-      };
-    }
     execute() {
       this.events.entities.removed.forEach(entity => {
         t.false(entity.hasComponent(FooComponent));
@@ -510,6 +418,20 @@ test("Queries removing multiple components", t => {
       t.is(this.queries.notTest.length, 0);
     }
   }
+
+  SystemA.queries = {
+    entities: {
+      components: [FooComponent, BarComponent],
+      events: {
+        removed: {
+          event: "EntityRemoved"
+        }
+      }
+    },
+    notTest: {
+      components: [Not(FooComponent), BarComponent, EmptyComponent]
+    }
+  };
 
   world.registerSystem(SystemA);
 
@@ -571,40 +493,23 @@ test("Querries removing deferred components", t => {
   }
 
   class SystemF extends System {
-    init() {
-      return {
-        queries: {
-          entities: {
-            components: [FooComponent],
-            events: {
-              removed: {
-                event: "EntityRemoved"
-              }
-            }
-          }
-        }
-      };
-    }
     execute() {
       this.queries.entities[0].removeComponent(FooComponent);
     }
   }
 
-  class SystemFB extends System {
-    init() {
-      return {
-        queries: {
-          entities: {
-            components: [FooComponent, BarComponent],
-            events: {
-              removed: {
-                event: "EntityRemoved"
-              }
-            }
-          }
+  SystemF.queries = {
+    entities: {
+      components: [FooComponent],
+      events: {
+        removed: {
+          event: "EntityRemoved"
         }
-      };
+      }
     }
+  };
+
+  class SystemFB extends System {
     execute() {
       // @todo Instead of removing backward should it work also forward?
       var entities = this.queries.entities;
@@ -614,22 +519,29 @@ test("Querries removing deferred components", t => {
     }
   }
 
-  class SystemB extends System {
-    init() {
-      return {
-        queries: {
-          entities: {
-            components: [BarComponent],
-            events: {
-              removed: {
-                event: "EntityRemoved"
-              }
-            }
-          }
+  SystemFB.queries = {
+    entities: {
+      components: [FooComponent, BarComponent],
+      events: {
+        removed: {
+          event: "EntityRemoved"
         }
-      };
+      }
     }
-  }
+  };
+
+  class SystemB extends System {}
+
+  SystemB.queries = {
+    entities: {
+      components: [BarComponent],
+      events: {
+        removed: {
+          event: "EntityRemoved"
+        }
+      }
+    }
+  };
 
   world
     .registerSystem(SystemF)
@@ -692,36 +604,32 @@ test("Querries removing deferred components", t => {
 test("Reactive", t => {
   var world = new World();
 
-  class ReactiveSystem extends System {
-    init() {
-      return {
-        queries: {
-          entities: {
-            components: [FooComponent, BarComponent],
-            events: {
-              added: {
-                event: "EntityAdded"
-              },
-              removed: {
-                event: "EntityRemoved"
-              },
-              changed: {
-                event: "EntityChanged"
-              },
-              fooChanged: {
-                event: "ComponentChanged",
-                components: [FooComponent]
-              },
-              barChanged: {
-                event: "ComponentChanged",
-                components: [BarComponent]
-              }
-            }
-          }
+  class ReactiveSystem extends System {}
+
+  ReactiveSystem.queries = {
+    entities: {
+      components: [FooComponent, BarComponent],
+      events: {
+        added: {
+          event: "EntityAdded"
+        },
+        removed: {
+          event: "EntityRemoved"
+        },
+        changed: {
+          event: "EntityChanged"
+        },
+        fooChanged: {
+          event: "ComponentChanged",
+          components: [FooComponent]
+        },
+        barChanged: {
+          event: "ComponentChanged",
+          components: [BarComponent]
         }
-      };
+      }
     }
-  }
+  };
 
   // Register empty system
   world.registerSystem(ReactiveSystem);
@@ -829,46 +737,34 @@ test("Queries with 'mandatory' parameter", t => {
   };
 
   class SystemA extends System {
-    init() {
-      return {
-        queries: {
-          entities: { components: [FooComponent], mandatory: false }
-        }
-      };
-    }
-
     execute() {
       counter.a++;
     }
   }
 
-  class SystemB extends System {
-    init() {
-      return {
-        queries: {
-          entities: { components: [FooComponent], mandatory: true }
-        }
-      };
-    }
+  SystemA.queries = {
+    entities: { components: [FooComponent], mandatory: false }
+  };
 
+  class SystemB extends System {
     execute() {
       counter.b++;
     }
   }
 
-  class SystemC extends System {
-    init() {
-      return {
-        queries: {
-          entities: { components: [BarComponent], mandatory: true }
-        }
-      };
-    }
+  SystemB.queries = {
+    entities: { components: [FooComponent], mandatory: true }
+  };
 
+  class SystemC extends System {
     execute() {
       counter.c++;
     }
   }
+
+  SystemC.queries = {
+    entities: { components: [BarComponent], mandatory: true }
+  };
 
   // -------
   var world = new World();

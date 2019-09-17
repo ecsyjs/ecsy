@@ -41,12 +41,9 @@ export class System {
 
     this.initialized = true;
 
-    this.config = this.init ? this.init() : null;
-
-    if (!this.config) return;
-    if (this.config.queries) {
-      for (var name in this.config.queries) {
-        var queryConfig = this.config.queries[name];
+    if (this.constructor.queries) {
+      for (var name in this.constructor.queries) {
+        var queryConfig = this.constructor.queries[name];
         var Components = queryConfig.components;
         if (!Components || Components.length === 0) {
           throw new Error("'components' attribute can't be empty in a query");
@@ -98,7 +95,7 @@ export class System {
         }
       }
     }
-
+    /*
     if (this.config.events) {
       for (let name in this.config.events) {
         var event = this.config.events[name];
@@ -108,6 +105,7 @@ export class System {
         });
       }
     }
+*/
   }
 
   stop() {
@@ -142,7 +140,7 @@ export class System {
     };
 
     if (this.config) {
-      var queries = this.config.queries;
+      var queries = this.queries;
       for (let queryName in queries) {
         let query = queries[queryName];
         json.queries[queryName] = {
