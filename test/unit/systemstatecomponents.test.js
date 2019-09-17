@@ -12,34 +12,30 @@ test("reset", t => {
   class StateComponentA extends SystemStateComponent {}
 
   class SystemA extends System {
-    init() {
-      return {
-        queries: {
-          added: { components: [FooComponent, Not(StateComponentA)] },
-          remove: { components: [Not(FooComponent), StateComponentA] },
-          normal: { components: [FooComponent, StateComponentA] }
-        }
-      };
-    }
-
     execute() {
-      this.queries.added.forEach(entity => {
+      this.queries.added.results.forEach(entity => {
         entity.addComponent(StateComponentA);
       });
 
-      this.queries.remove.forEach(entity => {
+      this.queries.remove.results.forEach(entity => {
         entity.removeComponent(StateComponentA);
       });
 
-      this.queries.normal.forEach(() => {
+      this.queries.normal.results.forEach(() => {
         // use entity and its components
       });
     }
   }
 
+  SystemA.queries = {
+    added: { components: [FooComponent, Not(StateComponentA)] },
+    remove: { components: [Not(FooComponent), StateComponentA] },
+    normal: { components: [FooComponent, StateComponentA] }
+  };
+
   world.registerSystem(SystemA);
   var entityManager = world.entityManager;
-  var systemA = world.systemManager.systems[0];
+  var systemA = world.getSystem(SystemA);
   var entity = world.createEntity();
   entity.addComponent(FooComponent);
 
@@ -108,23 +104,23 @@ test("reset", t => {
 
   // Immediate remove component
   entity = world.createEntity().addComponent(FooComponent);
-  t.is(systemA.queries.added.length, 1);
-  t.is(systemA.queries.remove.length, 0);
-  t.is(systemA.queries.normal.length, 0);
+  t.is(systemA.queries.added.results.length, 1);
+  t.is(systemA.queries.remove.results.length, 0);
+  t.is(systemA.queries.normal.results.length, 0);
   world.execute();
-  t.is(systemA.queries.added.length, 0);
-  t.is(systemA.queries.remove.length, 0);
-  t.is(systemA.queries.normal.length, 1);
+  t.is(systemA.queries.added.results.length, 0);
+  t.is(systemA.queries.remove.results.length, 0);
+  t.is(systemA.queries.normal.results.length, 1);
 
   entity.removeComponent(FooComponent, true);
-  t.is(systemA.queries.added.length, 0);
-  t.is(systemA.queries.remove.length, 1);
-  t.is(systemA.queries.normal.length, 0);
+  t.is(systemA.queries.added.results.length, 0);
+  t.is(systemA.queries.remove.results.length, 1);
+  t.is(systemA.queries.normal.results.length, 0);
 
   world.execute();
-  t.is(systemA.queries.added.length, 0);
-  t.is(systemA.queries.remove.length, 0);
-  t.is(systemA.queries.normal.length, 0);
+  t.is(systemA.queries.added.results.length, 0);
+  t.is(systemA.queries.remove.results.length, 0);
+  t.is(systemA.queries.normal.results.length, 0);
   entity.remove(true); // Cleaning up
 
   // Immediate remove entity
@@ -137,13 +133,13 @@ test("reset", t => {
   t.is(entityManager.entitiesToRemove.length, 0); // It's not deferred just a ghost
   t.is(entityManager._entities.length, 1); // It's still alive waiting for SCA to be removed
 
-  t.is(systemA.queries.added.length, 0);
-  t.is(systemA.queries.remove.length, 1);
-  t.is(systemA.queries.normal.length, 0);
+  t.is(systemA.queries.added.results.length, 0);
+  t.is(systemA.queries.remove.results.length, 1);
+  t.is(systemA.queries.normal.results.length, 0);
   world.execute();
-  t.is(systemA.queries.added.length, 0);
-  t.is(systemA.queries.remove.length, 0);
-  t.is(systemA.queries.normal.length, 0);
+  t.is(systemA.queries.added.results.length, 0);
+  t.is(systemA.queries.remove.results.length, 0);
+  t.is(systemA.queries.normal.results.length, 0);
 
   // The entity get removed when SCA is removed too as it was a ghost
   t.is(entityManager._entities.length, 0);
