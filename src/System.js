@@ -87,7 +87,22 @@ export class System {
                       }
                     }
                   );
+                } else if (Array.isArray(event)) {
+                  let eventList = (this.queries[queryName][eventName] = []);
+                  query.eventDispatcher.addEventListener(
+                    Query.prototype.COMPONENT_CHANGED,
+                    (entity, changedComponent) => {
+                      // Avoid duplicates
+                      if (
+                        event.indexOf(changedComponent.constructor) !== -1 &&
+                        eventList.indexOf(entity) === -1
+                      ) {
+                        eventList.push(entity);
+                      }
+                    }
+                  );
                 } else {
+                  /*
                   // Checking just specific components
                   let changedList = (this.queries[queryName][eventName] = {});
                   event.forEach(component => {
@@ -106,6 +121,7 @@ export class System {
                       }
                     );
                   });
+                  */
                 }
               } else {
                 let eventList = (this.queries[queryName][eventName] = []);

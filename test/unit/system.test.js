@@ -646,31 +646,31 @@ test("Reactive", t => {
 
   // Changing
   entity0.getMutableComponent(FooComponent);
-  //t.is(query.changed.length, 1);
-  t.is(query.changed.fooComponent.length, 1);
-  t.is(query.changed.barComponent.length, 0);
+  t.is(query.changed.length, 1);
+  //t.is(query.changed.fooComponent.length, 1);
+  //t.is(query.changed.barComponent.length, 0);
   world.execute(); // After execute, events should be cleared
   //  t.is(query.changed.length, 0);
 
   entity0.getMutableComponent(BarComponent);
-  //t.is(query.changed.length, 1);
-  t.is(query.changed.fooComponent.length, 0);
-  t.is(query.changed.barComponent.length, 1);
+  t.is(query.changed.length, 1);
+  //t.is(query.changed.fooComponent.length, 0);
+  //t.is(query.changed.barComponent.length, 1);
 
   world.execute(); // After execute, events should be cleared
-  //t.is(query.changed.length, 0);
-  t.is(query.changed.barComponent.length, 0);
+  t.is(query.changed.length, 0);
+  //t.is(query.changed.barComponent.length, 0);
   // Check if the entity is already on the list?
   entity0.getMutableComponent(FooComponent);
   entity0.getMutableComponent(BarComponent);
-  //t.is(query.changed.length, 1);
-  t.is(query.changed.fooComponent.length, 1);
-  t.is(query.changed.barComponent.length, 1);
+  t.is(query.changed.length, 1);
+  //t.is(query.changed.fooComponent.length, 1);
+  //t.is(query.changed.barComponent.length, 1);
 
   world.execute(); // After execute, events should be cleared
-  //t.is(query.changed.length, 0);
-  t.is(query.changed.fooComponent.length, 0);
-  t.is(query.changed.barComponent.length, 0);
+  t.is(query.changed.length, 0);
+  //t.is(query.changed.fooComponent.length, 0);
+  //t.is(query.changed.barComponent.length, 0);
 
   // remove an entity
   entity0.remove();
