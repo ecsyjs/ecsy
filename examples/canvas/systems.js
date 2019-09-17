@@ -9,15 +9,6 @@ import {
 import { fillCircle, drawLine, intersection } from "./utils.js";
 
 export class MovementSystem extends System {
-  init() {
-    return {
-      queries: {
-        entities: { components: [Circle, Movement] },
-        context: { components: [CanvasContext, DemoSettings], mandatory: true }
-      }
-    };
-  }
-
   execute(delta) {
     var context = this.queries.context.results[0];
     let canvasWidth = context.getComponent(CanvasContext).width;
@@ -57,15 +48,12 @@ export class MovementSystem extends System {
   }
 }
 
-export class IntersectionSystem extends System {
-  init() {
-    return {
-      queries: {
-        entities: { components: [Circle] }
-      }
-    };
-  }
+MovementSystem.queries = {
+  entities: { components: [Circle, Movement] },
+  context: { components: [CanvasContext, DemoSettings], mandatory: true }
+};
 
+export class IntersectionSystem extends System {
   execute() {
     let entities = this.queries.entities.results;
 
@@ -114,17 +102,11 @@ export class IntersectionSystem extends System {
   }
 }
 
-export class Renderer extends System {
-  init() {
-    return {
-      queries: {
-        circles: { components: [Circle] },
-        intersectingCircles: { components: [Intersecting] },
-        context: { components: [CanvasContext], mandatory: true }
-      }
-    };
-  }
+IntersectionSystem.queries = {
+  entities: { components: [Circle] }
+};
 
+export class Renderer extends System {
   execute() {
     var context = this.queries.context.results[0];
     let canvasComponent = context.getComponent(CanvasContext);
@@ -175,3 +157,9 @@ export class Renderer extends System {
     }
   }
 }
+
+Renderer.queries = {
+  circles: { components: [Circle] },
+  intersectingCircles: { components: [Intersecting] },
+  context: { components: [CanvasContext], mandatory: true }
+};
