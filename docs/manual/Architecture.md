@@ -217,15 +217,13 @@ var acceleration = entity.getComponentValue(Acceleration);
 
 Systems are stateless processors of groups of entities.
 
+### init
+### execute
+### ordering
+
 ### Reactive systems
 
 ### Life cycle
-
-## Queries
-
-### Not operator
-
-### Reactive queries
 
 ## Pooling
 
@@ -240,3 +238,147 @@ Systems are stateless processors of groups of entities.
 ## Life cycle
 
 ## Queries
+
+A query is a collection of entities that match some condition based on the components they own.
+There are multiple ways to create a query:
+* Creating an instance of `Query(Components, World)` (Not recommended)
+* Getting the query directly from the `QueryManager` by calling `world.entityManager.queryComponents(Components)`
+* Defining the queries on a `System`. This is also the recommended way as the engine could use that information to organize and optimize the execution of the systems and queries.
+
+A query is always updated with the entities that matches the components' condition. One the query is initialized it traverse the components groups to determine which entities should get added to it. But after that entities will get added or removed from the query as components are being added or removed from them.
+If we create several queries with the same components, the `QueryManager` will just create a single query under the hood and referece it everywhere saving memory and computation.
+
+### Examples
+
+For example, if we want a query with all the entities that has the component `Position` on a system called `SystemTest`, we should define the query as:
+```javascript
+SystemTest.queries = {
+  positions: {
+    components: [ Position ]
+  }
+};
+```
+
+The `components` attribute defines the list of components that an entity must have to be included in this query.
+
+You can also define multiple queries;
+
+```javascript
+SystemTest.queries = {
+  positions: {
+    components: [ Position ]
+  },
+  physicsObjects: {
+    components: [ PhysicBody, Transform ]
+  }
+};
+```
+
+In this example the `physicsObjects` query will get populated with the components that have both `PhysicsBody` **and** `Transform`.
+
+### Not operator
+
+It is also possible to include a `Not` operator when defining a query:
+```javascript
+SystemTest.queries = {
+  activeEnemies: {
+    components: [ Enemy, Not(Dead) ]
+  }
+};
+```
+This will return all the entities that have a `Enemy` component but have not the `Dead` component.
+
+This operator could be very useful as a factory pattern (**See example link**):
+```javascript
+SystemTest.queries = {
+  playerUninitialized: {
+    components: [ Player, Not(Name) ]
+  }
+};
+```
+The `playerUnitialized` query will have all the players that don't have a `Name` component yet, a system could get that list and add a random name to them:
+```javascript
+queries.playerUnitialized.forEach(entity => {
+  entity.addComponent(Name, {value: getRandomName()});
+});
+```
+And as soon as the component `Name` is added to the player entity, that entity will disappear from the query.
+
+### Reactive queries
+
+Using reactive queries make it possible to react to changes on entities and its components.
+
+#### Added and removed
+One common use case is to detect whenever an entity has been added or removed from a query. This can be done by just setting `added` and `removed` attributes to `true` on the query:
+
+```javascript
+SystemTest.queries = {
+  boxes: {
+    components: [ Box, Transform ],
+    listen: {
+      added: true,
+      removed: true
+    }
+  }
+};
+```
+
+With that definition it will be possible to iterate through them on the `execute` function:
+```javascript
+class SystemTest extends System {
+  execute() {
+    var boxesQuery = this.queries.boxes;
+
+    // All the entities with `Box` and `Transform` components
+    boxesQuery.results.forEach(entity => {});
+
+    // All the entities added to the query since the last call
+    boxesQuery.added.forEach(entity => {});
+
+    // All the entities removed from the query since the last call
+    boxesQuery.removed.forEach(entity => {});
+  }
+}
+```
+
+To avoid callbacks and asynchronicity, which is a bad thing for cache and predictability on the execution, entities are queued on the `added` and `removed` lists but they system owning these lists will be able to process them just whenever the `execute` method will get called.
+So everytime you call `execute` you will have the list of all the entities added or removed since the last call. After the call has been executed these lists will get cleared.
+
+#### Changed
+Sometimes is also interesting to detect that an entity or a specific component has changed. Detecting these changes is more tricky to do performantly that's why we rely on the `entity.getMutableComponent` function (More info **link**) that basically mark the component as modified.
+The syntax to detect if an entity has changed, this means that any of the components from the entity that are part of the query have changed, is similar to the ones for `added` or `removed`:
+
+
+```javascript
+SystemTest.queries = {
+  boxes: {
+    components: [ Box, Transform ],
+    listen: {
+      added: true,
+      removed: true
+      changed: true  // Detect that any of the components on the query (Box, Transform) has changed
+    }
+  }
+};
+```
+
+Similar to the previous example, we now can iterate on the `changed` list of entities:
+```javascript
+class SystemTest extends System {
+  execute() {
+    var boxesQuery = this.queries.boxes;
+
+    // All the entities with `Box` component
+    boxesQuery.results.forEach(entity => {});
+
+    // All the entities added to the query since the last call
+    boxesQuery.added.forEach(entity => {});
+
+    // All the entities removed from the query since the last call
+    boxesQuery.removed.forEach(entity => {});
+
+    // All the entities which Box or Transform components have changed since the last call
+    boxesQuery.changed.forEach(entity => {});
+  }
+}
+```
