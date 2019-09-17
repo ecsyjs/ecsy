@@ -5,7 +5,7 @@ An entity is an object that has an unique ID which purpose is to group component
 
 Entities are always created within a `World` context:
 
-```
+```javascript
 var entity = world.createEntity();
 ```
 
@@ -127,9 +127,44 @@ class ComponentA extends Component {
 }
 ```
 
-### Create component helper
+### Components pooling
+Usually an ECSY application will involve adding and removing components in real time. Allocating resources in a performance sensitive application is considered a bad pattern as the garbage collector will get called often and it will hit the performance.
+In order to minimize it ECSY includes automatic pooling for components.
+This means that if we add component to an entity as:
+```javascript
+entity.addComponent(ComponentA)
+```
+the engine will try to reuse a `ComponentA` instance from a pool of components previously created, and it won't allocate a new one instead. Once we are done with that component and do `entity.removeComponent(ComponentA)`, it will get returned to the pool, ready to be used by other entity.
 
-### Reset, Copy, Clear
+ECSY should know how to reset a component to its original state, that's why it's mandatory that components implements a `reset` method to get the benefits from pooling, otherwise you will get a warning message about it.
+
+```javascript
+class List extends Component {
+  constructor() {
+    this.value = [];
+  }
+
+  reset() {
+    this.value.length = 0;
+  }
+}
+
+class Position extends Component {
+  constructor() {
+    this.reset();
+  }
+
+  reset() {
+    this.x = 0;
+    this.y = 0;
+    this.z = 0;
+  }
+}
+```
+
+Please notice that creating a component using the `createComponent` helper (**Link**) will include a `reset` implementation.
+
+### Create component helper
 
 ## Data types
 
