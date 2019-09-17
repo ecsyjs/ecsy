@@ -129,11 +129,20 @@ test("Queries", t => {
     .registerSystem(SystemBoth);
 
   // Foo
-  t.is(world.systemManager.getSystems()[0].queries.entities.length, 10);
+  t.is(
+    world.systemManager.getSystem(SystemFoo).queries.entities.results.length,
+    10
+  );
   // Bar
-  t.is(world.systemManager.getSystems()[1].queries.entities.length, 10);
+  t.is(
+    world.systemManager.getSystem(SystemBar).queries.entities.results.length,
+    10
+  );
   // Both
-  t.is(world.systemManager.getSystems()[2].queries.entities.length, 5);
+  t.is(
+    world.systemManager.getSystem(SystemBoth).queries.entities.results.length,
+    5
+  );
 });
 
 test("Queries with 'Not' operator", t => {
@@ -176,19 +185,19 @@ test("Queries with 'Not' operator", t => {
   world.registerSystem(SystemNotBar);
   var queries = world.systemManager.getSystems()[0].queries;
 
-  t.is(queries.fooNotBar.length, 5);
-  t.is(queries.emptyNotBar.length, 5);
-  t.is(queries.emptyNotBarFoo.length, 0);
+  t.is(queries.fooNotBar.results.length, 5);
+  t.is(queries.emptyNotBar.results.length, 5);
+  t.is(queries.emptyNotBarFoo.results.length, 0);
 
   // Adding BarComponent to entity0 will remove it from the queries Not(BarComponent)
   world.entityManager._entities[0].addComponent(BarComponent);
-  t.is(queries.fooNotBar.length, 4);
-  t.is(queries.emptyNotBar.length, 4);
+  t.is(queries.fooNotBar.results.length, 4);
+  t.is(queries.emptyNotBar.results.length, 4);
 
   // Removing BarComponent from entity0 will add it from the queries Not(BarComponent)
   world.entityManager._entities[0].removeComponent(BarComponent);
-  t.is(queries.fooNotBar.length, 5);
-  t.is(queries.emptyNotBar.length, 5);
+  t.is(queries.fooNotBar.results.length, 5);
+  t.is(queries.emptyNotBar.results.length, 5);
 });
 
 test("Queries with sync removal", t => {
@@ -205,7 +214,7 @@ test("Queries with sync removal", t => {
 
   class SystemA extends System {
     execute() {
-      var entities = this.queries.entities;
+      var entities = this.queries.entities.results;
       for (var i = 0; i < entities.length; i++) {
         entities[i].remove(true);
       }
@@ -215,17 +224,15 @@ test("Queries with sync removal", t => {
   SystemA.queries = {
     entities: {
       components: [FooComponent],
-      events: {
-        removed: {
-          event: "EntityRemoved"
-        }
+      listen: {
+        removed: true
       }
     }
   };
 
   class SystemB extends System {
     execute() {
-      var entities = this.queries.entities;
+      var entities = this.queries.entities.results;
       for (var i = 0, l = entities.length; i < l; i++) {
         entities[i].remove(true);
       }
@@ -235,10 +242,8 @@ test("Queries with sync removal", t => {
   SystemB.queries = {
     entities: {
       components: [FooComponent],
-      events: {
-        removed: {
-          event: "EntityRemoved"
-        }
+      listen: {
+        removed: true
       }
     }
   };
@@ -248,10 +253,10 @@ test("Queries with sync removal", t => {
   var systemA = world.systemManager.getSystems()[0];
   var systemB = world.systemManager.getSystems()[1];
 
-  var entitiesA = systemA.queries.entities;
-  var entitiesB = systemA.queries.entities;
-  var entitiesRemovedA = systemA.events.entities.removed;
-  var entitiesRemovedB = systemB.events.entities.removed;
+  var entitiesA = systemA.queries.entities.results;
+  var entitiesB = systemA.queries.entities.results;
+  var entitiesRemovedA = systemA.queries.entities.removed;
+  var entitiesRemovedB = systemB.queries.entities.removed;
 
   // Sync standard remove invalid loop
   t.is(entitiesA.length, 10);
@@ -288,18 +293,16 @@ test("Queries with deferred removal", t => {
 
   class SystemF extends System {
     execute() {
-      this.queries.entities[1].remove();
-      this.queries.entities[0].remove();
+      this.queries.entities.results[1].remove();
+      this.queries.entities.results[0].remove();
     }
   }
 
   SystemF.queries = {
     entities: {
       components: [FooComponent],
-      events: {
-        removed: {
-          event: "EntityRemoved"
-        }
+      listen: {
+        removed: true
       }
     }
   };
@@ -307,7 +310,7 @@ test("Queries with deferred removal", t => {
   class SystemFB extends System {
     execute() {
       // @todo Instead of removing backward should it work also forward?
-      var entities = this.queries.entities;
+      var entities = this.queries.entities.results;
       for (let i = entities.length - 1; i >= 0; i--) {
         entities[i].remove();
       }
@@ -317,10 +320,8 @@ test("Queries with deferred removal", t => {
   SystemFB.queries = {
     entities: {
       components: [FooComponent, BarComponent],
-      events: {
-        removed: {
-          event: "EntityRemoved"
-        }
+      listen: {
+        removed: true
       }
     }
   };
@@ -330,10 +331,8 @@ test("Queries with deferred removal", t => {
   SystemB.queries = {
     entities: {
       components: [BarComponent],
-      events: {
-        removed: {
-          event: "EntityRemoved"
-        }
+      listen: {
+        removed: true
       }
     }
   };
@@ -343,16 +342,16 @@ test("Queries with deferred removal", t => {
     .registerSystem(SystemFB)
     .registerSystem(SystemB);
 
-  var systemF = world.systemManager.getSystems()[0];
-  var systemFB = world.systemManager.getSystems()[1];
-  var systemB = world.systemManager.getSystems()[2];
+  var systemF = world.systemManager.getSystem(SystemF);
+  var systemFB = world.systemManager.getSystem(SystemFB);
+  var systemB = world.systemManager.getSystem(SystemB);
 
-  var entitiesF = systemF.queries.entities;
-  var entitiesFB = systemFB.queries.entities;
-  var entitiesB = systemB.queries.entities;
-  var entitiesRemovedF = systemF.events.entities.removed;
-  var entitiesRemovedFB = systemFB.events.entities.removed;
-  var entitiesRemovedB = systemB.events.entities.removed;
+  var entitiesF = systemF.queries.entities.results;
+  var entitiesFB = systemFB.queries.entities.results;
+  var entitiesB = systemB.queries.entities.results;
+  var entitiesRemovedF = systemF.queries.entities.removed;
+  var entitiesRemovedFB = systemFB.queries.entities.removed;
+  var entitiesRemovedB = systemB.queries.entities.removed;
 
   // [F,F,FB,FB,B,B]
   t.is(entitiesF.length, 4);
@@ -409,23 +408,21 @@ test("Queries removing multiple components", t => {
 
   class SystemA extends System {
     execute() {
-      this.events.entities.removed.forEach(entity => {
+      this.queries.entities.removed.forEach(entity => {
         t.false(entity.hasComponent(FooComponent));
         t.true(entity.hasRemovedComponent(FooComponent));
       });
 
       // this query should never match
-      t.is(this.queries.notTest.length, 0);
+      t.is(this.queries.notTest.results.length, 0);
     }
   }
 
   SystemA.queries = {
     entities: {
       components: [FooComponent, BarComponent],
-      events: {
-        removed: {
-          event: "EntityRemoved"
-        }
+      listen: {
+        removed: true
       }
     },
     notTest: {
@@ -435,9 +432,10 @@ test("Queries removing multiple components", t => {
 
   world.registerSystem(SystemA);
 
-  var systemA = world.systemManager.getSystems()[0];
-  var entitiesA = systemA.queries.entities;
-  var entitiesRemovedA = systemA.events.entities.removed;
+  var systemA = world.systemManager.getSystem(SystemA);
+  var query = systemA.queries.entities;
+  var entitiesA = query.results;
+  var entitiesRemovedA = query.removed;
 
   // Remove one entity => entityRemoved x1
   t.is(entitiesA.length, 6);
@@ -494,17 +492,15 @@ test("Querries removing deferred components", t => {
 
   class SystemF extends System {
     execute() {
-      this.queries.entities[0].removeComponent(FooComponent);
+      this.queries.entities.results[0].removeComponent(FooComponent);
     }
   }
 
   SystemF.queries = {
     entities: {
       components: [FooComponent],
-      events: {
-        removed: {
-          event: "EntityRemoved"
-        }
+      listen: {
+        removed: true
       }
     }
   };
@@ -512,7 +508,7 @@ test("Querries removing deferred components", t => {
   class SystemFB extends System {
     execute() {
       // @todo Instead of removing backward should it work also forward?
-      var entities = this.queries.entities;
+      var entities = this.queries.entities.results;
       for (let i = entities.length - 1; i >= 0; i--) {
         entities[i].removeComponent(BarComponent);
       }
@@ -522,10 +518,8 @@ test("Querries removing deferred components", t => {
   SystemFB.queries = {
     entities: {
       components: [FooComponent, BarComponent],
-      events: {
-        removed: {
-          event: "EntityRemoved"
-        }
+      listen: {
+        removed: true
       }
     }
   };
@@ -535,10 +529,8 @@ test("Querries removing deferred components", t => {
   SystemB.queries = {
     entities: {
       components: [BarComponent],
-      events: {
-        removed: {
-          event: "EntityRemoved"
-        }
+      listen: {
+        removed: true
       }
     }
   };
@@ -552,12 +544,12 @@ test("Querries removing deferred components", t => {
   var systemFB = world.systemManager.getSystems()[1];
   var systemB = world.systemManager.getSystems()[2];
 
-  var entitiesF = systemF.queries.entities;
-  var entitiesFB = systemFB.queries.entities;
-  var entitiesB = systemB.queries.entities;
-  var entitiesRemovedF = systemF.events.entities.removed;
-  var entitiesRemovedFB = systemFB.events.entities.removed;
-  var entitiesRemovedB = systemB.events.entities.removed;
+  var entitiesF = systemF.queries.entities.results;
+  var entitiesFB = systemFB.queries.entities.results;
+  var entitiesB = systemB.queries.entities.results;
+  var entitiesRemovedF = systemF.queries.entities.removed;
+  var entitiesRemovedFB = systemFB.queries.entities.removed;
+  var entitiesRemovedB = systemB.queries.entities.removed;
 
   // [F,F,FB,FB,B,B]
   t.is(entitiesF.length, 4);
@@ -609,24 +601,10 @@ test("Reactive", t => {
   ReactiveSystem.queries = {
     entities: {
       components: [FooComponent, BarComponent],
-      events: {
-        added: {
-          event: "EntityAdded"
-        },
-        removed: {
-          event: "EntityRemoved"
-        },
-        changed: {
-          event: "EntityChanged"
-        },
-        fooChanged: {
-          event: "ComponentChanged",
-          components: [FooComponent]
-        },
-        barChanged: {
-          event: "ComponentChanged",
-          components: [BarComponent]
-        }
+      listen: {
+        added: true,
+        removed: true,
+        changed: [FooComponent, BarComponent]
       }
     }
   };
@@ -645,16 +623,15 @@ test("Reactive", t => {
 
   var system = world.systemManager.getSystems()[0];
   var query = system.queries.entities;
-  var events = system.events.entities;
   var entity0 = world.entityManager._entities[0];
 
   // Entities from the standard query
-  t.is(query.length, 15);
+  t.is(query.results.length, 15);
 
   // Added entities
-  t.is(system.events.entities.added.length, 15);
+  t.is(query.added.length, 15);
   world.execute(); // After execute, events should be cleared
-  t.is(system.events.entities.added.length, 0);
+  t.is(query.added.length, 0);
   system.clearEvents();
 
   // Add a new one
@@ -663,70 +640,70 @@ test("Reactive", t => {
     .addComponent(FooComponent)
     .addComponent(BarComponent);
 
-  t.is(events.added.length, 1);
+  t.is(query.added.length, 1);
   world.execute(); // After execute, events should be cleared
-  t.is(events.added.length, 0);
+  t.is(query.added.length, 0);
 
   // Changing
   entity0.getMutableComponent(FooComponent);
-  t.is(events.changed.length, 1);
-  t.is(events.fooChanged.length, 1);
-  t.is(events.barChanged.length, 0);
+  //t.is(query.changed.length, 1);
+  t.is(query.changed.fooComponent.length, 1);
+  t.is(query.changed.barComponent.length, 0);
   world.execute(); // After execute, events should be cleared
-  t.is(events.changed.length, 0);
+  //  t.is(query.changed.length, 0);
 
   entity0.getMutableComponent(BarComponent);
-  t.is(events.changed.length, 1);
-  t.is(events.fooChanged.length, 0);
-  t.is(events.barChanged.length, 1);
+  //t.is(query.changed.length, 1);
+  t.is(query.changed.fooComponent.length, 0);
+  t.is(query.changed.barComponent.length, 1);
 
   world.execute(); // After execute, events should be cleared
-  t.is(events.changed.length, 0);
-  t.is(events.barChanged.length, 0);
+  //t.is(query.changed.length, 0);
+  t.is(query.changed.barComponent.length, 0);
   // Check if the entity is already on the list?
   entity0.getMutableComponent(FooComponent);
   entity0.getMutableComponent(BarComponent);
-  t.is(events.changed.length, 1);
-  t.is(events.fooChanged.length, 1);
-  t.is(events.barChanged.length, 1);
+  //t.is(query.changed.length, 1);
+  t.is(query.changed.fooComponent.length, 1);
+  t.is(query.changed.barComponent.length, 1);
 
   world.execute(); // After execute, events should be cleared
-  t.is(events.changed.length, 0);
-  t.is(events.fooChanged.length, 0);
-  t.is(events.barChanged.length, 0);
+  //t.is(query.changed.length, 0);
+  t.is(query.changed.fooComponent.length, 0);
+  t.is(query.changed.barComponent.length, 0);
 
   // remove an entity
   entity0.remove();
-  t.is(events.removed.length, 1);
+  t.is(query.removed.length, 1);
   world.execute(); // After execute, events should be cleared
-  t.is(events.removed.length, 0);
+  t.is(query.removed.length, 0);
 
   // Removed
   entity0 = world.entityManager._entities[0];
   entity0.removeComponent(FooComponent);
-  t.is(events.removed.length, 1);
+  t.is(query.removed.length, 1);
   world.execute(); // After execute, events should be cleared
-  t.is(events.removed.length, 0);
+  t.is(query.removed.length, 0);
 
   // Added componets to the previous one
   entity0.addComponent(FooComponent);
-  t.is(events.added.length, 1);
+  t.is(query.added.length, 1);
   world.execute(); // After execute, events should be cleared
-  t.is(events.added.length, 0);
+  t.is(query.added.length, 0);
 
   // Remove all components from the first 5 entities
   for (i = 0; i < 5; i++) {
     world.entityManager._entities[i].removeAllComponents();
   }
-  t.is(events.removed.length, 5);
+  t.is(query.removed.length, 5);
   world.execute(); // After execute, events should be cleared
-  t.is(events.removed.length, 0);
+  t.is(query.removed.length, 0);
 
   // remove all entities
   world.entityManager.removeAllEntities();
-  t.is(events.removed.length, 10);
+  t.is(query.removed.length, 10);
   world.execute(); // After execute, events should be cleared
-  t.is(events.removed.length, 0);
+  t.is(query.removed.length, 0);
 });
 
 test("Queries with 'mandatory' parameter", t => {

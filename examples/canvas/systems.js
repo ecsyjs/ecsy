@@ -9,22 +9,13 @@ import {
 import { fillCircle, drawLine, intersection } from "./utils.js";
 
 export class MovementSystem extends System {
-  init() {
-    return {
-      queries: {
-        entities: { components: [Circle, Movement] },
-        context: { components: [CanvasContext, DemoSettings], mandatory: true }
-      }
-    };
-  }
-
   execute(delta) {
-    var context = this.queries.context[0];
+    var context = this.queries.context.results[0];
     let canvasWidth = context.getComponent(CanvasContext).width;
     let canvasHeight = context.getComponent(CanvasContext).height;
     let multiplier = context.getComponent(DemoSettings).speedMultiplier;
 
-    let entities = this.queries.entities;
+    let entities = this.queries.entities.results;
     for (var i = 0; i < entities.length; i++) {
       let entity = entities[i];
       let circle = entity.getMutableComponent(Circle);
@@ -57,17 +48,14 @@ export class MovementSystem extends System {
   }
 }
 
-export class IntersectionSystem extends System {
-  init() {
-    return {
-      queries: {
-        entities: { components: [Circle] }
-      }
-    };
-  }
+MovementSystem.queries = {
+  entities: { components: [Circle, Movement] },
+  context: { components: [CanvasContext, DemoSettings], mandatory: true }
+};
 
+export class IntersectionSystem extends System {
   execute() {
-    let entities = this.queries.entities;
+    let entities = this.queries.entities.results;
 
     for (var i = 0; i < entities.length; i++) {
       let entity = entities[i];
@@ -114,19 +102,13 @@ export class IntersectionSystem extends System {
   }
 }
 
-export class Renderer extends System {
-  init() {
-    return {
-      queries: {
-        circles: { components: [Circle] },
-        intersectingCircles: { components: [Intersecting] },
-        context: { components: [CanvasContext], mandatory: true }
-      }
-    };
-  }
+IntersectionSystem.queries = {
+  entities: { components: [Circle] }
+};
 
+export class Renderer extends System {
   execute() {
-    var context = this.queries.context[0];
+    var context = this.queries.context.results[0];
     let canvasComponent = context.getComponent(CanvasContext);
     let ctx = canvasComponent.ctx;
     let canvasWidth = canvasComponent.width;
@@ -135,7 +117,7 @@ export class Renderer extends System {
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-    let circles = this.queries.circles;
+    let circles = this.queries.circles.results;
     for (var i = 0; i < circles.length; i++) {
       let circle = circles[i].getComponent(Circle);
 
@@ -153,7 +135,7 @@ export class Renderer extends System {
       ctx.stroke();
     }
 
-    let intersectingCircles = this.queries.intersectingCircles;
+    let intersectingCircles = this.queries.intersectingCircles.results;
     for (let i = 0; i < intersectingCircles.length; i++) {
       let intersect = intersectingCircles[i].getComponent(Intersecting);
       for (var j = 0; j < intersect.points.length; j++) {
@@ -175,3 +157,9 @@ export class Renderer extends System {
     }
   }
 }
+
+Renderer.queries = {
+  circles: { components: [Circle] },
+  intersectingCircles: { components: [Intersecting] },
+  context: { components: [CanvasContext], mandatory: true }
+};

@@ -47,16 +47,8 @@
 
       // Systems
       class NameSystem extends System {
-        init() {
-          return {
-            queries: {
-              entities: { components: [NPC, Not(Name)] }
-            }
-          };
-        }
-
         execute() {
-          this.queries.entities.forEach(entity => {
+          this.queries.entities.results.forEach(entity => {
             var name = randomFromArray(names);
             log(`Added name '${name}' to player id=${entity.id}`);
             entity.addComponent(Name, {value: name});
@@ -64,17 +56,13 @@
         }
       }
 
-      class TshirtSystem extends System {
-        init() {
-          return {
-            queries: {
-              entities: { components: [NPC, Not(Tshirt)] }
-            }
-          };
-        }
+      NameSystem.queries = {
+        entities: { components: [NPC, Not(Name)] }
+      };
 
+      class TshirtSystem extends System {
         execute() {
-          this.queries.entities.forEach(entity => {
+          this.queries.entities.results.forEach(entity => {
             var size = randomFromArray(sizes);
             var color = randomFromArray(colors);
             log(`Added '${color}' '${size}' tshirt to player id=${entity.id}`);
@@ -83,6 +71,10 @@
         }
       }
 
+      TshirtSystem.queries = {
+        entities: { components: [NPC, Not(Tshirt)] }
+      };
+      
       // Initialize our world
       var world = new World();
 

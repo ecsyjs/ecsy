@@ -23,7 +23,7 @@ export class RotatingSystem extends System {
   }
 
   execute(delta) {
-    let entities = this.queries.entities;
+    let entities = this.queries.entities.results;
     for (let i = 0; i < entities.length; i++) {
       let entity = entities[i];
       let rotatingSpeed = entity.getComponent(Rotating).rotatingSpeed;
@@ -49,7 +49,7 @@ export class PulsatingColorSystem extends System {
 
   execute(delta, time) {
     time *= 1000;
-    let entities = this.queries.entities;
+    let entities = this.queries.entities.results;
     for (let i = 0; i < entities.length; i++) {
       let entity = entities[i];
       let object = entity.getComponent(Object3D).object;
@@ -81,7 +81,7 @@ export class PulsatingScaleSystem extends System {
   }
 
   execute(delta, time) {
-    let entities = this.queries.entities;
+    let entities = this.queries.entities.results;
     for (let i = 0; i < entities.length; i++) {
       let entity = entities[i];
       let object = entity.getComponent(Object3D).object;
@@ -112,7 +112,7 @@ export class MovingSystem extends System {
   }
 
   execute(delta, time) {
-    let entities = this.queries.entities;
+    let entities = this.queries.entities.results;
     for (let i = 0; i < entities.length; i++) {
       let entity = entities[i];
       let object = entity.getComponent(Object3D).object;
@@ -134,7 +134,7 @@ export class TimeoutSystem extends System {
   }
 
   execute(delta) {
-    let entities = this.queries.entities;
+    let entities = this.queries.entities.results;
     for (let i = 0; i < entities.length; i++) {
       let entity = entities[i];
 
@@ -166,8 +166,8 @@ export class ColliderSystem extends System {
   }
 
   execute() {
-    let boxes = this.queries.boxes;
-    let balls = this.queries.balls;
+    let boxes = this.queries.boxes.results;
+    let balls = this.queries.balls.results;
     for (let i = 0; i < balls.length; i++) {
       let ball = balls[i];
       let ballObject = ball.getComponent(Object3D).object;
