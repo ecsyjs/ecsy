@@ -26,8 +26,7 @@ entity.addComponent(ComponentA);
 entity.addComponent(ComponentA, {number: 20, string: "Hi"});
 ```
 
-### Accessing components and mutability
-
+### Accessing components and mutability
 You can access a component from an entity with two modes:
 - `getComponent(Component`: Get the component for read only operations.
 - `getMutableComponent(Component)`: Get the components to modify its values.
@@ -228,7 +227,7 @@ Systems are stateless processors of groups of entities.
 
 ### Reactive queries
 
-## Pooling
+## Pooling
 
 ### Entity pooling
 
@@ -236,13 +235,8 @@ Systems are stateless processors of groups of entities.
 
 ### Prefab pooling
 
-## Deferred removal
+## Deferred removal
 
-## Life cycle
-
-
-
-
-
+## Life cycle
 
 ## Queries
