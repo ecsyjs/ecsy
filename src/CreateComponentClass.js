@@ -3,7 +3,7 @@ import { inferType } from "./InferType";
 /**
  * Create a component class from a schema
  */
-export function createComponent(schema, name) {
+export function createComponentClass(schema, name) {
   //var Component = new Function(`return function ${name}() {}`)();
   for (let key in schema) {
     let type = schema[key].type;

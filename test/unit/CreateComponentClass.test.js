@@ -1,5 +1,5 @@
 import test from "ava";
-import { createComponent } from "../../src/CreateComponent";
+import { createComponentClass } from "../../src/CreateComponentClass";
 import { createType } from "../../src/CreateType";
 import { Vector3 } from "../helpers/customtypes";
 
@@ -31,7 +31,7 @@ test("Unknown types", t => {
     vector3: { default: new Vector3(4, 5, 6) } /* unknown type */
   };
 
-  var ComponentA = createComponent(schema, "ComponentA");
+  var ComponentA = createComponentClass(schema, "ComponentA");
   var c1 = new ComponentA();
 
   t.deepEqual(c1.vector3.toArray(), [4, 5, 6]);
@@ -75,7 +75,7 @@ test("resetClear", t => {
     vector3: { default: new Vector3(4, 5, 6), type: CustomTypes.Vector3 }
   };
 
-  var ComponentA = createComponent(schema, "ComponentA");
+  var ComponentA = createComponentClass(schema, "ComponentA");
   var c1 = new ComponentA();
 
   t.is(c1.number, 0.5);
@@ -131,7 +131,7 @@ test("copy", t => {
     array: { default: [] }
   };
 
-  var ComponentA = createComponent(schema, "ComponentA");
+  var ComponentA = createComponentClass(schema, "ComponentA");
 
   var c1 = new ComponentA();
   var c2 = new ComponentA();
@@ -194,7 +194,7 @@ test("Array of vector3 type", t => {
     }
   };
 
-  var ComponentA = createComponent(schema, "ComponentA");
+  var ComponentA = createComponentClass(schema, "ComponentA");
 
   var c1 = new ComponentA();
   var c2 = new ComponentA();
@@ -240,7 +240,7 @@ test("Copy with different number of parameters", t => {
     value3: { default: 3 }
   };
 
-  var ComponentA = createComponent(schema, "ComponentA");
+  var ComponentA = createComponentClass(schema, "ComponentA");
   var c1 = new ComponentA();
 
   t.is(c1.value1, 1);

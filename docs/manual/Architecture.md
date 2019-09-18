@@ -161,7 +161,7 @@ class Position extends Component {
 }
 ```
 
-Please notice that creating a component using the `createComponent` helper (**Link**) will include a `reset` implementation.
+Please notice that creating a component using the `createComponentClass` helper (**Link**) will include a `reset` implementation.
 
 ### Create component helper
 
