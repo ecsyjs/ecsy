@@ -10,7 +10,7 @@
   </head>
   <body>
     <script type="module">
-      import {createComponent, createType, Types} from '../../../build/ecsy.module.js';
+      import {createComponentClass, createType, Types} from '../../../build/ecsy.module.js';
 
       class Vector3 {
         constructor(x, y, z) {
@@ -60,7 +60,7 @@
         array: { default: [1,2,3], type: Types.Array }
       };
 
-      var ComponentA = createComponent(schema, "ComponentA");
+      var ComponentA = createComponentClass(schema, "ComponentA");
       window.ComponentA = ComponentA;
 
       var ca = new ComponentA();
