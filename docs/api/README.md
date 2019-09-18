@@ -151,15 +151,6 @@ Negate a component query
 
 -   `Component`  
 
-## createComponent
-
-Create a component class from a schema
-
-### Parameters
-
--   `schema`  
--   `name`  
-
 ## createType
 
 Use createType to create custom type definitions.
@@ -171,6 +162,15 @@ Use createType to create custom type definitions.
 ## Types
 
 Standard types
+
+## createComponentClass
+
+Create a component class from a schema
+
+### Parameters
+
+-   `schema`  
+-   `name`  
 
 [1]: #system
 

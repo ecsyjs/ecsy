@@ -5,6 +5,7 @@
 class SystemManager {
   constructor(world) {
     this._systems = [];
+    this._executeSystems = []; // Systems that have `execute` method
     this.world = world;
   }
 
@@ -17,12 +18,13 @@ class SystemManager {
     if (system.init) system.init();
     system.order = this._systems.length;
     this._systems.push(system);
+    if (system.execute) this._executeSystems.push(system);
     this.sortSystems();
     return this;
   }
 
   sortSystems() {
-    this._systems.sort((a, b) => {
+    this._executeSystems.sort((a, b) => {
       return a.priority - b.priority || a.order - b.order;
     });
   }
@@ -59,9 +61,9 @@ class SystemManager {
    * @param {Number} time Elapsed time
    */
   execute(delta, time) {
-    this._systems.forEach(system => {
+    this._executeSystems.forEach(system => {
       if (system.enabled && system.initialized) {
-        if (system.execute && system.canExecute()) {
+        if (system.canExecute()) {
           let startTime = performance.now();
           system.execute(delta, time);
           system.executeTime = performance.now() - startTime;
@@ -1178,25 +1180,20 @@ class System {
                       }
                     }
                   );
-                } else {
-                  // Checking just specific components
-                  let changedList = (this.queries[queryName][eventName] = {});
-                  event.forEach(component => {
-                    let eventList = (changedList[
-                      componentPropertyName(component)
-                    ] = []);
-                    query.eventDispatcher.addEventListener(
-                      Query.prototype.COMPONENT_CHANGED,
-                      (entity, changedComponent) => {
-                        if (
-                          changedComponent.constructor === component &&
-                          eventList.indexOf(entity) === -1
-                        ) {
-                          eventList.push(entity);
-                        }
+                } else if (Array.isArray(event)) {
+                  let eventList = (this.queries[queryName][eventName] = []);
+                  query.eventDispatcher.addEventListener(
+                    Query.prototype.COMPONENT_CHANGED,
+                    (entity, changedComponent) => {
+                      // Avoid duplicates
+                      if (
+                        event.indexOf(changedComponent.constructor) !== -1 &&
+                        eventList.indexOf(entity) === -1
+                      ) {
+                        eventList.push(entity);
                       }
-                    );
-                  });
+                    }
+                  );
                 }
               } else {
                 let eventList = (this.queries[queryName][eventName] = []);
@@ -1501,7 +1498,7 @@ function inferType(value) {
 /**
  * Create a component class from a schema
  */
-function createComponent(schema, name) {
+function createComponentClass(schema, name) {
   //var Component = new Function(`return function ${name}() {}`)();
   for (let key in schema) {
     let type = schema[key].type;
@@ -1600,4 +1597,4 @@ function createComponent(schema, name) {
   return Component;
 }
 
-export { Component, Not, System, TagComponent, Types, World, createComponent, createType };
+export { Component, Not, System, TagComponent, Types, World, createComponentClass, createType };
