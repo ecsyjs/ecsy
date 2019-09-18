@@ -596,7 +596,9 @@ test("Querries removing deferred components", t => {
 test("Reactive", t => {
   var world = new World();
 
-  class ReactiveSystem extends System {}
+  class ReactiveSystem extends System {
+    execute() {}
+  }
 
   ReactiveSystem.queries = {
     entities: {

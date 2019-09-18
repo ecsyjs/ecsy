@@ -5,6 +5,7 @@
 export class SystemManager {
   constructor(world) {
     this._systems = [];
+    this._executeSystems = []; // Systems that have `execute` method
     this.world = world;
   }
 
@@ -17,12 +18,13 @@ export class SystemManager {
     if (system.init) system.init();
     system.order = this._systems.length;
     this._systems.push(system);
+    if (system.execute) this._executeSystems.push(system);
     this.sortSystems();
     return this;
   }
 
   sortSystems() {
-    this._systems.sort((a, b) => {
+    this._executeSystems.sort((a, b) => {
       return a.priority - b.priority || a.order - b.order;
     });
   }
@@ -59,9 +61,9 @@ export class SystemManager {
    * @param {Number} time Elapsed time
    */
   execute(delta, time) {
-    this._systems.forEach(system => {
+    this._executeSystems.forEach(system => {
       if (system.enabled && system.initialized) {
-        if (system.execute && system.canExecute()) {
+        if (system.canExecute()) {
           let startTime = performance.now();
           system.execute(delta, time);
           system.executeTime = performance.now() - startTime;
