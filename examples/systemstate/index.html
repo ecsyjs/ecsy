@@ -43,18 +43,8 @@
 
       // Systems
       class MainSystem extends System {
-        init() {
-          return {
-            queries: {
-              added: { components: [Sprite, Not(SpriteResources)] },
-              removed: { components: [Not(Sprite), SpriteResources] },
-              normal: { components: [Sprite, SpriteResources] }
-            }
-          };
-        }
-
         execute() {
-          this.queries.added.forEach(entity => {
+          this.queries.added.results.forEach(entity => {
             var memPosition = Math.floor(Math.random() * 1000);
             var size = Math.floor(Math.random() * 900) + 100;
 
@@ -62,7 +52,7 @@
             entity.addComponent(SpriteResources, {memPosition, size});
           });
 
-          this.queries.removed.forEach(entity => {
+          this.queries.removed.results.forEach(entity => {
             var resources = entity.getComponent(SpriteResources);
             log(`Freeing SpriteResources 'memory position: ${resources.memPosition}, size: ${resources.size}kb'`);
             log(`Removing SpriteResources component from entity id=${entity.id}`);
@@ -70,6 +60,11 @@
           });
         }
       }
+      MainSystem.queries = {
+        added: { components: [Sprite, Not(SpriteResources)] },
+        removed: { components: [Not(Sprite), SpriteResources] },
+        normal: { components: [Sprite, SpriteResources] }
+      };
 
       // Initialize our world
       var world = new World();
