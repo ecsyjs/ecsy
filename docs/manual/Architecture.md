@@ -213,13 +213,79 @@ var acceleration = entity.getComponentValue(Acceleration);
 
 ## System State Components
 
+System State Components are components used by a system to hold internal resources for an entity, they are not removed when you delete the entity, you must remove them from once you are done with them.
+It can be used to detect whenever an entity has been added or removed from a query.
+
+```javascript
+class MySystem extends System {
+  init() {
+    return {
+      queries: {
+        added: { components: [ComponentA, Not(StateComponentA)] },
+        remove: { components: [Not(ComponentA), StateComponentA] },
+        normal: { components: [ComponentA, StateComponentA] },
+      }
+    };
+  },
+  execute() {
+    added.forEach(entity => {
+      entity.addStateComponent(StateComponentA, {data});
+    });
+
+    remove.forEach(entity => {
+      var component = entity.getStateComponent(StateComponentA);
+      // free resources for `component`
+      entity.removeStateComponent(StateComponentA);
+    });
+
+    normal.forEach(entity => {
+      // use entity and its components
+    });
+  }
+}
+
+MySystem.queries = {
+  added: { components: [ComponentA, Not(StateComponentA)] },
+  remove: { components: [Not(ComponentA), StateComponentA] },
+  normal: { components: [ComponentA, StateComponentA] },
+};
+```
+
 ## System
 
 Systems are stateless processors of groups of entities.
 
+### queries
+
 ### init
+
+
 ### execute
-### ordering
+
+
+### Execution order
+By default systems are executed on the same order they are registered in the world:
+```javascript
+world
+  .registerSystem(SystemA)
+  .registerSystem(SystemB)
+  .registerSystem(SystemC);
+```
+This will execute `SystemA > SystemB > SystemC`.
+
+It is also possible to define the priority on which the systems will get executed by adding a `priority: Number` attribute when registering them.
+By default systes have `priority=0` and they are sorted ascendingly, it means the lower the number the earlier the system will be executed.
+
+```javascript
+world
+  .registerSystem(SystemA)
+  .registerSystem(SystemB, { priority: 2 })
+  .registerSystem(SystemC, { priority: -1 })
+  .registerSystem(SystemD)
+  .registerSystem(SystemE);
+```
+
+This will results on an execution order as: `SystemC > SystemA > SystemD > SystemE > SystemB`.
 
 ### Reactive systems
 
@@ -381,4 +447,22 @@ class SystemTest extends System {
     boxesQuery.changed.forEach(entity => {});
   }
 }
+```
+
+Defining `changed: true` will populate the list if **any** of the components on the query has been modified. If you are just interested just in some specific components instead, you can define an array of components instead of the boolean value:
+```javascript
+SystemTest.queries = {
+  boxes: {
+    components: [ Box, Transform ],
+    listen: {
+      added: true,
+      removed: true
+      changed: [ Box ]  // Detect that the Box component has changed
+    }
+  }
+};
+
+// ...
+  boxesQuery.changed.forEach(entity => {}); // Box component has changed
+// ...
 ```
