@@ -1,5 +1,12 @@
 # ECSY Architecture
 
+## World
+By default your application should have at least one `world`. A world is basically a container for `entities`, `components` and `systems`.  Even so, you can have multiple worlds running at the same time and enable or disable them as you need.
+
+```javascript
+world = new World();
+```
+
 ## Entities
 An entity is an object that has an unique ID which purpose is to group components together.
 
@@ -126,6 +133,10 @@ class ComponentA extends Component {
 }
 ```
 
+### clear
+
+### copy
+
 ### Components pooling
 Usually an ECSY application will involve adding and removing components in real time. Allocating resources in a performance sensitive application is considered a bad pattern as the garbage collector will get called often and it will hit the performance.
 In order to minimize it ECSY includes automatic pooling for components.
@@ -163,7 +174,12 @@ class Position extends Component {
 
 Please notice that creating a component using the `createComponentClass` helper (**Link**) will include a `reset` implementation.
 
-### Create component helper
+## Create component helper
+Creating a component and implementing its `reset` function can be a repetitive task specially when we are working with simple data types.
+At the same time it could lead to side effects errors, specially when pooling components, if there is some bug on one of the components' `reset` function for example.
+In order to ease this task, it is possible to use a helper function called `createComponentClass(schema, className)` which takes a JSON schema with the definition of the component and generate the class accordanly, implementing the `reset`, `copy` and `clear` functions.
+
+
 
 ## Data types
 
@@ -211,7 +227,7 @@ Eventually we could end up adding some syntactic sugar for these type of compone
 var acceleration = entity.getComponentValue(Acceleration);
 ```
 
-## System State Components
+### System State Components
 
 System State Components are components used by a system to hold internal resources for an entity, they are not removed when you delete the entity, you must remove them from once you are done with them.
 It can be used to detect whenever an entity has been added or removed from a query.
@@ -254,14 +270,27 @@ MySystem.queries = {
 ## System
 
 Systems are stateless processors of groups of entities.
+Usually each system defines one or more queries of entities and it iterate through these lists per frame.
 
-### queries
+```javascript
+class SystemName extends System {
+  init() {}
+  execute(delta, time) {}
+}
 
-### init
+SystemName.queries = {};
+```
 
+A system should always extends from the `System` class and can implement two functions:
+- `init()`: This function is called when the system is registered in a world (Calling `world.registerSystem` **link**) and can be used to initialize anything the system needs.
+- `execute(deltaTime, elapsedTime)`: It will get called each frame by default (unless you are using a custom scheduler). Usually it will be used to loop through the lists of entities from each query and process the value of theirs components.
 
-### execute
+### Registering a system
 
+Systems should be registered in a world in order to initialize them and add them to the default scheduler that will execute them on each frame.
+```javascript
+world.registerSystem(SystemName);
+```
 
 ### Execution order
 By default systems are executed on the same order they are registered in the world:
