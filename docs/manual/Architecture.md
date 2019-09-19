@@ -1,7 +1,10 @@
 # ECSY Architecture
 
+## Overview
+
 ## World
 By default your application should have at least one `world`. A world is basically a container for `entities`, `components` and `systems`.  Even so, you can have multiple worlds running at the same time and enable or disable them as you need.
+**TODO: link to doc**
 
 ```javascript
 world = new World();
@@ -10,14 +13,14 @@ world = new World();
 ## Entities
 An entity is an object that has an unique ID which purpose is to group components together.
 
-Entities are always created within a `World` context:
+Entities should be created within a `World` context:
 
 ```javascript
 var entity = world.createEntity();
 ```
 
 ### Adding components
-Once you have created an entity you can add components to it:
+Once an entity is created, it is possible to add **TODO: link to components** components to it:
 ```javascript
 class ComponentA {
   constructor() {
@@ -33,17 +36,18 @@ entity.addComponent(ComponentA);
 entity.addComponent(ComponentA, {number: 20, string: "Hi"});
 ```
 
-### Accessing components and mutability
-You can access a component from an entity with two modes:
+### Accessing components and modify components **TODO: Change it in two?**
+Component can be accessed from an entity in two ways:
 - `getComponent(Component`: Get the component for read only operations.
 - `getMutableComponent(Component)`: Get the components to modify its values.
 
-> Please notice that if you are in ()[debug mode] it will throw an error if you try to modify a component accessed by `getComponent` but that error won't be available on release mode because of performance reasons.
+> If **TODO: Link** `DEBUG` mode is enabled it will throw an error if you try to modify a component accessed by `getComponent`, but that error will not be thrown on release mode because of performance reasons.
 
-These two access mode help us to implement `reactive systems`(**LINK**) without much overhead on the execution (We avoid using custom setters or proxies). This means everytime you request a mutable component, it will get marked as modified and systems listening for that will get notified accordanly.
-> It's important to notice that the component will get marked as modified even if you don't change any attribute on it, so try to use `getMutableComponent` only when you know you will actually modify the component and use `getComponent` otherwise.
+These two access modes help to implement `reactive queries`(**TODO: link**), which are basically lists of entities populated with components that has mutated somehow, without much overhead on the execution as we avoid using custom setters or proxies.
+This means everytime you request a mutable component, it will get marked as modified and systems listening for that will get notified accordanly.
+It's important to notice that the component will get marked as modified even if you don't change any attribute on it, so try to use `getMutableComponent` only when you know you will actually modify the component and use `getComponent` otherwise.
 
-Side effects of these two modes are allowing automatic schedulers to analyze the code to paralellize it and making the code easily readable as we could understand how the system is acting on the components.
+Other positive side effects of these two modes are allowing automatic schedulers to analyze the code to paralellize it and making the code easily readable as we could understand how the system is acting on the components.
 
 ### Removing components
 Another common operation on entities is to remove components:
@@ -52,10 +56,10 @@ Another common operation on entities is to remove components:
 entity.removeComponent(ComponentA);
 ```
 
-This will mark the component to be removed and will populate all the queues from the systems that are listening to that event, but the component itself won't be disposed until the end of the frame.
+This will mark the component to be removed and will populate all the queues from the systems that are listening to that event (**TODO: Link remove reactive**), but the component itself won't be disposed until the end of the frame (**TODO: More on life cycle**), we call it `deferred removal`.
 This is done so systems that need to react to it can still access the data of the components.
 
-Once a component is removed from an entity using the default deferred mode, you can still access its contents, before the end of the frame, by calling `getRemovedComponent(Component)`:
+Once a component is removed from an entity, it is possible to access its contents, by calling `getRemovedComponent(Component)`:
 
 ```javascript
 class SystemFoo extends System {
@@ -93,12 +97,11 @@ This example will output:
 
 And it will stop the execution there as the query won't get satisfied after the `Box` component is removed from the entity.
 
-**MORE ON THIS ON LIFECYCLE**
-
-You can still remove the component immediately if needed by passing a second parameter to `removeComponent(Component, forceImmediate)`, although is not the recommended behaviour because it could lead to side effect if other systems need to access the removed component:
+Even if the deferred removal is the default behaviour, it is possible to remove a component immediately if needed, by passing a second parameter to `removeComponent(Component, forceImmediate)`.
+Although this is not the recommended behaviour because it could lead to side effect if other systems need to access the removed component:
 ```javascript
 // The component will get removed immediately
-entity.removeComponent(Component, A);
+entity.removeComponent(ComponentA, true);
 ```
 
 ## Components
@@ -111,7 +114,7 @@ function ComponentA() {
 }
 ```
 
-But the recommended way is using ES6 classes:
+The recommended way is using ES6 classes:
 ```javascript
 class ComponentA {
   constructor() {
@@ -127,9 +130,18 @@ import { Component } from 'ecsy';
 
 class ComponentA extends Component {
   constructor() {
+    super();
     this.number = 10;
     this.string = "Hello";
   }
+}
+```
+
+```javascript
+class ComponentName extends Component {
+  clear() {}
+  copy() {}
+  reset() {}
 }
 ```
 
@@ -139,12 +151,13 @@ class ComponentA extends Component {
 
 ### Components pooling
 Usually an ECSY application will involve adding and removing components in real time. Allocating resources in a performance sensitive application is considered a bad pattern as the garbage collector will get called often and it will hit the performance.
-In order to minimize it ECSY includes automatic pooling for components.
-This means that if we add component to an entity as:
+In order to minimize it ECSY includes pooling for components.
+This means that everytime a component is added to an entity as:
 ```javascript
 entity.addComponent(ComponentA)
 ```
-the engine will try to reuse a `ComponentA` instance from a pool of components previously created, and it won't allocate a new one instead. Once we are done with that component and do `entity.removeComponent(ComponentA)`, it will get returned to the pool, ready to be used by other entity.
+the engine will try to reuse a `ComponentA` instance from the pool of components previously created, and it won't allocate a new one instead.
+When releasing the component, by calling `entity.removeComponent(ComponentA)`, it will get returned to the pool, ready to be used by other entity.
 
 ECSY should know how to reset a component to its original state, that's why it's mandatory that components implements a `reset` method to get the benefits from pooling, otherwise you will get a warning message about it.
 
@@ -185,7 +198,7 @@ In order to ease this task, it is possible to use a helper function called `crea
 
 ### Tag Components
 
-Some components don't store data and are used to tag some entities. It's recommended to extends `TagComponent` on these cases so the engine could, eventually, optimize the usage of this component.
+Some components don't store data and are used just as tags. In these cases it is recommended to extends `TagComponent` so the engine could, eventually, optimize the usage of this component.
 
 ```javascript
 class Enemy extends TagComponent {}
@@ -269,7 +282,7 @@ MySystem.queries = {
 
 ## System
 
-Systems are stateless processors of groups of entities.
+Systems are stateless processors of groups of entities.**TODO:Change**
 Usually each system defines one or more queries of entities and it iterate through these lists per frame.
 
 ```javascript
