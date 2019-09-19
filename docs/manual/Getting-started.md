@@ -1,8 +1,8 @@
 # Getting started
 
 ## ECS principles
-First of all, let's define the common terminology used in ECS:
-- `entity`: An entity is an object that has an unique ID which purpose is to group components together.
+First of all, let's briefly define the common terminology used in ECS:
+- `entity`: An entity is an object that has an unique ID which only purpose is to group components together.
 - `component`: Is an object that just store data.
 - `system`: Systems are stateless classes, than can define `queries` Stateless processors of list of entities that match specific condition.
 

@@ -277,13 +277,42 @@ class SystemName extends System {
   init() {}
   execute(delta, time) {}
 }
-
-SystemName.queries = {};
 ```
 
 A system should always extends from the `System` class and can implement two functions:
 - `init()`: This function is called when the system is registered in a world (Calling `world.registerSystem` **link**) and can be used to initialize anything the system needs.
 - `execute(deltaTime, elapsedTime)`: It will get called each frame by default (unless you are using a custom scheduler). Usually it will be used to loop through the lists of entities from each query and process the value of theirs components.
+
+Systems could define one or more queries (**LINK**) by setting the static `queries` attribute:
+
+```javascript
+SystemName.queries = {
+  boxes: { components: [ Box ] }
+  spheres: { components: [ Sphere ] }
+};
+```
+
+If a `queries` attribute is defined, is it possible to access the entities matching these queries on the `execute` method:
+
+```javascript
+class SystemName extends System {
+  execute(delta, time) {
+    var q = this.queries;
+
+    q.boxes.results.forEach(entity => {
+      var box = entity.getComponent(Box);
+      // Do whatever you want with box
+    });
+
+    q.Spheres.results.forEach(entity => {
+      var sphere = entity.getComponent(Sphere);
+      // Do whatever you want with Sphere
+    });
+  }
+}
+```
+
+> If there is a `reactive query` **link** on the list of queries defined for a system, this system is called `reactive system` as it will react to changes on the entities and its components.
 
 ### Registering a system
 
@@ -316,9 +345,9 @@ world
 
 This will results on an execution order as: `SystemC > SystemA > SystemD > SystemE > SystemB`.
 
-### Reactive systems
-
 ### Life cycle
+
+
 
 ## Pooling
 
@@ -334,42 +363,39 @@ This will results on an execution order as: `SystemC > SystemA > SystemD > Syste
 
 ## Queries
 
-A query is a collection of entities that match some condition based on the components they own.
+A query is a collection of entities that match some conditions based on the components they own.
 There are multiple ways to create a query:
-* Creating an instance of `Query(Components, World)` (Not recommended)
+* Creating an instance of `Query(Components, World)`
 * Getting the query directly from the `QueryManager` by calling `world.entityManager.queryComponents(Components)`
-* Defining the queries on a `System`. This is also the recommended way as the engine could use that information to organize and optimize the execution of the systems and queries.
+* Defining the queries on a `System`. This is also the recommended way as the engine could use that information to organize and optimize the execution of the systems and queries. Also if several queries are created with the same components, the `QueryManager` will just create a single query under the hood and referece it everywhere saving memory and computation.
 
-A query is always updated with the entities that matches the components' condition. One the query is initialized it traverse the components groups to determine which entities should get added to it. But after that entities will get added or removed from the query as components are being added or removed from them.
-If we create several queries with the same components, the `QueryManager` will just create a single query under the hood and referece it everywhere saving memory and computation.
+A query is always updated with the entities that matches the components' condition. Once the query is initialized it traverse the components groups to determine which entities should be added to it. But after that, entities will get added or removed from the query as components are being added or removed from them.
 
-### Examples
+### Query syntax
 
-For example, if we want a query with all the entities that has the component `Position` on a system called `SystemTest`, we should define the query as:
+The only mandatory field in a query is `components` attribute which defines the list of components that an entity must have to be included in this query.
+
+```json
+{
+  QueryName: {
+    components: ArrayOfComponents,
+    listen: {
+      added: Boolean,
+      removed: Boolean,
+      changed: Boolean | ArrayOfComponents
+    }
+  }
+}
+```
+
+For example, defining a query containing all the entities that has the component `Position` and `Velocity`:
 ```javascript
-SystemTest.queries = {
+var query = {
   positions: {
-    components: [ Position ]
+    components: [ Position, Velocity ]
   }
 };
 ```
-
-The `components` attribute defines the list of components that an entity must have to be included in this query.
-
-You can also define multiple queries;
-
-```javascript
-SystemTest.queries = {
-  positions: {
-    components: [ Position ]
-  },
-  physicsObjects: {
-    components: [ PhysicBody, Transform ]
-  }
-};
-```
-
-In this example the `physicsObjects` query will get populated with the components that have both `PhysicsBody` **and** `Transform`.
 
 ### Not operator
 
@@ -381,9 +407,9 @@ SystemTest.queries = {
   }
 };
 ```
-This will return all the entities that have a `Enemy` component but have not the `Dead` component.
+This will return all the entities that **have** a `Enemy` component but **do have not** the `Dead` component.
 
-This operator could be very useful as a factory pattern (**See example link**):
+This operator could be very useful as a factory pattern ([example](https://fernandojsg.github.io/ecsy/examples/factory/index.html)):
 ```javascript
 SystemTest.queries = {
   playerUninitialized: {
@@ -436,13 +462,13 @@ class SystemTest extends System {
 }
 ```
 
-To avoid callbacks and asynchronicity, which is a bad thing for cache and predictability on the execution, entities are queued on the `added` and `removed` lists but they system owning these lists will be able to process them just whenever the `execute` method will get called.
+To avoid callbacks and asynchrony, which is a bad thing for cache and predictability on the execution, entities are queued on the `added` and `removed` lists but the system owning these lists will be able to process them just whenever the `execute` method will get called.
 So everytime you call `execute` you will have the list of all the entities added or removed since the last call. After the call has been executed these lists will get cleared.
 
 #### Changed
-Sometimes is also interesting to detect that an entity or a specific component has changed. Detecting these changes is more tricky to do performantly that's why we rely on the `entity.getMutableComponent` function (More info **link**) that basically mark the component as modified.
-The syntax to detect if an entity has changed, this means that any of the components from the entity that are part of the query have changed, is similar to the ones for `added` or `removed`:
-
+Sometimes is also interesting to detect that an entity or a specific component has changed, , this means that any of the components from the entity that are part of the query have changed.
+Detecting these changes trickier to do it performantly, that is why we rely on the `entity.getMutableComponent` function (More info **TODO: link**) that basically marks the component as modified.
+The syntax to detect if an entity has changed, is similar to the ones for `added` or `removed`:
 
 ```javascript
 SystemTest.queries = {
