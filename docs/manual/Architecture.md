@@ -519,8 +519,6 @@ SystemTest.queries = {
 // ...
 ```
 
-## Deferred removal
-
 ## Entities and components life cycle
 
 By default ECSY uses deferred removal when removing an entity or a component:
@@ -540,3 +538,68 @@ entity.removeComponent(Player, true);
 // Remove entity inmediately
 entity.remove(true);
 ```
+
+When a component or an entity is removed, one `to be removed` flag is activated and the `reactive queries` (**TODO: link**) listening for `removed` events will get populated by them.
+```javascript
+// Component to identify a wolf
+class Wolf extends TagComponent {}
+
+// Component to store how long is sleeping the wolf
+class Sleeping extends Component {
+  constructor() {
+    super();
+    this.startSleepingTime = 0;
+  }
+}
+
+// This system will wake up sleeping wolves randomly
+class SystemAwakeWolves extends System {
+  execute() {
+    this.queries.sleepingWolves.results.forEach(wolf => {
+      if (Math.random() > 0.5) {
+        wolf.removeComponent(Sleeping);
+      }
+    });
+  }
+}
+SystemAwakeWolves.queries = {
+  sleepingWolves: { components: [ Wolf, Sleeping ]}
+};
+
+// This system will implements wolf reactions after just being awake
+class SystemWolfReactions extends System {
+  execute(delta, elapsedTime) {
+    this.queries.sleepingWolves.removed.forEach(wolf => {
+      var sleeping = wolf.getRemovedComponent(Sleeping);
+      var duration = elapsedTime - sleeping.startSleepingTime;
+      // Do whatever with the `duration` value
+      // eg: Make the wolf move slower if its was sleeping for so long
+    });
+  }
+}
+SystemWolfReactions.queries = {
+  sleepingWolves: {
+    components: [ Wolf, Sleeping ],
+    listen: {
+      removed: true
+    }
+  }
+};
+```
+
+In the previous example, the `SystemAwakeWolves` randomly wakes up wolves by removing the `Sleeping` component from them. The entities representing these wolves will get removed from its `sleepingWolves` query.
+As the `SystemWolfReactions` has the same query as the `SystemAwakeWolves`, the entity will also get removed from its query. Because the query is also reactive **TODO: link to reactive queries** (`removed: true`), the `sleepingWolves.removed` will get populated with the wolves that were awake in the previous system.
+When iterating these removed entities, it is possible to access the removed `Sleeping` component by using `getRemovedComponent`.
+Please notice that if immediate removal were used **TODO: Link to forceremoved**, instead of the default deferred method, the component will not be accessible to any systems after it.
+
+This flow is exactly the same when removing entities instead of components. The entities and its components will still be available on the rest of the systems reacting to these deletions.
+
+### Clearing removal queues
+
+When using deferred removal, it is needed to deallocate the entities and components at some point, and this is happening at the end of the frame.
+After all the systems' execute method are being called, the components and entities are truly removed and returned to their pools.
+Is important to notice that if an applicatio has a running order as: `SystemA > SystemB > SystemC` and `SystemA` removes an entity, `SystemB` and `SystemC` will be able to read it and its components.
+But if `SystemB` does the same, just `SystemC` will be able to react to it, as the entity and components data will get cleared at the end of the frame, so `SystemA` will not be able to read that data.
+Because of that is important that you define an appropiate execution order based on the needs for your reactive systems.
+
+There is one special use case when removing components and entities and is when using `System State Components` as they should be removed explicitly and they will not get removed if `entity.remove` is being called. **TODO: link to System State Components**
