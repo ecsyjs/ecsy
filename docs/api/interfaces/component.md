@@ -1,0 +1,6 @@
+
+# Interface: Component
+
+## Hierarchy
+
+* **Component**

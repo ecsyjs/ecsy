@@ -35,19 +35,11 @@ export class World {
     this.eventDispatcher.removeEventListener(eventName, callback);
   }
 
-  /**
-   * Register a component
-   * @param {Component} Component
-   */
   registerComponent(Component) {
     this.componentsManager.registerComponent(Component);
     return this;
   }
 
-  /**
-   * Register a system
-   * @param {System} System
-   */
   registerSystem(System, attributes) {
     this.systemManager.registerSystem(System, attributes);
     return this;
