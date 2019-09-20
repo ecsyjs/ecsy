@@ -1,6 +1,6 @@
 # ECSY Architecture
 
-![ECSY architecture](http://ecsy.io/docs/manual/images/ECSY Architecture.svg)
+![ECSY architecture](http://ecsy.io/docs/manual/images/ECSY%20Architecture.svg)
 
 ## Overview
 ECSY is a Entity Component System (ECS) engine for web applications.
