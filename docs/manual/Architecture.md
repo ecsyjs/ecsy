@@ -11,7 +11,7 @@ Some common terminology of the elements needed to build an ECSY application are:
 - `queries`: Used by systems to determine which entities they are interested in, based on the components the entities own.
 - `world`: Container for entities, components, systems and queries.
 
-With these the usual workflow would be:
+The usual workflow would be:
 - Define the components that shape the data you need to use in your application.
 - Define the systems that will use these components to obtain some change on your application.
 - Create entities and attach components to it.
@@ -98,6 +98,7 @@ var acceleration = entity.getComponentValue(Acceleration);
 ```
 
 ### Components pooling
+
 Usually an ECSY application will involve adding and removing components in real time. Allocating resources in a performance sensitive application is considered a bad pattern as the garbage collector will get called often and it will impact the performance.
 In order to minimize it, ECSY includes pooling for components.
 This means that everytime a component is added to an entity as:
@@ -187,7 +188,6 @@ In order to ease this task, it is possible to use a helper function called `crea
 ## Data types
 
 
-
 ## Entities
 An entity is an object that has an unique ID which purpose is to group components together.
 
@@ -219,7 +219,7 @@ Component can be accessed from an entity in two ways:
 - `getComponent(Component`: Get the component for read only operations.
 - `getMutableComponent(Component)`: Get the components to modify its values.
 
-> If **TODO: Link** `DEBUG` mode is enabled it will throw an error if you try to modify a component accessed by `getComponent`, but that error will not be thrown on release mode because of performance reasons.
+If **TODO: Link** `DEBUG` mode is enabled it will throw an error if you try to modify a component accessed by `getComponent`, but that error will not be thrown on release mode because of performance reasons.
 
 These two access modes help to implement `reactive queries`(**TODO: link**), which are basically lists of entities populated with components that has mutated somehow, without much overhead on the execution as we avoid using custom setters or proxies.
 This means everytime you request a mutable component, it will get marked as modified and systems listening for that will get notified accordanly.
@@ -348,7 +348,7 @@ world
 This will execute `SystemA > SystemB > SystemC`.
 
 It is also possible to define the priority on which the systems will get executed by adding a `priority: Number` attribute when registering them.
-By default systes have `priority=0` and they are sorted ascendingly, it means the lower the number the earlier the system will be executed.
+By default systems have `priority=0` and they are sorted ascendingly, it means the lower the number the earlier the system will be executed.
 
 ```javascript
 world
@@ -360,22 +360,6 @@ world
 ```
 
 This will results on an execution order as: `SystemC > SystemA > SystemD > SystemE > SystemB`.
-
-### Life cycle
-
-
-
-## Pooling
-
-### Entity pooling
-
-### Component pooling
-
-### Prefab pooling
-
-## Deferred removal
-
-## Life cycle
 
 ## Queries
 
@@ -533,4 +517,26 @@ SystemTest.queries = {
 // ...
   boxesQuery.changed.forEach(entity => {}); // Box component has changed
 // ...
+```
+
+## Deferred removal
+
+## Entities and components life cycle
+
+By default ECSY uses deferred removal when removing an entity or a component:
+```javascript
+// Deferred remove component
+entity.removeComponent(Player);
+
+// Deferred remove entity
+entity.remove();
+```
+
+It is possible to override that behaviour and remove the component and entity immediately by passing `true` as aditional parameter to both functions. Although this is not the recommended behaviour as it could lead to side effects, so it should be used with caution:
+```javascript
+// Remove component inmediately
+entity.removeComponent(Player, true);
+
+// Remove entity inmediately
+entity.remove(true);
 ```
