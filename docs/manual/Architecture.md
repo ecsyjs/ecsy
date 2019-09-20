@@ -17,7 +17,7 @@ With these the usual workflow would be:
 
 ## World
 By default your application should have at least one `world`. A world is basically a container for `entities`, `components` and `systems`.  Even so, you can have multiple worlds running at the same time and enable or disable them as you need.
-[More info on the API Reference](/api/?id=world).
+[More info on the API Reference](http://ecsy.io/docs/#/api/?id=world).
 **TODO: link to doc**
 
 ```javascript
