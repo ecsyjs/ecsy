@@ -1,8 +1,22 @@
 # ECSY Architecture
 
 ## Overview
+ECSY is a Entity Component System (ECS) engine for web applications.
+Some common terminology of the elements needed to build an ECSY application are:
+- `entity`: Is an object that has an unique ID and can have multiple components attached to it.
+- `component`: Is where the data is stored.
+- `system`: Processes list of entities reading and modifying their components.
+- `queries`: Used by systems to determine which entities they are interested in, based on the components the entities own.
+- `world`: Container for entities, components, systems and queries.
 
-## World
+With these the usual workflow would be:
+- Define the components that shape the data you need to use in your application.
+- Define the systems that will use these components to obtain some change on your application.
+- Create entities and attach components to it.
+- Run!
+
+
+## World
 By default your application should have at least one `world`. A world is basically a container for `entities`, `components` and `systems`.  Even so, you can have multiple worlds running at the same time and enable or disable them as you need.
 **TODO: link to doc**
 
@@ -10,102 +24,8 @@ By default your application should have at least one `world`. A world is basical
 world = new World();
 ```
 
-## Entities
-An entity is an object that has an unique ID which purpose is to group components together.
-
-Entities should be created within a `World` context:
-
-```javascript
-var entity = world.createEntity();
-```
-
-### Adding components
-Once an entity is created, it is possible to add **TODO: link to components** components to it:
-```javascript
-class ComponentA {
-  constructor() {
-    this.number = 10;
-    this.string = "Hello";
-  }
-}
-
-// Add the component with the default values
-entity.addComponent(ComponentA);
-
-// Add the component replacing the default values
-entity.addComponent(ComponentA, {number: 20, string: "Hi"});
-```
-
-### Accessing components and modify components **TODO: Change it in two?**
-Component can be accessed from an entity in two ways:
-- `getComponent(Component`: Get the component for read only operations.
-- `getMutableComponent(Component)`: Get the components to modify its values.
-
-> If **TODO: Link** `DEBUG` mode is enabled it will throw an error if you try to modify a component accessed by `getComponent`, but that error will not be thrown on release mode because of performance reasons.
-
-These two access modes help to implement `reactive queries`(**TODO: link**), which are basically lists of entities populated with components that has mutated somehow, without much overhead on the execution as we avoid using custom setters or proxies.
-This means everytime you request a mutable component, it will get marked as modified and systems listening for that will get notified accordanly.
-It's important to notice that the component will get marked as modified even if you don't change any attribute on it, so try to use `getMutableComponent` only when you know you will actually modify the component and use `getComponent` otherwise.
-
-Other positive side effects of these two modes are allowing automatic schedulers to analyze the code to paralellize it and making the code easily readable as we could understand how the system is acting on the components.
-
-### Removing components
-Another common operation on entities is to remove components:
-
-```javascript
-entity.removeComponent(ComponentA);
-```
-
-This will mark the component to be removed and will populate all the queues from the systems that are listening to that event (**TODO: Link remove reactive**), but the component itself won't be disposed until the end of the frame (**TODO: More on life cycle**), we call it `deferred removal`.
-This is done so systems that need to react to it can still access the data of the components.
-
-Once a component is removed from an entity, it is possible to access its contents, by calling `getRemovedComponent(Component)`:
-
-```javascript
-class SystemFoo extends System {
-  execute() {
-    this.queries.boxes.removed.forEach(entity => {
-      var component = entity.getRemovedComponent(Box);
-      console.log('Component removed:', component, 'on entity: ', entity.id);
-    });
-
-    this.queries.boxes.entities.forEach(entity => {
-      console.log('Iterating on entity: ', entity.id);
-    });
-  }
-}
-
-SystemFoo.queries = {
-  boxes: {
-    components: [ Box ],
-    removed: true // To listen for removed entities from the query
-  }
-}
-
-var entity = world.createEntity().addComponent(Box);
-world.execute();
-entity.removeComponent(Box);
-world.execute();
-```
-
-This example will output:
-
-```
-- Iterating on entity: 1
-- Component removed: box on entity: 1
-```
-
-And it will stop the execution there as the query won't get satisfied after the `Box` component is removed from the entity.
-
-Even if the deferred removal is the default behaviour, it is possible to remove a component immediately if needed, by passing a second parameter to `removeComponent(Component, forceImmediate)`.
-Although this is not the recommended behaviour because it could lead to side effect if other systems need to access the removed component:
-```javascript
-// The component will get removed immediately
-entity.removeComponent(ComponentA, true);
-```
-
 ## Components
-A `Component` is an object that can store data but should have not behaviour. There is not a mandatory way to define a component.
+A `Component` is an object that can store data but should have not behaviour (As that should be handled on systems). There is not a mandatory way to define a component.
 It could just be a function:
 ```javascript
 function ComponentA() {
@@ -278,6 +198,100 @@ MySystem.queries = {
   remove: { components: [Not(ComponentA), StateComponentA] },
   normal: { components: [ComponentA, StateComponentA] },
 };
+```
+
+## Entities
+An entity is an object that has an unique ID which purpose is to group components together.
+
+Entities should be created within a `World` context:
+
+```javascript
+var entity = world.createEntity();
+```
+
+### Adding components
+Once an entity is created, it is possible to add **TODO: link to components** components to it:
+```javascript
+class ComponentA {
+  constructor() {
+    this.number = 10;
+    this.string = "Hello";
+  }
+}
+
+// Add the component with the default values
+entity.addComponent(ComponentA);
+
+// Add the component replacing the default values
+entity.addComponent(ComponentA, {number: 20, string: "Hi"});
+```
+
+### Accessing components and modify components **TODO: Change it in two?**
+Component can be accessed from an entity in two ways:
+- `getComponent(Component`: Get the component for read only operations.
+- `getMutableComponent(Component)`: Get the components to modify its values.
+
+> If **TODO: Link** `DEBUG` mode is enabled it will throw an error if you try to modify a component accessed by `getComponent`, but that error will not be thrown on release mode because of performance reasons.
+
+These two access modes help to implement `reactive queries`(**TODO: link**), which are basically lists of entities populated with components that has mutated somehow, without much overhead on the execution as we avoid using custom setters or proxies.
+This means everytime you request a mutable component, it will get marked as modified and systems listening for that will get notified accordanly.
+It's important to notice that the component will get marked as modified even if you don't change any attribute on it, so try to use `getMutableComponent` only when you know you will actually modify the component and use `getComponent` otherwise.
+
+Other positive side effects of these two modes are allowing automatic schedulers to analyze the code to paralellize it and making the code easily readable as we could understand how the system is acting on the components.
+
+### Removing components
+Another common operation on entities is to remove components:
+
+```javascript
+entity.removeComponent(ComponentA);
+```
+
+This will mark the component to be removed and will populate all the queues from the systems that are listening to that event (**TODO: Link remove reactive**), but the component itself won't be disposed until the end of the frame (**TODO: More on life cycle**), we call it `deferred removal`.
+This is done so systems that need to react to it can still access the data of the components.
+
+Once a component is removed from an entity, it is possible to access its contents, by calling `getRemovedComponent(Component)`:
+
+```javascript
+class SystemFoo extends System {
+  execute() {
+    this.queries.boxes.removed.forEach(entity => {
+      var component = entity.getRemovedComponent(Box);
+      console.log('Component removed:', component, 'on entity: ', entity.id);
+    });
+
+    this.queries.boxes.entities.forEach(entity => {
+      console.log('Iterating on entity: ', entity.id);
+    });
+  }
+}
+
+SystemFoo.queries = {
+  boxes: {
+    components: [ Box ],
+    removed: true // To listen for removed entities from the query
+  }
+}
+
+var entity = world.createEntity().addComponent(Box);
+world.execute();
+entity.removeComponent(Box);
+world.execute();
+```
+
+This example will output:
+
+```
+- Iterating on entity: 1
+- Component removed: box on entity: 1
+```
+
+And it will stop the execution there as the query won't get satisfied after the `Box` component is removed from the entity.
+
+Even if the deferred removal is the default behaviour, it is possible to remove a component immediately if needed, by passing a second parameter to `removeComponent(Component, forceImmediate)`.
+Although this is not the recommended behaviour because it could lead to side effect if other systems need to access the removed component:
+```javascript
+// The component will get removed immediately
+entity.removeComponent(ComponentA, true);
 ```
 
 ## System
