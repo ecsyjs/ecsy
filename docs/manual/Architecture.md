@@ -15,9 +15,9 @@ With these the usual workflow would be:
 - Create entities and attach components to it.
 - Run!
 
-
 ## World
 By default your application should have at least one `world`. A world is basically a container for `entities`, `components` and `systems`.  Even so, you can have multiple worlds running at the same time and enable or disable them as you need.
+[More info on the API Reference](/docs/#/api/?id=world).
 **TODO: link to doc**
 
 ```javascript
@@ -34,17 +34,7 @@ function ComponentA() {
 }
 ```
 
-The recommended way is using ES6 classes:
-```javascript
-class ComponentA {
-  constructor() {
-    this.number = 10;
-    this.string = "Hello";
-  }
-}
-```
-
-Currently the `Component` class exporter by ECSY is a dummy class but eventually in the future we could use it for other purposes so we recommend extending the components from it:
+The recommended way is using ES6 classes and extending the `Component` class:
 ```javascript
 import { Component } from 'ecsy';
 
@@ -57,13 +47,10 @@ class ComponentA extends Component {
 }
 ```
 
-```javascript
-class ComponentName extends Component {
-  clear() {}
-  copy() {}
-  reset() {}
-}
-```
+It is also recommended to implement the following functions on every component class:
+- `clear`: It should clear
+
+
 
 ### clear
 
@@ -273,19 +260,21 @@ SystemFoo.queries = {
 }
 
 var entity = world.createEntity().addComponent(Box);
-world.execute();
+world.execute(); // Execute frame 1
 entity.removeComponent(Box);
-world.execute();
+world.execute(); // Execute frame 2
 ```
 
 This example will output:
 
 ```
-- Iterating on entity: 1
-- Component removed: box on entity: 1
+Frame 1:
+  - Iterating on entity: 1
+Frame 2:
+  - Component removed: box on entity: 1
 ```
 
-And it will stop the execution there as the query won't get satisfied after the `Box` component is removed from the entity.
+Any further `execute()` will not log anything, since none of the queries are satisfied after the component `Box` was removed from the entity.
 
 Even if the deferred removal is the default behaviour, it is possible to remove a component immediately if needed, by passing a second parameter to `removeComponent(Component, forceImmediate)`.
 Although this is not the recommended behaviour because it could lead to side effect if other systems need to access the removed component:
@@ -391,10 +380,7 @@ This will results on an execution order as: `SystemC > SystemA > SystemD > Syste
 ## Queries
 
 A query is a collection of entities that match some conditions based on the components they own.
-There are multiple ways to create a query:
-* Creating an instance of `Query(Components, World)`
-* Getting the query directly from the `QueryManager` by calling `world.entityManager.queryComponents(Components)`
-* Defining the queries on a `System`. This is also the recommended way as the engine could use that information to organize and optimize the execution of the systems and queries. Also if several queries are created with the same components, the `QueryManager` will just create a single query under the hood and referece it everywhere saving memory and computation.
+The most common use case for queries is to define them in systems. This is also the recommended way as the engine could use that information to organize and optimize the execution of the systems and queries. Also if several queries are created with the same components, the `QueryManager` will just create a single query under the hood and referece it everywhere saving memory and computation.
 
 A query is always updated with the entities that matches the components' condition. Once the query is initialized it traverse the components groups to determine which entities should be added to it. But after that, entities will get added or removed from the query as components are being added or removed from them.
 
