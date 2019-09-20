@@ -50,60 +50,8 @@ class ComponentA extends Component {
 ```
 
 It is also recommended to implement the following functions on every component class:
-- `clear`: It should clear
-
-
-
-### clear
-
-### copy
-
-### Components pooling
-Usually an ECSY application will involve adding and removing components in real time. Allocating resources in a performance sensitive application is considered a bad pattern as the garbage collector will get called often and it will hit the performance.
-In order to minimize it ECSY includes pooling for components.
-This means that everytime a component is added to an entity as:
-```javascript
-entity.addComponent(ComponentA)
-```
-the engine will try to reuse a `ComponentA` instance from the pool of components previously created, and it won't allocate a new one instead.
-When releasing the component, by calling `entity.removeComponent(ComponentA)`, it will get returned to the pool, ready to be used by other entity.
-
-ECSY should know how to reset a component to its original state, that's why it's mandatory that components implements a `reset` method to get the benefits from pooling, otherwise you will get a warning message about it.
-
-```javascript
-class List extends Component {
-  constructor() {
-    this.value = [];
-  }
-
-  reset() {
-    this.value.length = 0;
-  }
-}
-
-class Position extends Component {
-  constructor() {
-    this.reset();
-  }
-
-  reset() {
-    this.x = 0;
-    this.y = 0;
-    this.z = 0;
-  }
-}
-```
-
-Please notice that creating a component using the `createComponentClass` helper (**Link**) will include a `reset` implementation.
-
-## Create component helper
-Creating a component and implementing its `reset` function can be a repetitive task specially when we are working with simple data types.
-At the same time it could lead to side effects errors, specially when pooling components, if there is some bug on one of the components' `reset` function for example.
-In order to ease this task, it is possible to use a helper function called `createComponentClass(schema, className)` which takes a JSON schema with the definition of the component and generate the class accordanly, implementing the `reset`, `copy` and `clear` functions.
-
-
-
-## Data types
+- `copy(src)`: Copy the values from the `src` component.
+- `reset()`: Reset the component's attributes to their default values.
 
 ### Tag Components
 
@@ -149,6 +97,46 @@ Eventually we could end up adding some syntactic sugar for these type of compone
 var acceleration = entity.getComponentValue(Acceleration);
 ```
 
+### Components pooling
+Usually an ECSY application will involve adding and removing components in real time. Allocating resources in a performance sensitive application is considered a bad pattern as the garbage collector will get called often and it will impact the performance.
+In order to minimize it, ECSY includes pooling for components.
+This means that everytime a component is added to an entity as:
+```javascript
+entity.addComponent(ComponentA)
+```
+the engine will try to reuse a `ComponentA` instance, from the pool of components previously created, and it won't allocate a new one instead.
+When releasing that component, by calling `entity.removeComponent(ComponentA)`, it will get returned to the pool, ready to be used by other entity.
+
+ECSY should know how to reset a component to its original state, that's why it's highly recommended that components implements a `reset` method to get the benefits from pooling.
+
+```javascript
+// Example of components with `reset` methods implemented
+
+class List extends Component {
+  constructor() {
+    this.value = [];
+  }
+
+  reset() {
+    this.value.length = 0;
+  }
+}
+
+class Position extends Component {
+  constructor() {
+    this.reset();
+  }
+
+  reset() {
+    this.x = 0;
+    this.y = 0;
+    this.z = 0;
+  }
+}
+```
+
+It is possible to use the helper function `createComponentClass` to ease the creation of components as it will implement the `reset` and `copy` functions automatically. **TODO: Link** More info
+
 ### System State Components
 
 System State Components are components used by a system to hold internal resources for an entity, they are not removed when you delete the entity, you must remove them from once you are done with them.
@@ -188,6 +176,17 @@ MySystem.queries = {
   normal: { components: [ComponentA, StateComponentA] },
 };
 ```
+
+## Create component helper
+Creating a component and implementing its `reset` function can be a repetitive task specially when we are working with simple data types.
+At the same time it could lead to side effects errors, specially when pooling components, if there is some bug on one of the components' `reset` function for example.
+In order to ease this task, it is possible to use a helper function called `createComponentClass(schema, className)` which takes a JSON schema with the definition of the component and generate the class accordanly, implementing the `reset`, `copy` and `clear` functions.
+
+**TODO: Extend it**
+
+## Data types
+
+
 
 ## Entities
 An entity is an object that has an unique ID which purpose is to group components together.
@@ -287,8 +286,7 @@ entity.removeComponent(ComponentA, true);
 
 ## System
 
-Systems are stateless processors of groups of entities.**TODO:Change**
-Usually each system defines one or more queries of entities and it iterate through these lists per frame.
+Systems are used to transform data stored on the components. Usually each system defines one or more queries of entities and it iterate through these lists per frame.
 
 ```javascript
 class SystemName extends System {
@@ -297,11 +295,11 @@ class SystemName extends System {
 }
 ```
 
-A system should always extends from the `System` class and can implement two functions:
-- `init()`: This function is called when the system is registered in a world (Calling `world.registerSystem` **link**) and can be used to initialize anything the system needs.
-- `execute(deltaTime, elapsedTime)`: It will get called each frame by default (unless you are using a custom scheduler). Usually it will be used to loop through the lists of entities from each query and process the value of theirs components.
+A system should always extends from the `System` class and it can implement two functions:
+- `init()`: This function is called when the system is registered in a world (Calling `world.registerSystem` **TODO: link**) and can be used to initialize anything the system needs.
+- `execute(deltaTime, elapsedTime)`: It will get called each frame by default (unless a custom scheduler is being used). Usually it will be used to loop through the lists of entities from each query and process the value of theirs components.
 
-Systems could define one or more queries (**LINK**) by setting the static `queries` attribute:
+Systems could define one or more queries (**TODO: LINK**) by setting the static `queries` attribute:
 
 ```javascript
 SystemName.queries = {
@@ -330,7 +328,7 @@ class SystemName extends System {
 }
 ```
 
-> If there is a `reactive query` **link** on the list of queries defined for a system, this system is called `reactive system` as it will react to changes on the entities and its components.
+If there is a `reactive query` (A query that *listen* for entities added or removed to it or which components has changed, more info **TODO:link**) on the list of queries defined by a system, this system is called `reactive system` as it will react to changes on the entities and its components.
 
 ### Registering a system
 
