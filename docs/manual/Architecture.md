@@ -394,6 +394,12 @@ entity.removeComponent(ComponentA, true);
 
 Systems are used to transform data stored on the components. Usually each system defines one or more queries of entities and it iterate through these lists per frame.
 
+![Wolves and dragons](http://ecsy.io/docs/manual/images/Wolves%20and%20Dragons%20Frames.svg)
+
+Every frame systems are executed and they create, remove or modify entities and components.
+
+The system interface is as follows:
+
 ```javascript
 class SystemName extends System {
   init() {}
