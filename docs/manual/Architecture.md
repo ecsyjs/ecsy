@@ -295,7 +295,9 @@ var ExampleComponent = createComponentClass({
 ```
 
 ## Entities
-An entity is an object that has an unique ID which purpose is to group components together.
+An entity is an object that has an unique ID which purpose is to group components together. **TODO: Explaining the dif between composition and inheritance**
+
+![Entities](http://ecsy.io/docs/manual/images/entities.svg)
 
 Entities should be created within a `World` context:
 
@@ -390,7 +392,7 @@ Although this is not the recommended behaviour because it could lead to side eff
 entity.removeComponent(ComponentA, true);
 ```
 
-## System
+## Systems
 
 Systems are used to transform data stored on the components. Usually each system defines one or more queries of entities and it iterate through these lists per frame.
 
