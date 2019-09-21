@@ -183,10 +183,116 @@ Creating a component and implementing its `reset` function can be a repetitive t
 At the same time it could lead to side effects errors, specially when pooling components, if there is some bug on one of the components' `reset` function for example.
 In order to ease this task, it is possible to use a helper function called `createComponentClass(schema, className)` which takes a JSON schema with the definition of the component and generate the class accordanly, implementing the `reset`, `copy` and `clear` functions.
 
-**TODO: Extend it**
+The JSON defines the number of the attributes of the components, its default value and type.
 
-## Data types
+```javascript
+var ExampleComponent = createComponentClass({
+  number: { default: 0.5 },
+  string: { default: "foo" },
+  bool: { default: true },
+  array: { default: [1, 2, 3] }
+  vector3: { default: new Vector3(4, 5, 6), type: CustomTypes.Vector3 }
+}, "ExampleComponent");
+```
 
+Basic types (number, boolean, string and arrays) are infered by the default value. It is possible to use custom type defined by `createType` (explained in the next section).
+The second parameter for `createComponentClass` is the class name for the component and even so is not mandatory is strongly recommended as it will ease the debug and trace.
+
+The previous example will create a `ExampleComponent` component that could be already used to add to entities as if it were created manually:
+```javascript
+entity.addComponent(ExampleComponent);
+```
+
+In fact the equivalent of that code could be something like:
+```javascript
+class ExampleComponent extends Component {
+  constructor() {
+    super();
+    this.reset();
+  }
+
+  clear() {
+    this.number = 0;
+    this.string = "";
+    this.bool = false;
+    this.array.length = 0;
+    this.vector3.set(0, 0, 0);
+  }
+
+  copy(src) {
+    this.number = src.number;
+    this.string = src.string;
+    this.bool = src.bool;
+    this.array = src.array.splice();;
+    this.vector3.copy(src.vector3);
+  }
+
+  reset() {
+    this.number = 0.5;
+    this.string = "foo";
+    this.bool = true;
+    this.array = [1, 2, 3];
+    this.vector3 = new Vector3(4, 5, 6);
+  }
+}
+```
+
+Even using such a simple example, without complex data types, is easy to understand that implementing all the functions `clear`, `copy` and `reset` (**TODO: for pooling link**) could lead to small bugs that could have unexpected side effects that should not be present when using the `createComponentClass`.
+
+It is important to notice that when defining an schema every attribute must have a known type, if no data type is provided for complex types, `createComponentClass` will not implement `clear`, `copy` and `reset` and it will just return the component class with the attributes defined.
+
+### Data types
+
+It is possible to use custom types, to be used in the schema definition when calling `createComponentClass`, by defining them with `createType`:
+
+```javascript
+createType({
+  baseType: T,
+  create: defaultValue => {},
+  reset (src, key, defaultValue) => {},
+  clear: (src, key) => {};
+})
+```
+
+Where:
+- `create(defaultValue)`: Return a value of type `baseType` using a default value.
+- `reset(src, key, defaultValue)`: Reset the `key` attribute on the object `src` with the default value.
+- `clear(src, key)`: Clear the `key` attribute on the object `src`.
+- `copy(src, dst, key)`: Copy the `key` attribute from the object `src` to the object `src`.
+
+Type definition for basic standard types are [already defined](https://github.com/MozillaReality/ecsy/blob/dev/src/StandardTypes.js) in the library: `number`, `boolean`, `string` and `array`.
+
+The following code implements a custom type for a `Vector3` imported from an external library:
+
+```javascript
+  var CustomVector3 = createType({
+    baseType: Vector3,
+    create: defaultValue => {
+      var v = new Vector3(0, 0, 0);
+      if (typeof defaultValue !== "undefined") {
+        v.copy(defaultValue);
+      }
+      return v;
+    },
+    reset: (src, key, defaultValue) => {
+      if (typeof defaultValue !== "undefined") {
+        src[key].copy(defaultValue);
+      } else {
+        src[key].set(0, 0, 0);
+      }
+    },
+    clear: (src, key) => {
+      src[key].set(0, 0, 0);
+    }
+  });
+```
+
+As the type for `Vector3` has been already defined, it is possible to use it to define a component:
+```javascript
+var ExampleComponent = createComponentClass({
+  vector3: { default: new Vector3(4, 5, 6), type: CustomVector3 }
+}, "ExampleComponent");
+```
 
 ## Entities
 An entity is an object that has an unique ID which purpose is to group components together.
