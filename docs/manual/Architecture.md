@@ -3,7 +3,8 @@
 ![ECSY architecture](http://ecsy.io/docs/manual/images/ECSY%20Architecture.svg)
 
 ## Overview
-ECSY is a Entity Component System (ECS) engine for web applications.
+ECSY (Pronounced as *"eksi"*) is a Entity Component System (ECS) engine for web applications.
+The basic idea of this pattern is to move from defining our entities using inherance as in Object Oriented Programming, to using composition in a Data Oriented Programming paradigm. ([More info on wikipedia](https://en.wikipedia.org/wiki/Entity_component_system))
 Some common terminology of the elements needed to build an ECSY application are:
 - `entity`: Is an object that has an unique ID and can have multiple components attached to it.
 - `component`: Is where the data is stored.
@@ -140,8 +141,21 @@ It is possible to use the helper function `createComponentClass` to ease the cre
 
 ### System State Components
 
-System State Components are components used by a system to hold internal resources for an entity, they are not removed when you delete the entity, you must remove them from once you are done with them.
+System State Components (SSC) are components used by a system to hold internal resources for an entity, they are not removed when you delete the entity, you must remove them from once you are done with them.
 It can be used to detect whenever an entity has been added or removed from a query.
+**TODO: Add link to example**
+
+SSC can be defined by extending `SystemStateComponent` instead of `Component`:
+```javascript
+class StateComponentA extends SystemStateComponent {
+  constructor() {
+    super();
+    this.value = 10;
+  }
+}
+```
+
+Once the SSC is defined, it can be used as any other component:
 
 ```javascript
 class MySystem extends System {
@@ -156,13 +170,13 @@ class MySystem extends System {
   },
   execute() {
     added.forEach(entity => {
-      entity.addStateComponent(StateComponentA, {data});
+      entity.addComponent(StateComponentA, {data});
     });
 
     remove.forEach(entity => {
-      var component = entity.getStateComponent(StateComponentA);
+      var component = entity.getComponent(StateComponentA);
       // free resources for `component`
-      entity.removeStateComponent(StateComponentA);
+      entity.removeComponent(StateComponentA);
     });
 
     normal.forEach(entity => {
