@@ -3,7 +3,7 @@
 ![ECSY architecture](http://ecsy.io/docs/manual/images/ECSY%20Architecture.svg)
 
 ## Overview
-ECSY (Pronounced as *"eksi"*) is a Entity Component System (ECS) engine for web applications.
+ECSY (Pronounced as "eksi") is a Entity Component System (ECS) engine for web applications.
 The basic idea of this pattern is to move from defining our entities using inherance as in Object Oriented Programming, to using composition in a Data Oriented Programming paradigm. ([More info on wikipedia](https://en.wikipedia.org/wiki/Entity_component_system))
 Some common terminology of the elements needed to build an ECSY application are:
 - `entity`: Is an object that has an unique ID and can have multiple components attached to it.
