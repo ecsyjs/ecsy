@@ -355,7 +355,7 @@ class SystemFoo extends System {
       console.log('Component removed:', component, 'on entity: ', entity.id);
     });
 
-    this.queries.boxes.entities.forEach(entity => {
+    this.queries.boxes.results.forEach(entity => {
       console.log('Iterating on entity: ', entity.id);
     });
   }
@@ -427,14 +427,12 @@ If a `queries` attribute is defined, is it possible to access the entities match
 ```javascript
 class SystemName extends System {
   execute(delta, time) {
-    var q = this.queries;
-
-    q.boxes.results.forEach(entity => {
+    this.queries.boxes.results.forEach(entity => {
       var box = entity.getComponent(Box);
       // Do whatever you want with box
     });
 
-    q.Spheres.results.forEach(entity => {
+    this.queries.Spheres.results.forEach(entity => {
       var sphere = entity.getComponent(Sphere);
       // Do whatever you want with Sphere
     });
@@ -480,7 +478,7 @@ This will results on an execution order as: `SystemC > SystemA > SystemD > Syste
 A query is a collection of entities that match some conditions based on the components they own.
 The most common use case for queries is to define them in systems. This is also the recommended way as the engine could use that information to organize and optimize the execution of the systems and queries. Also if several queries are created with the same components, the `QueryManager` will just create a single query under the hood and referece it everywhere saving memory and computation.
 
-A query is always updated with the entities that matches the components' condition. Once the query is initialized it traverse the components groups to determine which entities should be added to it. But after that, entities will get added or removed from the query as components are being added or removed from them.
+A query is always updated with the entities that match the components' condition. Once the query is initialized it traverses the components groups to determine which entities should be added to it. But after that, entities will get added or removed from the query as components are being added or removed from them.
 
 ### Query syntax
 
@@ -520,7 +518,7 @@ SystemTest.queries = {
 ```
 This will return all the entities that **have** a `Enemy` component but **do have not** the `Dead` component.
 
-This operator could be very useful as a factory pattern ([example](https://fernandojsg.github.io/ecsy/examples/factory/index.html)):
+This operator could be very useful as a factory pattern ([ex`am`ple](https://fernandojsg.github.io/ecsy/examples/factory/index.html)):
 ```javascript
 SystemTest.queries = {
   playerUninitialized: {
@@ -530,7 +528,7 @@ SystemTest.queries = {
 ```
 The `playerUnitialized` query will have all the players that don't have a `Name` component yet, a system could get that list and add a random name to them:
 ```javascript
-queries.playerUnitialized.forEach(entity => {
+queries.playerUnitialized.results.forEach(entity => {
   entity.addComponent(Name, {value: getRandomName()});
 });
 ```
@@ -684,10 +682,15 @@ SystemAwakeWolves.queries = {
 class SystemWolfReactions extends System {
   execute(delta, elapsedTime) {
     this.queries.sleepingWolves.removed.forEach(wolf => {
-      var sleeping = wolf.getRemovedComponent(Sleeping);
-      var duration = elapsedTime - sleeping.startSleepingTime;
-      // Do whatever with the `duration` value
-      // eg: Make the wolf move slower if its was sleeping for so long
+      // We have to check if the "Sleeping" component has been removed
+      // because if the "Wolf" component is removed instead, it will trigger
+      // also ths "removed" event as is not fulfilling the query anymore either
+      if (wolf.hasRemovedComponent(Sleeping)) {
+        var sleeping = wolf.getRemovedComponent(Sleeping);
+        var duration = elapsedTime - sleeping.startSleepingTime;
+        // Do whatever with the `duration` value
+        // eg: Make the wolf move slower if its was sleeping for so long
+      }
     });
   }
 }
