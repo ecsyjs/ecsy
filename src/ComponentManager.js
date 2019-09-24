@@ -2,10 +2,6 @@ import ObjectPool from "./ObjectPool.js";
 import DummyObjectPool from "./DummyObjectPool.js";
 import { componentPropertyName } from "./Utils.js";
 
-/**
- * @private
- * @class ComponentManager
- */
 export class ComponentManager {
   constructor() {
     this.Components = {};
@@ -13,10 +9,6 @@ export class ComponentManager {
     this.numComponents = {};
   }
 
-  /**
-   * Register a component
-   * @param {Component} Component Component to register
-   */
   registerComponent(Component) {
     this.Components[Component.name] = Component;
     this.numComponents[Component.name] = 0;
@@ -34,10 +26,6 @@ export class ComponentManager {
     this.numComponents[Component.name]--;
   }
 
-  /**
-   * Get components pool
-   * @param {Component} Component Type of component type for the pool
-   */
   getComponentsPool(Component) {
     var componentName = componentPropertyName(Component);
 

@@ -1,7 +1,3 @@
-/**
- * @private
- * @class SystemManager
- */
 export class SystemManager {
   constructor(world) {
     this._systems = [];
@@ -9,10 +5,6 @@ export class SystemManager {
     this.world = world;
   }
 
-  /**
-   * Register a system
-   * @param {System} System System to register
-   */
   registerSystem(System, attributes) {
     var system = new System(this.world, attributes);
     if (system.init) system.init();
@@ -29,25 +21,14 @@ export class SystemManager {
     });
   }
 
-  /**
-   * Return a registered system based on its class
-   * @param {System} System
-   */
   getSystem(System) {
     return this._systems.find(s => s instanceof System);
   }
 
-  /**
-   * Return all the systems registered
-   */
   getSystems() {
     return this._systems;
   }
 
-  /**
-   * Remove a system
-   * @param {System} System System to remove
-   */
   removeSystem(System) {
     var index = this._systems.indexOf(System);
     if (!~index) return;
@@ -55,11 +36,6 @@ export class SystemManager {
     this._systems.splice(index, 1);
   }
 
-  /**
-   * Update all the systems. Called per frame.
-   * @param {Number} delta Delta time since the last frame
-   * @param {Number} time Elapsed time
-   */
   execute(delta, time) {
     this._executeSystems.forEach(system => {
       if (system.enabled && system.initialized) {
@@ -73,9 +49,6 @@ export class SystemManager {
     });
   }
 
-  /**
-   * Return stats
-   */
   stats() {
     var stats = {
       numSystems: this._systems.length,

@@ -1,6 +1,3 @@
-/**
- * Use createType to create custom type definitions.
- */
 export function createType(typeDefinition) {
   var mandatoryFunctions = [
     "create",

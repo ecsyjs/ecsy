@@ -8,7 +8,7 @@
   "types": "src/index.d.ts",
   "scripts": {
     "build": "rollup -c && npm run docs",
-    "docs": "typedoc --readme none --mode file --excludeExternals --plugin typedoc-plugin-markdown  --hideSources --hideBreadcrumbs --out docs/api/ --includeDeclarations --includes 'src/**/*.d.ts' src",
+    "docs": "rm docs/api/_sidebar.md; typedoc --readme none --mode file --excludeExternals --plugin typedoc-plugin-markdown  --hideSources --hideBreadcrumbs --out docs/api/ --includeDeclarations --includes 'src/**/*.d.ts' src; touch docs/api/_sidebar.md",
     "dev:docs": "nodemon -e ts -x 'npm run docs' -w src",
     "dev": "concurrently --names 'ROLLUP,DOCS,HTTP' -c 'bgBlue.bold,bgYellow.bold,bgGreen.bold' 'rollup -c -w -m inline' 'npm run dev:docs' 'npm run dev:server'",
     "dev:server": "http-server -c-1 -p 8080 --cors",
