@@ -169,16 +169,14 @@ export class System {
       priority: this.priority,
       queries: {}
     };
-
+/*
     if (this.config) {
       var queries = this.queries;
       for (let queryName in queries) {
-        /*
         let query = queries[queryName];
         json.queries[queryName] = {
           key: this._queries[queryName].key
         };
-        /*
         if (query.events) {
           let events = (json.queries[queryName]["events"] = {});
           for (let eventName in query.events) {
@@ -192,9 +190,9 @@ export class System {
             }
           }
         }
-        */
       }
     }
+*/
 
     return json;
   }
