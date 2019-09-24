@@ -1,6 +1,8 @@
 
 # Class: Entity
 
+An entity in the world.
+
 ## Hierarchy
 
 * **Entity**
@@ -12,26 +14,31 @@
 * [addComponent](entity.md#addcomponent)
 * [getComponent](entity.md#getcomponent)
 * [getMutableComponent](entity.md#getmutablecomponent)
+* [hasAllComponents](entity.md#hasallcomponents)
+* [hasAnyComponents](entity.md#hasanycomponents)
 * [hasComponent](entity.md#hascomponent)
 * [remove](entity.md#remove)
+* [removeAllComponents](entity.md#removeallcomponents)
 * [removeComponent](entity.md#removecomponent)
 
 ## Methods
 
 ###  addComponent
 
-▸ **addComponent**<**T**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹T›, `values?`: __type): *this*
+▸ **addComponent**<**T**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹T›, `values?`: object): *this*
+
+Add a component to the entity.
 
 **Type parameters:**
 
-▪ **T**: *[Component](../interfaces/component.md)*
+▪ **T**: *[Component](component.md)*
 
 **Parameters:**
 
-Name | Type |
------- | ------ |
-`Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹T› |
-`values?` | __type |
+Name | Type | Description |
+------ | ------ | ------ |
+`Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹T› | Type of component to add to this entity |
+`values?` | object | Optional values to replace the default attributes on the component  |
 
 **Returns:** *this*
 
@@ -41,11 +48,11 @@ ___
 
 ▸ **getComponent**<**T**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹T›): *T*
 
-Get an immutable reference to a component on this entity
+Get an immutable reference to a component on this entity.
 
 **Type parameters:**
 
-▪ **T**: *[Component](../interfaces/component.md)*
+▪ **T**: *[Component](component.md)*
 
 **Parameters:**
 
@@ -61,17 +68,59 @@ ___
 
 ▸ **getMutableComponent**<**T**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹T›): *T*
 
+Get a mutable reference to a component on this entity.
+
 **Type parameters:**
 
-▪ **T**: *[Component](../interfaces/component.md)*
+▪ **T**: *[Component](component.md)*
 
 **Parameters:**
 
-Name | Type |
------- | ------ |
-`Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹T› |
+Name | Type | Description |
+------ | ------ | ------ |
+`Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹T› | Type of component to get  |
 
 **Returns:** *T*
+
+___
+
+###  hasAllComponents
+
+▸ **hasAllComponents**<**T**>(`Components`: Array‹[ComponentConstructor](../interfaces/componentconstructor.md)‹T››): *boolean*
+
+Check if the entity has all components in a list.
+
+**Type parameters:**
+
+▪ **T**: *[Component](component.md)*
+
+**Parameters:**
+
+Name | Type | Description |
+------ | ------ | ------ |
+`Components` | Array‹[ComponentConstructor](../interfaces/componentconstructor.md)‹T›› | Component types to check  |
+
+**Returns:** *boolean*
+
+___
+
+###  hasAnyComponents
+
+▸ **hasAnyComponents**<**T**>(`Components`: Array‹[ComponentConstructor](../interfaces/componentconstructor.md)‹T››): *boolean*
+
+Check if the entity has any of the components in a list.
+
+**Type parameters:**
+
+▪ **T**: *[Component](component.md)*
+
+**Parameters:**
+
+Name | Type | Description |
+------ | ------ | ------ |
+`Components` | Array‹[ComponentConstructor](../interfaces/componentconstructor.md)‹T›› | Component types to check  |
+
+**Returns:** *boolean*
 
 ___
 
@@ -79,15 +128,17 @@ ___
 
 ▸ **hasComponent**<**T**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹T›): *boolean*
 
+Check if the entity has a component.
+
 **Type parameters:**
 
-▪ **T**: *[Component](../interfaces/component.md)*
+▪ **T**: *[Component](component.md)*
 
 **Parameters:**
 
-Name | Type |
------- | ------ |
-`Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹T› |
+Name | Type | Description |
+------ | ------ | ------ |
+`Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹T› | Type of component  |
 
 **Returns:** *boolean*
 
@@ -103,19 +154,30 @@ Remove this entity from the world.
 
 ___
 
+###  removeAllComponents
+
+▸ **removeAllComponents**(): *void*
+
+Remove all components on this entity.
+
+**Returns:** *void*
+
+___
+
 ###  removeComponent
 
-▸ **removeComponent**<**T**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹T›, `forceRemove?`: boolean): *this*
+▸ **removeComponent**<**T**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹T›): *this*
+
+Remove a component from the entity.
 
 **Type parameters:**
 
-▪ **T**: *[Component](../interfaces/component.md)*
+▪ **T**: *[Component](component.md)*
 
 **Parameters:**
 
-Name | Type |
------- | ------ |
-`Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹T› |
-`forceRemove?` | boolean |
+Name | Type | Description |
+------ | ------ | ------ |
+`Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹T› | Type of component to remove from this entity  |
 
 **Returns:** *this*

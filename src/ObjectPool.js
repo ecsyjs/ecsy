@@ -1,7 +1,3 @@
-/**
- * @private
- * @class ObjectPool
- */
 export default class ObjectPool {
   // @todo Add initial size
   constructor(T, initialSize) {

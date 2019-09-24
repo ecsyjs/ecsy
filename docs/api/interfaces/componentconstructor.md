@@ -3,7 +3,7 @@
 
 ## Type parameters
 
-▪ **T**: *[Component](component.md)*
+▪ **T**: *[Component](../classes/component.md)*
 
 ## Hierarchy
 

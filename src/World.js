@@ -3,9 +3,6 @@ import { EntityManager } from "./EntityManager.js";
 import { ComponentManager } from "./ComponentManager.js";
 import EventDispatcher from "./EventDispatcher.js";
 
-/**
- * @class World
- */
 export class World {
   constructor() {
     this.componentsManager = new ComponentManager(this);
@@ -45,26 +42,14 @@ export class World {
     return this;
   }
 
-  /**
-   * Return a registered system based on its class
-   * @param {System} System
-   */
   getSystem(SystemClass) {
     return this.systemManager.getSystem(SystemClass);
   }
 
-  /**
-   * Get all the systems registered
-   */
   getSystems() {
     return this.systemManager.getSystems();
   }
 
-  /**
-   * Update the systems per frame
-   * @param {Number} delta Delta time since the last call
-   * @param {Number} time Elapsed time
-   */
   execute(delta, time) {
     if (this.enabled) {
       this.systemManager.execute(delta, time);
@@ -80,16 +65,10 @@ export class World {
     this.enabled = true;
   }
 
-  /**
-   * Create a new entity
-   */
   createEntity() {
     return this.entityManager.createEntity();
   }
 
-  /**
-   * Get some stats
-   */
   stats() {
     var stats = {
       entities: this.entityManager.stats(),

@@ -1,7 +1,3 @@
-/**
- * @private
- * @class DummyObjectPool
- */
 export default class DummyObjectPool {
   constructor(T) {
     this.count = 0;
