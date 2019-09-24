@@ -29,6 +29,10 @@
 
       class Sprite {
         constructor() {
+          this.reset();
+        }
+
+        reset() {
           this.name = 'empty';
         }
       }
@@ -36,6 +40,10 @@
       class SpriteResources extends SystemStateComponent {
         constructor() {
           super();
+          this.reset();
+        }
+
+        reset() {
           this.size = 0;
           this.memPosition = 0;
         }
