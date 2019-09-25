@@ -14,14 +14,6 @@ import {
 } from "./components.mjs";
 
 export class RotatingSystem extends System {
-  init() {
-    return {
-      queries: {
-        entities: { components: [Rotating, Object3D] }
-      }
-    };
-  }
-
   execute(delta) {
     let entities = this.queries.entities.results;
     for (let i = 0; i < entities.length; i++) {
@@ -36,17 +28,13 @@ export class RotatingSystem extends System {
   }
 }
 
+RotatingSystem.queries = {
+  entities: { components: [Rotating, Object3D] }
+};
+
 const TIMER_TIME = 1;
 
 export class PulsatingColorSystem extends System {
-  init() {
-    return {
-      queries: {
-        entities: { components: [PulsatingColor, Object3D] }
-      }
-    };
-  }
-
   execute(delta, time) {
     time *= 1000;
     let entities = this.queries.entities.results;
@@ -71,15 +59,11 @@ export class PulsatingColorSystem extends System {
   }
 }
 
-export class PulsatingScaleSystem extends System {
-  init() {
-    return {
-      queries: {
-        entities: { components: [PulsatingScale] }
-      }
-    };
-  }
+PulsatingColorSystem.queries = {
+  entities: { components: [PulsatingColor, Object3D] }
+};
 
+export class PulsatingScaleSystem extends System {
   execute(delta, time) {
     let entities = this.queries.entities.results;
     for (let i = 0; i < entities.length; i++) {
@@ -101,16 +85,11 @@ export class PulsatingScaleSystem extends System {
     }
   }
 }
+PulsatingScaleSystem.queries = {
+  entities: { components: [PulsatingScale] }
+};
 
 export class MovingSystem extends System {
-  init() {
-    return {
-      queries: {
-        entities: { components: [Moving] }
-      }
-    };
-  }
-
   execute(delta, time) {
     let entities = this.queries.entities.results;
     for (let i = 0; i < entities.length; i++) {
@@ -123,16 +102,11 @@ export class MovingSystem extends System {
     }
   }
 }
+MovingSystem.queries = {
+  entities: { components: [Moving] }
+};
 
 export class TimeoutSystem extends System {
-  init() {
-    return {
-      queries: {
-        entities: { components: [Timeout] }
-      }
-    };
-  }
-
   execute(delta) {
     let entities = this.queries.entities.results;
     for (let i = 0; i < entities.length; i++) {
@@ -154,17 +128,11 @@ export class TimeoutSystem extends System {
     }
   }
 }
+TimeoutSystem.queries = {
+  entities: { components: [Timeout] }
+};
 
 export class ColliderSystem extends System {
-  init() {
-    return {
-      queries: {
-        boxes: { components: [Collisionable] },
-        balls: { components: [Collider] }
-      }
-    };
-  }
-
   execute() {
     let boxes = this.queries.boxes.results;
     let balls = this.queries.balls.results;
@@ -199,3 +167,7 @@ export class ColliderSystem extends System {
     }
   }
 }
+ColliderSystem.queries = {
+  boxes: { components: [Collisionable] },
+  balls: { components: [Collider] }
+};
