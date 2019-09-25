@@ -11,15 +11,7 @@ ECSY (pronounced as "eksi") is an highly experimental Entity Component System fr
 
 For detailed information on the architecture and API please visit the [documentation page](https://ecsy.io/docs/#/)
 
-# Examples
-- Ball example:
-  - three.js: https://ecsy.io/examples/ball-example/three
-  - babylon: https://ecsy.io/examples/ball-example/babylon
-- 2D Canvas https://ecsy.io/examples/canvas
-- Factory pattern with `Not` operator: https://ecsy.io/examples/factory
-- System state component example: https://ecsy.io/examples/systemstate
-
-# Features
+## Features
 - Framework agnostic
 - Focused on providing a simple but yet efficient API
 - Designed to avoid garbage collection as possible
@@ -33,6 +25,14 @@ For detailed information on the architecture and API please visit the [documenta
   - Reactive events will not generate a random callback when emited but queued and be processed in order
 - Modern Javascript: ES6, classes, modules,...
 - Pool for components and entities
+
+# Examples
+- Ball example:
+  - three.js: https://ecsy.io/examples/ball-example/three
+  - babylon: https://ecsy.io/examples/ball-example/babylon
+- 2D Canvas https://ecsy.io/examples/canvas
+- Factory pattern with `Not` operator: https://ecsy.io/examples/factory
+- System state component example: https://ecsy.io/examples/systemstate
 
 # Usage
 
