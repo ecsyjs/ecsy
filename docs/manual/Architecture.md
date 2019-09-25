@@ -6,11 +6,11 @@
 ECSY (Pronounced as "eksi") is an Entity Component System (ECS) engine for web applications.
 The basic idea of this pattern is to move from defining the entities in our application using composition in a Data Oriented Programming paradigm. ([More info on wikipedia](https://en.wikipedia.org/wiki/Entity_component_system))
 Some common terminology of the elements needed to build an ECSY application are:
-- `entity`: Is an object that has an unique ID and can have multiple components attached to it.
-- `component`: Is where the data is stored.
-- `system`: Processes list of entities reading and modifying their components.
-- `queries`: Used by systems to determine which entities they are interested in, based on the components the entities own.
-- `world`: Container for entities, components, systems and queries.
+- [entities](/manual/Architecture?id=entities): Is an object that has an unique ID and can have multiple components attached to it.
+- [components](/manual/Architecture?id=components): Is where the data is stored.
+- [systems](/manual/Architecture?id=systems): Processes list of entities reading and modifying their components.
+- [queries](/manual/Architecture?id=queries): Used by systems to determine which entities they are interested in, based on the components the entities own.
+- [world](/manual/Architecture?id=world): Container for entities, components, systems and queries.
 
 The usual workflow would be:
 - Define the components that shape the data you need to use in your application.
@@ -20,15 +20,14 @@ The usual workflow would be:
 
 ## World
 By default your application should have at least one `world`. A world is basically a container for `entities`, `components` and `systems`.  Even so, you can have multiple worlds running at the same time and enable or disable them as you need.
-[More info on the API Reference](/docs/#/api/classes/world).
-**TODO: link to doc**
+[API Reference](/api/classes/world).
 
 ```javascript
 world = new World();
 ```
 
 ## Components
-A `Component` is an object that can store data but should have not behaviour (As that should be handled on systems). There is not a mandatory way to define a component.
+A `Component` ([API Reference](/api/classes/component)) is an object that can store data but should have not behaviour (As that should be handled on systems). There is not a mandatory way to define a component.
 It could just be a function:
 ```javascript
 function ComponentA() {
@@ -56,7 +55,7 @@ It is also recommended to implement the following functions on every component c
 
 ### Tag Components
 
-Some components don't store data and are used just as tags. In these cases it is recommended to extends `TagComponent` so the engine could, eventually, optimize the usage of this component.
+Some components don't store data and are used just as tags. In these cases it is recommended to extends `TagComponent` ([API Reference](/api/classes/tagcomponent) so the engine could, eventually, optimize the usage of this component.
 
 ```javascript
 class Enemy extends TagComponent {}
@@ -137,15 +136,14 @@ class Position extends Component {
 }
 ```
 
-It is possible to use the helper function `createComponentClass` to ease the creation of components as it will implement the `reset` and `copy` functions automatically. **TODO: Link** More info
+It is possible to use the helper function `createComponentClass` to ease the creation of components as it will implement the `reset` and `copy` functions automatically.
 
 ### System State Components
 
 System State Components (SSC) are components used by a system to hold internal resources for an entity, they are not removed when you delete the entity, you must remove them from once you are done with them.
 It can be used to detect whenever an entity has been added or removed from a query.
-**TODO: Add link to example**
 
-SSC can be defined by extending `SystemStateComponent` instead of `Component`:
+SSC can be defined by extending `SystemStateComponent` [API Reference](/api/classes/systemstatecomponent) instead of `Component`:
 ```javascript
 class StateComponentA extends SystemStateComponent {
   constructor() {
@@ -251,7 +249,7 @@ class ExampleComponent extends Component {
 }
 ```
 
-Even using such a simple example, without complex data types, is easy to understand that implementing all the functions `clear`, `copy` and `reset` (**TODO: for pooling link**) could lead to small bugs that could have unexpected side effects that should not be present when using the `createComponentClass`.
+Even using such a simple example, without complex data types, is easy to understand that implementing all the functions `clear`, `copy` and `reset` could lead to small bugs that could have unexpected side effects that should not be present when using the `createComponentClass`.
 
 It is important to notice that when defining an schema every attribute must have a known type, if no data type is provided for complex types, `createComponentClass` will not implement `clear`, `copy` and `reset` and it will just return the component class with the attributes defined.
 
@@ -309,7 +307,7 @@ var ExampleComponent = createComponentClass({
 ```
 
 ## Entities
-An entity is an object that has an unique ID which purpose is to group components together. **TODO: Explaining the dif between composition and inheritance**
+An entity is an object that has an unique ID which purpose is to group components together. [API Reference](/api/classes/entity).
 
 ![Entities](http://ecsy.io/docs/manual/images/entities.svg)
 
@@ -320,7 +318,7 @@ var entity = world.createEntity();
 ```
 
 ### Adding components
-Once an entity is created, it is possible to add **TODO: link to components** components to it:
+Once an entity is created, it is possible to add [components](/manual/Architecture?id=components) to it:
 ```javascript
 class ComponentA {
   constructor() {
@@ -336,14 +334,14 @@ entity.addComponent(ComponentA);
 entity.addComponent(ComponentA, {number: 20, string: "Hi"});
 ```
 
-### Accessing components and modify components **TODO: Change it in two?**
+### Accessing components and modify components
 Component can be accessed from an entity in two ways:
 - `getComponent(Component`: Get the component for read only operations.
 - `getMutableComponent(Component)`: Get the components to modify its values.
 
-If **TODO: Link** `DEBUG` mode is enabled it will throw an error if you try to modify a component accessed by `getComponent`, but that error will not be thrown on release mode because of performance reasons.
+If `DEBUG` mode is enabled it will throw an error if you try to modify a component accessed by `getComponent`, but that error will not be thrown on release mode because of performance reasons.
 
-These two access modes help to implement `reactive queries`(**TODO: link**), which are basically lists of entities populated with components that has mutated somehow, without much overhead on the execution as we avoid using custom setters or proxies.
+These two access modes help to implement `reactive queries`([more info](/manual/Architecture?id=reactive-queries)), which are basically lists of entities populated with components that has mutated somehow, without much overhead on the execution as we avoid using custom setters or proxies.
 This means everytime you request a mutable component, it will get marked as modified and systems listening for that will get notified accordanly.
 It's important to notice that the component will get marked as modified even if you don't change any attribute on it, so try to use `getMutableComponent` only when you know you will actually modify the component and use `getComponent` otherwise.
 
@@ -356,7 +354,7 @@ Another common operation on entities is to remove components:
 entity.removeComponent(ComponentA);
 ```
 
-This will mark the component to be removed and will populate all the queues from the systems that are listening to that event (**TODO: Link remove reactive**), but the component itself won't be disposed until the end of the frame (**TODO: More on life cycle**), we call it `deferred removal`.
+This will mark the component to be removed and will populate all the queues from the systems that are listening to that event, but the component itself won't be disposed until the end of the frame, we call it `deferred removal`.
 This is done so systems that need to react to it can still access the data of the components.
 
 Once a component is removed from an entity, it is possible to access its contents, by calling `getRemovedComponent(Component)`:
@@ -408,7 +406,7 @@ entity.removeComponent(ComponentA, true);
 
 ## Systems
 
-Systems are used to transform data stored on the components. Usually each system defines one or more queries of entities and it iterate through these lists per frame.
+Systems are used to transform data stored on the components. Usually each system defines one or more queries of entities and it iterate through these lists per frame. [API Reference](/api/classes/system)
 
 ![Wolves and dragons](http://ecsy.io/docs/manual/images/systems.svg)
 
@@ -424,10 +422,10 @@ class SystemName extends System {
 ```
 
 A system should always extends from the `System` class and it can implement two functions:
-- `init()`: This function is called when the system is registered in a world (Calling `world.registerSystem` **TODO: link**) and can be used to initialize anything the system needs.
+- `init()`: This function is called when the system is registered in a world (Calling `world.registerSystem`) and can be used to initialize anything the system needs.
 - `execute(deltaTime, elapsedTime)`: It will get called each frame by default (unless a custom scheduler is being used). Usually it will be used to loop through the lists of entities from each query and process the value of theirs components.
 
-Systems could define one or more queries (**TODO: LINK**) by setting the static `queries` attribute:
+Systems could define one or more [queries](/manual/Architecture?id=queries) by setting the static `queries` attribute:
 
 ```javascript
 SystemName.queries = {
@@ -454,7 +452,7 @@ class SystemName extends System {
 }
 ```
 
-If there is a `reactive query` (A query that *listen* for entities added or removed to it or which components has changed, more info **TODO:link**) on the list of queries defined by a system, this system is called `reactive system` as it will react to changes on the entities and its components.
+If there is a `reactive query` (A query that *listen* for entities added or removed to it or which components has changed, [more info](/manual/Architecture?id=reactive-queries)) on the list of queries defined by a system, this system is called `reactive system` as it will react to changes on the entities and its components.
 
 ### Registering a system
 
@@ -590,7 +588,7 @@ So everytime you call `execute` you will have the list of all the entities added
 
 #### Changed
 Sometimes is also interesting to detect that an entity or a specific component has changed, , this means that any of the components from the entity that are part of the query have changed.
-Detecting these changes trickier to do it performantly, that is why we rely on the `entity.getMutableComponent` function (More info **TODO: link**) that basically marks the component as modified.
+Detecting these changes trickier to do it performantly, that is why we rely on the `entity.getMutableComponent` function that basically marks the component as modified.
 The syntax to detect if an entity has changed, is similar to the ones for `added` or `removed`:
 
 ```javascript
@@ -665,7 +663,7 @@ entity.removeComponent(Player, true);
 entity.remove(true);
 ```
 
-When a component or an entity is removed, one `to be removed` flag is activated and the `reactive queries` (**TODO: link**) listening for `removed` events will get populated by them.
+When a component or an entity is removed, one `to be removed` flag is activated and the `reactive queries` ([more info](/manual/Architecture?id=reactive-queries)) listening for `removed` events will get populated by them.
 ```javascript
 // Component to identify a wolf
 class Wolf extends TagComponent {}
@@ -719,9 +717,9 @@ SystemWolfReactions.queries = {
 ```
 
 In the previous example, the `SystemAwakeWolves` randomly wakes up wolves by removing the `Sleeping` component from them. The entities representing these wolves will get removed from its `sleepingWolves` query.
-As the `SystemWolfReactions` has the same query as the `SystemAwakeWolves`, the entity will also get removed from its query. Because the query is also reactive **TODO: link to reactive queries** (`removed: true`), the `sleepingWolves.removed` will get populated with the wolves that were awake in the previous system.
+As the `SystemWolfReactions` has the same query as the `SystemAwakeWolves`, the entity will also get removed from its query. Because the query is also [reactive](/manual/Architecture?id=reactive-queries) (`removed: true`), the `sleepingWolves.removed` will get populated with the wolves that were awake in the previous system.
 When iterating these removed entities, it is possible to access the removed `Sleeping` component by using `getRemovedComponent`.
-Please notice that if immediate removal were used **TODO: Link to forceremoved**, instead of the default deferred method, the component will not be accessible to any systems after it.
+Please notice that if immediate removal were used, instead of the default deferred method, the component will not be accessible to any systems after it.
 
 This flow is exactly the same when removing entities instead of components. The entities and its components will still be available on the rest of the systems reacting to these deletions.
 
@@ -733,4 +731,4 @@ Is important to notice that if an applicatio has a running order as: `SystemA > 
 But if `SystemB` does the same, just `SystemC` will be able to react to it, as the entity and components data will get cleared at the end of the frame, so `SystemA` will not be able to read that data.
 Because of that is important that you define an appropiate execution order based on the needs for your reactive systems.
 
-There is one special use case when removing components and entities and is when using `System State Components` as they should be removed explicitly and they will not get removed if `entity.remove` is being called. **TODO: link to System State Components**
+There is one special use case when removing components and entities and is when using `System State Components` as they should be removed explicitly and they will not get removed if `entity.remove` is being called. [More info](/manual/Architecture?id=system-state-components)
