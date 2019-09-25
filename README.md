@@ -10,9 +10,10 @@
 #### An highly experimental Entity Component System written in Javascript ####
 
 ECSY (pronounced as "eksi") is an Entity Component System framework implemented in javascript.
+
 The primary goal for this project is to provide an easy to use API that helps developers organizing their code and sharing pieces across different projects.
 
-For detailed information please visit the [documentation page](http://ecsy.io/docs/#/)
+For detailed information on the architecture and API please visit the [documentation page](http://ecsy.io/docs/#/)
 
 # Examples
 - Ball example:
