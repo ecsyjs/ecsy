@@ -169,7 +169,8 @@ export class System {
       priority: this.priority,
       queries: {}
     };
-/*
+
+    /*
     if (this.config) {
       var queries = this.queries;
       for (let queryName in queries) {
