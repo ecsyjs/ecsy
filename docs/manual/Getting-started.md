@@ -2,7 +2,7 @@
 
 ## ECS principles
 ECSY (Pronounced as "eksi") is an Entity Component System (ECS) engine for web applications.
-The basic idea of this pattern is to move from defining the entities using a class hierarchy to using composition in a Data Oriented Programming paradigm. ([More info on wikipedia](https://en.wikipedia.org/wiki/Entity_component_system)). Programming with an ECS can result in code that is more efficient and easier to extend over time.
+The basic idea of this pattern is to move from defining application entities using a class hierarchy to using composition in a Data Oriented Programming paradigm. ([More info on wikipedia](https://en.wikipedia.org/wiki/Entity_component_system)). Programming with an ECS can result in code that is more efficient and easier to extend over time.
 Some common terms within ECS engines are:
 - [entities](/manual/Architecture?id=entities): an object with a unique ID that can have multiple components attached to it.
 - [components](/manual/Architecture?id=components): different facets of an entity. ex: geometry, physics, hit points.   Data is only stored in components.
