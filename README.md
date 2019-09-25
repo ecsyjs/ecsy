@@ -9,9 +9,11 @@
 
 #### An highly experimental Entity Component System written in Javascript ####
 
-Designed aiming to achieve a "pure" ECS implementation, following two main rules:
+ECSY (pronounced as "eksi") is an Entity Component System framework implemented in javascript.
 - Components are just data, and do not have behaviour.
 - Systems have just behaviour, without storing state.
+
+The
 
 # Examples
 - Ball example:
@@ -24,7 +26,6 @@ Designed aiming to achieve a "pure" ECS implementation, following two main rules
 - Focused on providing a simple but yet efficient API
 - Designed to avoid garbage collection as possible
 - Systems, entities and components are scoped in a `world` instance
-- Singleton components can be registered per `world`
 - Multiple queries per system
 - Reactive support:
   - Support for reactive behaviour on systems (React to changes on entities and components)
@@ -35,150 +36,109 @@ Designed aiming to achieve a "pure" ECS implementation, following two main rules
 - Modern Javascript: ES6, classes, modules,...
 - Pool for components and entities
 
-# Roadmap
+# Usage
 
-# Getting started
+For detailed information please visit the [documentation page](http://ecsy.io/docs/#/)
+
+Installing the package via `npm`:
+
 ```
 npm install --save ecsy
 ```
 
-# Complete example
-**Warning: Highly experimental API subject to change every day :)**
-
 ```javascript
-import {World, System, ReactiveSystem} from 'ecs';
+import {World, System} from 'ecsy';
 
-// Rotating component
-class Rotating {
+// Acceleration component
+class Acceleration {
   constructor() {
-    this.rotatingSpeed = 0.1;
-    this.decreasingSpeed = 0.001;
+    this.value = 0.1;
   }
 }
 
-// Transform component
-class Transform {
+// Position component
+class Position {
   constructor() {
-    this.rotation = { x: 0, y: 0, z: 0 };
-    this.position = { x: 0, y: 0, z: 0 };
-    this.scale = { x: 1, y: 1, z: 1 };
+    this.x = 0;
+    this.y = 0;
+    this.z = 0;
   }
 }
 
-// Mouse component (to be used as singleton)
-class MouseState {
-  constructor() {
-    this.mouseDown = false;
-  }
-}
-
-// Create a TestSystem to modify Transform components
-class RotatingSystem extends System {
-  init() {
-    return {
-      queries: {
-        entities: { components: [Rotating, Transform] }
-      }
-    };
-  }
-
-  execute(delta) {
-    let entities = this.queries.entities;
-    for (var i = 0; i < entities.length; i++) {
-      var entity = entities[i];
-
-      var rotating = entity.getComponent(Rotating);
-      var rotatingSpeed = rotating.rotatingSpeed;
-
-      var transform = entity.getMutableComponent(Transform);
-      transform.rotation.x += rotatingSpeed;
-    }
-  }
-}
-
-// Create a TestSystem
-class MouseSystem extends System {
-  init() {
-    var mouseState = this.world.components.mouseState;
-    window.addEventListener('mousedown', () => {
-      mouseState.mouseDown = true;
-    });
-
-    window.addEventListener('mouseup', () => {
-      mouseState.mouseDown = false;
-    });
-  }
-}
-
-// Create a reactive system
-class ReactiveSystem extends System {
-  init() {
-    return {
-      queries: {
-        entities: {
-          components: [Rotating, Transform]
-          events: {
-            added: {
-              event: "EntityAdded"
-            },
-            removed: {
-              event: "EntityRemoved"
-            },
-            changed: {
-              event: "EntityChanged"
-            },
-            rotatingChanged: {
-              event: "ComponentChanged",
-              components: [Rotating]
-            },
-            transformChanged: {
-              event: "ComponentChanged",
-              components: [Transform]
-            }
-          }
-        }
-      }
-    };
-  }
-
-  execute() {
-    console.log('OnAdded', this.events.entities.added);
-    console.log('OnRemoved', this.events.entities.removed);
-    console.log('OnChanged entities', this.events.entities.changed);
-    console.log('OnChanged Rotating Component', this.events.entities.rotatingChanged);
-    console.log('OnChanged Transform Component', this.events.entities.transformChanged);
-  }
-}
-
-// Create a world and register all the elements on it
+// Create world
 var world = new World();
-world
-  .registerComponent(Rotating)
-  .registerComponent(Transform)
-  .registerSingletonComponent(MouseState);
 
-world
-  .registerSystem(RotatingSystem)
-  .registerSystem(MouseSystem);
+var entityA = world
+  .createEntity()
+  .addComponent(Position);
 
-var entity = world.createEntity();
-entity
-  .addComponent(Rotating, {rotationSpeed: 0.2})
-  .addComponent(Transform);
-
-// Update systems per frame
-var previousTime = performance.now();
-
-function update() {
-  var time = performance.now();
-  var delta = time - previousTime;
-  previousTime = time;
-
-  world.execute(delta, time);
-  requestAnimationFrame(update);
+for (let i = 0; i < 10; i++) {
+  world
+    .createEntity();
+    .addComponent(Acceleration)
+    .addComponent(Position, { x: Math.random() * 10, y: Math.random() * 10, z: 0});
 }
 
-requestAnimationFrame(update);
+// Systems
+class MovableSystem extends System {
+  init() { // Do whatever you need here }
+  // This method will get called on every frame by default
+  execute(delta, time) {
+    // Iterate through all the entities on the query
+    this.queries.moving.forEach(entity => {
+      var acceleration = entity.getComponent(Acceleration).value;
+      var position = entity.getMutableComponent(Position);
+      position.x += acceleration * delta;
+      position.y += acceleration * delta;
+      position.z += acceleration * delta;
+    });
+  }
+}
+
+// Define a query of entities that have "Acceleration" and "Position" components
+System.queries = {
+  moving: {
+    components: [Acceleration, Position]
+  }
+}
+
+// Initialize entities
+var entityA = world
+  .createEntity()
+  .addComponent(Position);
+
+for (let i = 0; i < 10; i++) {
+  world
+    .createEntity();
+    .addComponent(Acceleration)
+    .addComponent(Position, { x: Math.random() * 10, y: Math.random() * 10, z: 0});
+}
+
+// Run!
+function run() {
+  // Compute delta and elapsed time
+  var time = performance.now();
+  var delta = time - lastTime;
+
+  // Run all the systems
+  world.execute(delta, time);
+
+  lastTime = time;
+  requestAnimationFrame(animate);
+}
+
+var lastTime = performance.now();
+run();
+```
+
+You can also include the hosted javascript directly on your HTML:
+
+```html
+<!-- Using UMD (It will expose a global ECSY namespace) -->
+<script src="http://ecsy.io/build/ecsy.js"></script>
+
+<!-- Using ES6 modules -->
+<script src="http://ecsy.io/build/ecsy.module.js"></script>
 ```
 
 [npm]: https://img.shields.io/npm/v/ecsy.svg
@@ -193,3 +153,4 @@ requestAnimationFrame(update);
 [lgtm-url]: https://lgtm.com/projects/g/fernandojsg/ecsy/
 [build-status]: https://travis-ci.com/fernandojsg/ecsy.svg?branch=master
 [build-status-url]: https://travis-ci.com/fernandojsg/ecsy
+

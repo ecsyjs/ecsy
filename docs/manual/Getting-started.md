@@ -178,13 +178,14 @@ run();
 ```javascript
 import {World, System} from 'ecsy';
 
-// Components
+// Acceleration component
 class Acceleration {
   constructor() {
     this.value = 0.1;
   }
 }
 
+// Position component
 class Position {
   constructor() {
     this.x = 0;
