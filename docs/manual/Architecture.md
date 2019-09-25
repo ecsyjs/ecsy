@@ -18,7 +18,7 @@ The usual workflow would be:
 - Create the `systems` that will use these `components` to read and transform the data of these entities.
 - Execute all the systems each frame.
 
-![Wolves and dragons example](http://ecsy.io/docs/manual/images/wolves-dragons.svg)
+![Wolves and dragons example](http://ecsy.io/docs/manual/images/dragons.svg)
 
 ## World
 By default your application should have at least one `world`. A world is basically a container for `entities`, `components` and `systems`.  Even so, you can have multiple worlds running at the same time and enable or disable them as you need.
