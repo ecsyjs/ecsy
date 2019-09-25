@@ -15,9 +15,11 @@ For detailed information on the architecture and API please visit the [documenta
 
 # Examples
 - Ball example:
-  - three.js: https://fernandojsg.github.io/ecsy/examples/ball-example/three
-  - babylon: https://fernandojsg.github.io/ecsy/examples/ball-example/babylon/ (WIP)
-- 2D Canvas https://fernandojsg.github.io/ecsy/examples/canvas
+  - three.js: http://ecsy.io/examples/ball-example/three
+  - babylon: http://ecsy.io/examples/ball-example/babylon
+- 2D Canvas http://ecsy.io/examples/canvas
+- Factory pattern with `Not` operator: http://ecsy.io/examples/factory
+- System state component example: http://ecsy.io/examples/systemstate
 
 # Features
 - Framework agnostic
