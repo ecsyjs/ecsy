@@ -1,4 +1,5 @@
 # Logs
+.idea
 .vscode
 .DS_Store
 logs
