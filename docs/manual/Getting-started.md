@@ -2,22 +2,23 @@
 
 ## ECS principles
 ECSY (Pronounced as "eksi") is an Entity Component System (ECS) engine for web applications.
-The basic idea of this pattern is to move from defining the entities in our application using composition in a Data Oriented Programming paradigm. ([More info on wikipedia](https://en.wikipedia.org/wiki/Entity_component_system))
-Some common terminology of the elements needed to build an ECSY application are:
-- [entities](/manual/Architecture?id=entities): Is an object that has an unique ID and can have multiple components attached to it.
-- [components](/manual/Architecture?id=components): Is where the data is stored.
-- [systems](/manual/Architecture?id=systems): Processes list of entities reading and modifying their components.
-- [queries](/manual/Architecture?id=queries): Used by systems to determine which entities they are interested in, based on the components the entities own.
-- [world](/manual/Architecture?id=world): Container for entities, components, systems and queries.
+The basic idea of this pattern is to move from defining the entities using a class hierarchy to using composition in a Data Oriented Programming paradigm. ([More info on wikipedia](https://en.wikipedia.org/wiki/Entity_component_system)). Programming with an ECS can result in code that is more efficient and easier to extend over time.
+Some common terms within ECS engines are:
+- [entities](/manual/Architecture?id=entities): an object with a unique ID that can have multiple components attached to it.
+- [components](/manual/Architecture?id=components): different facets of an entity. ex: geometry, physics, hit points.   Data is only stored in components.
+- [systems](/manual/Architecture?id=systems): do the actual work with in an application by processing entities and modifying their components.
+- [queries](/manual/Architecture?id=queries): used by systems to determine which entities they are interested in, based on the components the entities own.
+- [world](/manual/Architecture?id=world): a container for entities, components, systems and queries.
 
-The usual workflow would be:
+The usual workflow when building an ECS based program:
 - Create the `components` that shape the data you need to use in your application.
 - Create `entities` and attach `components` to them.
 - Create the `systems` that will use these `components` to read and transform the data of these entities.
 - Execute all the systems each frame.
 
 ## Creating a world
-By default your application should have at least one `world`. A world is basically a container for `entities`, `components` and `systems`.  Although you can have multiple worlds running at the same time and enable or disable them as you need.
+A world is a container for `entities`, `components` and `systems`. Most applications have only one `world`, 
+however you can have multiple worlds running at the same time and enable or disable them as you need.
 
 Let's start creating our first world:
 ```javascript
@@ -25,7 +26,7 @@ world = new World();
 ```
 
 ## Creating components
-Components are just objects that hold data. So we can use any way to define them, for example using ES6 class syntax (recommended):
+Components are just objects that hold data. We can use any way to define them, for example using ES6 class syntax (recommended):
 ```javascript
 class Acceleration {
   constructor() {
@@ -45,7 +46,7 @@ class Position {
 [More info on how to create components](/manual/Architecture?id=components).
 
 ## Creating entities
-Having our world and some components already defined, let's create [entities](/manual/Architecture?id=entities) and attach theses components to them:
+Having our world and some components already defined, let's create [entities](/manual/Architecture?id=entities) and attach these components to them:
 ```javascript
 var entityA = world
   .createEntity()
@@ -53,22 +54,24 @@ var entityA = world
 
 for (let i = 0; i < 10; i++) {
   world
-    .createEntity();
+    .createEntity()
     .addComponent(Acceleration)
     .addComponent(Position, { x: Math.random() * 10, y: Math.random() * 10, z: 0});
 }
 ```
-With that we have just created 11 entities. 10 with the `Acceleration` and `Position` components, and one just with the `Position` component.
+With that we have just created 11 entities. 10 with the `Acceleration` and `Position` components, and one with just the `Position` component. 
+Notice that the Position component is added using custom parameters. If we didn't use the parameters then the
+component would use the default values declared in the Position class. 
 
 ## Creating a system
 Now we are going to define a [system](/manual/Architecture?id=systems) to process the components we just created.
-A system should extend the `System` interface and could implement the following methods:
+A system should extend the `System` interface and can implement the following methods:
 - `init`: This will get called when the system is registered in a world.
 - `execute(delta, time)`: This is called on every frame.
 
 We could also define the [queries](/manual/Architecture?id=queries) of entities we are interested in based on the components they own. The `queries` attribute should be a static attribute of your system.
 
-We will start creating a system that will just loop through all the entities that has a `Position` component (11 in our example) and log theirs position.
+We will start by creating a system that will loop through all the entities that have a `Position` component (11 in our example) and log their positions.
 
 ```javascript
 class PositionLogSystem extends System {
@@ -79,9 +82,9 @@ class PositionLogSystem extends System {
     // Iterate through all the entities on the query
     this.queries.position.forEach(entity => {
       // Access the component `Position` on the current entity
-      var position = entity.getComponent(Position);
+      let pos = entity.getComponent(Position);
 
-      console.log(`Entity with ID: ${entity.id} has component Position={x: ${position.x}, y: ${position.y}, z: ${position.z}}`);
+      console.log(`Entity with ID: ${entity.id} has component Position={x: ${pos.x}, y: ${pos.y}, z: ${pos.z}}`);
     });
   }
 }
@@ -94,6 +97,8 @@ System.queries = {
 }
 ```
 
+The next system moves each entity that has both a Position and an Acceleration.
+
 ```javascript
 class MovableSystem extends System {
   init() { /* Do whatever you need here */ }
@@ -105,21 +110,23 @@ class MovableSystem extends System {
     this.queries.moving.forEach(entity => {
 
       // Get the `Acceleration` component as Read-only
-      var acceleration = entity.getComponent(Acceleration).value;
+      let acceleration = entity.getComponent(Acceleration).value;
 
       // Get the `Position` component as Writable
-      var position = entity.getMutableComponent(Position);
+      let position = entity.getMutableComponent(Position);
       position.x += acceleration * delta;
       position.y += acceleration * delta;
       position.z += acceleration * delta;
     });
   }
 }
+```
 
 Please note that we are accessing components on an entity by calling:
 - `getComponent(Component)`: If the component will be used as read-only.
 - `getMutableComponent(Component)`: If we plan to modify the values on the component.
 
+```javascript
 // Define a query of entities that have "Acceleration" and "Position" components
 System.queries = {
   moving: {
@@ -128,9 +135,9 @@ System.queries = {
 }
 ```
 
-This system's query `moving` hold a list to the entities that has both `Acceleration` and `Position`, 10 in total in our example.
+This system's query `moving` holds a list of entities that have both `Acceleration` and `Position`; 10 in total in our example.
 
-Please notice also that we could create an arbitrary number of queries if needed and process them in  `execute`, eg:
+Please notice that we could create an arbitrary number of queries if needed and process them in `execute`, ex:
 ```javascript
 class SystemDemo extends System {
   execute() {
@@ -145,7 +152,8 @@ SystemDemo.queries = {
 };
 ```
 
-Once we are done defining our systems it is time to register them in one world so they get initialized and added to the default scheduler to execute them on each frame.
+Now let's register them in the world so they get initialized and added to the default scheduler to execute them on each frame.
+
 ```javascript
 world
   .registerSystem(MovableSystem)
@@ -160,8 +168,8 @@ Now you just need to invoke `world.execute()` per frame. Currently ECSY doesn't 
 ```javascript
 function  run() {
   // Compute delta and elapsed time
-  var  time = performance.now();
-  var  delta = time - lastTime;
+  let  time = performance.now();
+  let  delta = time - lastTime;
 
   // Run all the systems
   world.execute(delta, time);
@@ -195,15 +203,15 @@ class Position {
 }
 
 // Create world
-var world = new World();
+let world = new World();
 
-var entityA = world
+let entityA = world
   .createEntity()
   .addComponent(Position);
 
 for (let i = 0; i < 10; i++) {
   world
-    .createEntity();
+    .createEntity()
     .addComponent(Acceleration)
     .addComponent(Position, { x: Math.random() * 10, y: Math.random() * 10, z: 0});
 }
@@ -215,8 +223,8 @@ class MovableSystem extends System {
   execute(delta, time) {
     // Iterate through all the entities on the query
     this.queries.moving.forEach(entity => {
-      var acceleration = entity.getComponent(Acceleration).value;
-      var position = entity.getMutableComponent(Position);
+      let acceleration = entity.getComponent(Acceleration).value;
+      let position = entity.getMutableComponent(Position);
       position.x += acceleration * delta;
       position.y += acceleration * delta;
       position.z += acceleration * delta;
@@ -232,22 +240,23 @@ System.queries = {
 }
 
 // Initialize entities
-var entityA = world
+let entityA = world
   .createEntity()
   .addComponent(Position);
 
 for (let i = 0; i < 10; i++) {
   world
-    .createEntity();
+    .createEntity()
     .addComponent(Acceleration)
     .addComponent(Position, { x: Math.random() * 10, y: Math.random() * 10, z: 0});
 }
 
 // Run!
+let lastTime = performance.now();
 function run() {
   // Compute delta and elapsed time
-  var time = performance.now();
-  var delta = time - lastTime;
+  let time = performance.now();
+  let delta = time - lastTime;
 
   // Run all the systems
   world.execute(delta, time);
@@ -256,7 +265,6 @@ function run() {
   requestAnimationFrame(animate);
 }
 
-var lastTime = performance.now();
 run();
 ```
 
