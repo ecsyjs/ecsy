@@ -3,8 +3,8 @@
 ![ECSY architecture](http://ecsy.io/docs/manual/images/ECSY%20Architecture.svg)
 
 ## Overview
-ECSY (Pronounced as "eksi") is a Entity Component System (ECS) engine for web applications.
-The basic idea of this pattern is to move from defining our entities using inherance as in Object Oriented Programming, to using composition in a Data Oriented Programming paradigm. ([More info on wikipedia](https://en.wikipedia.org/wiki/Entity_component_system))
+ECSY (Pronounced as "eksi") is an Entity Component System (ECS) engine for web applications.
+The basic idea of this pattern is to move from defining the entities in our application using composition in a Data Oriented Programming paradigm. ([More info on wikipedia](https://en.wikipedia.org/wiki/Entity_component_system))
 Some common terminology of the elements needed to build an ECSY application are:
 - `entity`: Is an object that has an unique ID and can have multiple components attached to it.
 - `component`: Is where the data is stored.
@@ -20,7 +20,7 @@ The usual workflow would be:
 
 ## World
 By default your application should have at least one `world`. A world is basically a container for `entities`, `components` and `systems`.  Even so, you can have multiple worlds running at the same time and enable or disable them as you need.
-[More info on the API Reference](http://ecsy.io/docs/#/api/?id=world).
+[More info on the API Reference](/docs/#/api/classes/world).
 **TODO: link to doc**
 
 ```javascript
