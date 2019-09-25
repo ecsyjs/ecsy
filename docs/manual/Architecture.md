@@ -1,6 +1,6 @@
 # ECSY Architecture
 
-![ECSY architecture](http://ecsy.io/docs/manual/images/ECSY%20Architecture.svg)
+![ECSY architecture](https://ecsy.io/docs/manual/images/ECSY%20Architecture.svg)
 
 ## Overview
 ECSY (Pronounced as "eksi") is an Entity Component System (ECS) engine for web applications.
@@ -18,7 +18,7 @@ The usual workflow would be:
 - Create the `systems` that will use these `components` to read and transform the data of these entities.
 - Execute all the systems each frame.
 
-![Wolves and dragons example](http://ecsy.io/docs/manual/images/dragons.svg)
+![Wolves and dragons example](https://ecsy.io/docs/manual/images/dragons.svg)
 
 ## World
 By default your application should have at least one `world`. A world is basically a container for `entities`, `components` and `systems`.  Even so, you can have multiple worlds running at the same time and enable or disable them as you need.
@@ -311,7 +311,7 @@ var ExampleComponent = createComponentClass({
 ## Entities
 An entity is an object that has an unique ID which purpose is to group components together. [API Reference](/api/classes/entity).
 
-![Entities](http://ecsy.io/docs/manual/images/entities.svg)
+![Entities](https://ecsy.io/docs/manual/images/entities.svg)
 
 Entities should be created within a `World` context:
 
@@ -410,7 +410,7 @@ entity.removeComponent(ComponentA, true);
 
 Systems are used to transform data stored on the components. Usually each system defines one or more queries of entities and it iterate through these lists per frame. [API Reference](/api/classes/system)
 
-![Wolves and dragons](http://ecsy.io/docs/manual/images/systems.svg)
+![Wolves and dragons](https://ecsy.io/docs/manual/images/systems.svg)
 
 Every frame systems are executed and they create, remove or modify entities and components.
 

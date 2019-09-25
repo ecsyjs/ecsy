@@ -11,15 +11,15 @@ ECSY (pronounced as "eksi") is an, **highly experimental**, Entity Component Sys
 
 The primary goal for this project is to provide an easy to use API that helps developers organizing their code and sharing pieces across different projects.
 
-For detailed information on the architecture and API please visit the [documentation page](http://ecsy.io/docs/#/)
+For detailed information on the architecture and API please visit the [documentation page](https://ecsy.io/docs/#/)
 
 # Examples
 - Ball example:
-  - three.js: http://ecsy.io/examples/ball-example/three
-  - babylon: http://ecsy.io/examples/ball-example/babylon
-- 2D Canvas http://ecsy.io/examples/canvas
-- Factory pattern with `Not` operator: http://ecsy.io/examples/factory
-- System state component example: http://ecsy.io/examples/systemstate
+  - three.js: https://ecsy.io/examples/ball-example/three
+  - babylon: https://ecsy.io/examples/ball-example/babylon
+- 2D Canvas https://ecsy.io/examples/canvas
+- Factory pattern with `Not` operator: https://ecsy.io/examples/factory
+- System state component example: https://ecsy.io/examples/systemstate
 
 # Features
 - Framework agnostic
@@ -133,10 +133,10 @@ You can also include the hosted javascript directly on your HTML:
 
 ```html
 <!-- Using UMD (It will expose a global ECSY namespace) -->
-<script src="http://ecsy.io/build/ecsy.js"></script>
+<script src="https://ecsy.io/build/ecsy.js"></script>
 
 <!-- Using ES6 modules -->
-<script src="http://ecsy.io/build/ecsy.module.js"></script>
+<script src="https://ecsy.io/build/ecsy.module.js"></script>
 ```
 
 [npm]: https://img.shields.io/npm/v/ecsy.svg
