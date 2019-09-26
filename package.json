@@ -71,6 +71,7 @@
     "prettier": "^1.18.2",
     "rollup": "^1.21.4",
     "rollup-plugin-json": "^4.0.0",
+    "rollup-plugin-terser": "^5.1.2",
     "typedoc": "^0.15.0",
     "typedoc-plugin-markdown": "^2.2.6",
     "typescript": "^3.6.3"
