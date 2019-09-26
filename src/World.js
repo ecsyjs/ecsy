@@ -1,7 +1,6 @@
 import { SystemManager } from "./SystemManager.js";
 import { EntityManager } from "./EntityManager.js";
 import { ComponentManager } from "./ComponentManager.js";
-import EventDispatcher from "./EventDispatcher.js";
 
 export class World {
   constructor() {
@@ -12,24 +11,11 @@ export class World {
     this.enabled = true;
 
     this.eventQueues = {};
-    this.eventDispatcher = new EventDispatcher();
 
     if (typeof CustomEvent !== "undefined") {
       var event = new CustomEvent("ecsy-world-created", { detail: this });
       window.dispatchEvent(event);
     }
-  }
-
-  emitEvent(eventName, data) {
-    this.eventDispatcher.dispatchEvent(eventName, data);
-  }
-
-  addEventListener(eventName, callback) {
-    this.eventDispatcher.addEventListener(eventName, callback);
-  }
-
-  removeEventListener(eventName, callback) {
-    this.eventDispatcher.removeEventListener(eventName, callback);
   }
 
   registerComponent(Component) {
