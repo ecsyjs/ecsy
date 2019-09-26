@@ -162,53 +162,63 @@ It is possible to use the helper function `createComponentClass` to ease the cre
 
 ### System State Components
 
-System State Components (SSC) are components used by a system to hold internal resources for an entity. They are not removed when you delete the entity. You must remove them when you are done with them.
+System State Components (SSC) are components used by a system to hold internal resources for an entity. They are not removed when you delete the entity, you must explicitly remove them when you are done with them.
 They can be used to detect when an entity has been added or removed from a query.
 
-SSC can be defined by extending `SystemStateComponent` [API Reference](/api/classes/systemstatecomponent) instead of `Component`:
+SSC can be defined by extending `SystemStateComponent` [API Reference](/api/classes/systemstatecomponent) instead of `Component`. Once the SSC is defined, it can be used as any other component.
 ```javascript
-class StateComponentA extends SystemStateComponent {
+class StateComponentGeometry extends SystemStateComponent {
   constructor() {
     super();
-    this.value = 10;
+    this.meshReference = null;
+  }
+}
+
+class Geometry {
+  constructor() {
+    this.primitive = "box";
   }
 }
 ```
 
-Once the SSC is defined, it can be used as any other component:
+In this example `StateComponentGeometry` is used to store the mesh resources created as defined in the `Geometry` component.
+If any other system removes that entity, the `Geometry` component will get removed but the `StateComponentGeometry` will remain "alive" so this system can detect it and free the mesh resources:
 
 ```javascript
-class MySystem extends System {
+class GeometrySystem extends System {
   init() {
     return {
       queries: {
-        added: { components: [ComponentA, Not(StateComponentA)] },
-        remove: { components: [Not(ComponentA), StateComponentA] },
-        normal: { components: [ComponentA, StateComponentA] },
+        added: { components: [Geometry, Not(StateComponentGeometry)] },
+        remove: { components: [Not(Geometry), StateComponentGeometry] },
+        normal: { components: [Geometry, StateComponentGeometry] },
       }
     };
   },
   execute() {
     added.forEach(entity => {
-      entity.addComponent(StateComponentA, {data});
+      var mesh = new Mesh(entity.getComponent(Geometry).primitive);
+      entity.addComponent(StateComponentGeometry, {mesh: mesh});
     });
 
     remove.forEach(entity => {
-      var component = entity.getComponent(StateComponentA);
-      // free resources for `component`
-      entity.removeComponent(StateComponentA);
+      var component = entity.getComponent(StateComponentGeometry);
+      // free resources for the mesh
+      component.mesh.dispose();
+
+      entity.removeComponent(StateComponentGeometry);
     });
 
     normal.forEach(entity => {
-      // use entity and its components
+      // use entity and its components (Geometry and StateComponentGeometry) if needed
     });
   }
 }
 
 MySystem.queries = {
-  added: { components: [ComponentA, Not(StateComponentA)] },
-  remove: { components: [Not(ComponentA), StateComponentA] },
-  normal: { components: [ComponentA, StateComponentA] },
+  added: { components: [Geometry, Not(StateComponentGeometry)] },
+  remove: { components: [Not(Geometry), StateComponentGeometry] },
+  normal: { components: [Geometry, StateComponentGeometry] },
 };
 ```
 
