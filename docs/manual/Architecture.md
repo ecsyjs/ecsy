@@ -3,16 +3,16 @@
 ![ECSY architecture](https://ecsy.io/docs/manual/images/ECSY%20Architecture.svg)
 
 ## Overview
-ECSY (Pronounced as "eksi") is an Entity Component System (ECS) engine for web applications.
-The basic idea of this pattern is to move from defining application entities using a class hierarchy to using composition in a Data Oriented Programming paradigm. ([More info on wikipedia](https://en.wikipedia.org/wiki/Entity_component_system))
+The following glossary is extracted from the [Getting started guide](/manual/Getting-started), it is recommended to read the whole section to get an overview on how the framework works.
+
 Some common terms within ECS engines are:
-- [entities](/manual/Architecture?id=entities): an object with a unique ID that can have multiple components attached to it.
+- [entities](/manual/Architecture?id=entities): an object with an unique ID that can have multiple components attached to it.
 - [components](/manual/Architecture?id=components): different facets of an entity. ex: geometry, physics, hit points.   Data is only stored in components.
 - [systems](/manual/Architecture?id=systems): do the actual work with in an application by processing entities and modifying their components.
 - [queries](/manual/Architecture?id=queries): used by systems to determine which entities they are interested in, based on the components the entities own.
 - [world](/manual/Architecture?id=world): a container for entities, components, systems and queries.
 
-The usual workflow when building an ECS based program:
+The usual workflow when building an ECS based application is:
 - Create the `components` that shape the data you need to use in your application.
 - Create `entities` and attach `components` to them.
 - Create the `systems` that will use these `components` to read and transform the data of these entities.
@@ -20,6 +20,24 @@ The usual workflow when building an ECS based program:
 
 ## Example
 
+Let's say we want to create a game where the player fights with wolves and dragons.
+We will start by creating the components to define each entity:
+- `Walker`: It can walk.
+- `Flyer`: It can fly.
+- `Enemy`: It is an enemy.
+- `Model3D`: It has a 3D model representation.
+
+Then we use these components to define our main entities:
+- `wolf`: It's an `Enemy`, can `walk` and has a `model3D`.
+- `dragon`: It's an `Enemy`, can `fly` and has a `model3D`.
+- `player`: It's an `Player`, can `walk` and has a `model3D`.
+
+And finally we define the systems that will add the logic to the game:
+- `Walk`: It will modify the `Walker` entities (`Player` and `Wolf`) moving them around.
+- `Fly`: It will modify the `Flyer` entities (`Dragon`) moving them around in the sky.
+- `AI_Walk`: It will modify the `Enemy` and `Walker` entities (`Wolf`) using AI techniques to compute the path they will follow.
+- `Attack`: It will implement all the logic for attacks between `Enemy` and `Player` entities.
+- `Draw`: It will draw all the entities that has `Model3D` component on the screen.
 
 ![Wolves and dragons example](https://ecsy.io/docs/manual/images/dragons.svg)
 
