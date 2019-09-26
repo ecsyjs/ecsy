@@ -21,11 +21,10 @@ The usual workflow when building an ECS based application is:
 ## Example
 
 Let's say we want to create a game where the player fights with wolves and dragons.
-We will start by creating the components to define each entity:
-- `Walker`: It can walk.
-- `Flyer`: It can fly.
-- `Enemy`: It is an enemy.
-- `Model3D`: It has a 3D model representation.
+We will start by defining components that will be attached to entities:
+- `Walker` and `Flyer` for entities that will walk and fly (resp.).
+- `Enemy` for enemy entitites.
+- `Model3D` for all the entities that will have a 3d Model.
 
 Then we use these components to define our main entities:
 - `wolf`: It's an `Enemy`, can `walk` and has a `model3D`.
