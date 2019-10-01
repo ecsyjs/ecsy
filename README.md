@@ -60,7 +60,7 @@ npm install --save ecsy
     <script type="module">
       import { World, System, TagComponent } from "https://ecsy.io/build/ecsy.module.js";
 
-      const NUM_ELEMENTS = 100;
+      const NUM_ELEMENTS = 50;
       const SPEED_MULTIPLIER = 0.3;
       const BOX_SIZE = 50;
       const CIRCLE_RADIUS = 30;
@@ -70,8 +70,12 @@ npm install --save ecsy
       let canvasWidth = canvas.width = window.innerWidth;
       let canvasHeight = canvas.height = window.innerHeight;
       let ctx = canvas.getContext("2d");
+
+      //----------------------
+      // Components
+      //----------------------
       
-      // Acceleration component
+      // Speed component
       class Speed {
         constructor() {
           this.x = this.y = 0;
@@ -85,17 +89,21 @@ npm install --save ecsy
         }
       }
       
-      // Box component
-      class Box extends TagComponent {}
+      // Shape component
+      class Shape {
+        constructor() {
+          this.primitive = 'box';
+        }
+      }
       
-      // Circle component
-      class Circle extends TagComponent {}
-
+      // Renderable component
+      class Renderable extends TagComponent {}
+      
       //----------------------
       // Systems
       //----------------------
       
-      // MOVABLESYSTEM
+      // MovableSystem
       class MovableSystem extends System {
         // This method will get called on every frame by default
         execute(delta, time) {
@@ -121,7 +129,7 @@ npm install --save ecsy
         }
       }
 
-      // MOVABLESYSTEM
+      // RendererSystem
       class RendererSystem extends System {
         // This method will get called on every frame by default
         execute(delta, time) {
@@ -130,38 +138,41 @@ npm install --save ecsy
           ctx.fillRect(0, 0, canvasWidth, canvasHeight);
           
           // Iterate through all the entities on the query
-          this.queries.boxes.results.forEach(entity => {
+          this.queries.renderables.results.forEach(entity => {
+            var shape = entity.getComponent(Shape);
             var position = entity.getComponent(Position);
-            
-            // Paint a circle
-            ctx.beginPath();
-            ctx.arc(position.x, position.y, CIRCLE_RADIUS, 0, 2 * Math.PI, false);
-            ctx.fillStyle= "#39c495";
-            ctx.fill();
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = "#0b845b";
-            ctx.stroke();
+            if (shape.primitive === 'box') {
+              this.drawBox(position);
+            } else {
+              this.drawCircle(position);
+            }
           });
-          
-          this.queries.circles.results.forEach(entity => {
-            var position = entity.getComponent(Position);
-            
-            // Paint a box
-            ctx.beginPath();
-            ctx.rect(position.x - BOX_SIZE / 2, position.y - BOX_SIZE / 2, BOX_SIZE, BOX_SIZE);
-            ctx.fillStyle= "#e2736e";
-            ctx.fill();
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = "#b74843";
-            ctx.stroke();            
-          });          
+        }
+        
+        drawCircle(position) {
+          ctx.beginPath();
+          ctx.arc(position.x, position.y, CIRCLE_RADIUS, 0, 2 * Math.PI, false);
+          ctx.fillStyle= "#39c495";
+          ctx.fill();
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = "#0b845b";
+          ctx.stroke();          
+        }
+        
+        drawBox(position) {
+          ctx.beginPath();
+          ctx.rect(position.x - BOX_SIZE / 2, position.y - BOX_SIZE / 2, BOX_SIZE, BOX_SIZE);
+          ctx.fillStyle= "#e2736e";
+          ctx.fill();
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = "#b74843";
+          ctx.stroke();                      
         }
       }
 
       // Define a query of entities that have "Acceleration" and "Position" components
       RendererSystem.queries = {
-        boxes: { components: [Box, Position] },
-        circles: { components: [Circle, Position] },
+        renderables: { components: [Renderable, Shape] }
       }
       
       // Create world and register the systems on it
@@ -170,12 +181,34 @@ npm install --save ecsy
         .registerSystem(MovableSystem)
         .registerSystem(RendererSystem);
 
+      // Some helper functions when creating the components
+      function getRandomSpeed() {
+        return {
+          x: SPEED_MULTIPLIER * (2 * Math.random() - 1), 
+          y: SPEED_MULTIPLIER * (2 * Math.random() - 1)
+        };
+      }
+      
+      function getRandomPosition() {
+        return { 
+          x: Math.random() * canvasWidth, 
+          y: Math.random() * canvasHeight
+        };
+      }
+      
+      function getRandomShape() {
+         return {
+           primitive: Math.random() >= 0.5 ? 'circle' : 'box'
+         };
+      }
+      
       for (let i = 0; i < NUM_ELEMENTS; i++) {
         world
           .createEntity()
-          .addComponent(Speed, {x: SPEED_MULTIPLIER * (2 * Math.random() - 1), y: SPEED_MULTIPLIER * (2 * Math.random() - 1)})
-          .addComponent(Math.random() >= 0.5 ? Circle : Box)
-          .addComponent(Position, { x: Math.random() * canvasWidth, y: Math.random() * canvasHeight});
+          .addComponent(Speed, getRandomSpeed())
+          .addComponent(Shape, getRandomShape())
+          .addComponent(Position, getRandomPosition())
+          .addComponent(Renderable)        
       }
             
       // Run!
