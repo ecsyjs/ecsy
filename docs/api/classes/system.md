@@ -3,17 +3,6 @@
 
 A system that manipulates entities in the world.
 
-## Hierarchy
-
-* **System**
-
-## Index
-
-### Methods
-
-* [play](system.md#play)
-* [stop](system.md#stop)
-
 ## Methods
 
 ###  play

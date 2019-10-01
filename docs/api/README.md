@@ -1,29 +1,6 @@
 
 # ecsy
 
-## Index
-
-### Classes
-
-* [Component](classes/component.md)
-* [Entity](classes/entity.md)
-* [System](classes/system.md)
-* [SystemStateComponent](classes/systemstatecomponent.md)
-* [TagComponent](classes/tagcomponent.md)
-* [World](classes/world.md)
-
-### Interfaces
-
-* [ComponentConstructor](interfaces/componentconstructor.md)
-* [SystemConstructor](interfaces/systemconstructor.md)
-* [Types](interfaces/types.md)
-
-### Functions
-
-* [Not](README.md#not)
-* [createComponentClass](README.md#createcomponentclass)
-* [createType](README.md#createtype)
-
 ## Functions
 
 ###  Not
@@ -50,7 +27,7 @@ ___
 
 ▸ **createComponentClass**<**T**>(`schema`: object, `name`: string): *[ComponentConstructor](interfaces/componentconstructor.md)‹T›*
 
-Create a component class from a schemaa.
+Create a component class from a schema.
 
 **Type parameters:**
 

@@ -3,25 +3,6 @@
 
 The World is the root of the ECS.
 
-## Hierarchy
-
-* **World**
-
-## Index
-
-### Constructors
-
-* [constructor](world.md#constructor)
-
-### Methods
-
-* [createEntity](world.md#createentity)
-* [execute](world.md#execute)
-* [play](world.md#play)
-* [registerComponent](world.md#registercomponent)
-* [registerSystem](world.md#registersystem)
-* [stop](world.md#stop)
-
 ## Constructors
 
 ###  constructor

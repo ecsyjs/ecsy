@@ -1,15 +1,21 @@
 window.docsifyTocBackPlugin = function(hook) {
   hook.doneEach(function() {
-    if (document.querySelector(".back-link") || location.href.endsWith("#/")) {
+    const isApiPage = location.hash.split("?")[0].includes("/api/");
+    let backLink = document.querySelector(".back-link");
+
+    if (!isApiPage) {
+      if (backLink) backLink.remove();
       return;
     }
 
-    const backLink = document.createElement("a");
-    backLink.className = "back-link";
-    backLink.href = "/docs";
-    backLink.innerHTML = "&larr;";
+    if (!backLink) {
+      backLink = document.createElement("a");
+      backLink.className = "back-link";
+      backLink.innerHTML = "&larr;";
+      const appName = document.querySelector(".app-name");
+      appName.after(backLink);
+    }
 
-    const appName = document.querySelector(".app-name");
-    appName.after(backLink);
+    backLink.href = "#/";
   });
 };

@@ -3,24 +3,6 @@
 
 An entity in the world.
 
-## Hierarchy
-
-* **Entity**
-
-## Index
-
-### Methods
-
-* [addComponent](entity.md#addcomponent)
-* [getComponent](entity.md#getcomponent)
-* [getMutableComponent](entity.md#getmutablecomponent)
-* [hasAllComponents](entity.md#hasallcomponents)
-* [hasAnyComponents](entity.md#hasanycomponents)
-* [hasComponent](entity.md#hascomponent)
-* [remove](entity.md#remove)
-* [removeAllComponents](entity.md#removeallcomponents)
-* [removeComponent](entity.md#removecomponent)
-
 ## Methods
 
 ###  addComponent
