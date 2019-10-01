@@ -3,25 +3,6 @@
 
 The World is the root of the ECS.
 
-## Hierarchy
-
-* **World**
-
-## Index
-
-### Constructors
-
-* [constructor](world.md#constructor)
-
-### Methods
-
-* [createEntity](world.md#createentity)
-* [execute](world.md#execute)
-* [play](world.md#play)
-* [registerComponent](world.md#registercomponent)
-* [registerSystem](world.md#registersystem)
-* [stop](world.md#stop)
-
 ## Constructors
 
 ###  constructor
@@ -31,6 +12,14 @@ The World is the root of the ECS.
 Create a new World.
 
 **Returns:** *[World](world.md)*
+
+## Properties
+
+###  enabled
+
+• **enabled**: *boolean*
+
+Whether the world tick should execute.
 
 ## Methods
 
@@ -58,6 +47,36 @@ Name | Type | Description |
 `time` | number | Elapsed time  |
 
 **Returns:** *void*
+
+___
+
+###  getSystem
+
+▸ **getSystem**<**T**>(`System`: [SystemConstructor](../interfaces/systemconstructor.md)‹T›): *[System](system.md)*
+
+Get a system registered in this world.
+
+**Type parameters:**
+
+▪ **T**: *[System](system.md)*
+
+**Parameters:**
+
+Name | Type | Description |
+------ | ------ | ------ |
+`System` | [SystemConstructor](../interfaces/systemconstructor.md)‹T› | Type of system to get.  |
+
+**Returns:** *[System](system.md)*
+
+___
+
+###  getSystems
+
+▸ **getSystems**(): *Array‹[System](system.md)›*
+
+Get a list of systems registered in this world.
+
+**Returns:** *Array‹[System](system.md)›*
 
 ___
 

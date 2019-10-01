@@ -5,10 +5,32 @@ import { Component, ComponentConstructor } from "./Component";
  */
 export class Entity {
   /**
+   * A unique ID for this entity.
+   */
+  id: number;
+
+  /**
    * Get an immutable reference to a component on this entity.
    * @param Component Type of component to get
    */
   getComponent<T extends Component>(Component:ComponentConstructor<T>): T;
+
+  /**
+   * Get an object containing all the components on this entity, where the object keys are the component types.
+   */
+  getComponents(): object;
+
+  /**
+   * Get a list of component types that have been added to this entity.
+   */
+  getComponentTypes<T extends Component>(): Array<T>;
+
+  /**
+   * Get a component that is slated to be removed from this entity.
+   */
+  getRemovedComponent<T extends Component>(
+    Component: ComponentConstructor<T>
+  ): T;
 
   /**
    * Get a mutable reference to a component on this entity.
@@ -41,6 +63,14 @@ export class Entity {
    * @param Component Type of component
    */
   hasComponent<T extends Component>(
+    Component: ComponentConstructor<T>
+  ): boolean;
+
+  /**
+   * Check if the entity has a component that is slated to be removed.
+   * @param Component Type of component
+   */
+  hasRemovedComponent<T extends Component>(
     Component: ComponentConstructor<T>
   ): boolean;
 

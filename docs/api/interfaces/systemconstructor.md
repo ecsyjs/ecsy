@@ -5,16 +5,6 @@
 
 ▪ **T**: *[System](../classes/system.md)*
 
-## Hierarchy
-
-* **SystemConstructor**
-
-## Index
-
-### Constructors
-
-* [constructor](systemconstructor.md#constructor)
-
 ## Constructors
 
 ###  constructor

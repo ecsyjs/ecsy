@@ -7,6 +7,11 @@ import { Entity } from "./Entity";
  */
 export class World {
   /**
+   * Whether the world tick should execute.
+   */
+  enabled:boolean;
+
+  /**
    * Create a new World.
    */
   constructor();
@@ -22,6 +27,17 @@ export class World {
    * @param System Type of system to register
    */
   registerSystem<T extends System>(System:SystemConstructor<T>): this;
+
+  /**
+   * Get a system registered in this world.
+   * @param System Type of system to get.
+   */
+  getSystem<T extends System>(System:SystemConstructor<T>):System;
+
+  /**
+   * Get a list of systems registered in this world.
+   */
+  getSystems():Array<System>;
 
   /**
    * Update the systems per frame.

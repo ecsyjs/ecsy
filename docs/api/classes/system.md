@@ -3,16 +3,13 @@
 
 A system that manipulates entities in the world.
 
-## Hierarchy
+## Properties
 
-* **System**
+###  enabled
 
-## Index
+• **enabled**: *boolean*
 
-### Methods
-
-* [play](system.md#play)
-* [stop](system.md#stop)
+Whether the system will execute during the world tick.
 
 ## Methods
 

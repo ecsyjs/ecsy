@@ -5,16 +5,6 @@
 
 ▪ **T**: *[Component](../classes/component.md)*
 
-## Hierarchy
-
-* **ComponentConstructor**
-
-## Index
-
-### Constructors
-
-* [constructor](componentconstructor.md#constructor)
-
 ## Constructors
 
 ###  constructor
