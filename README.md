@@ -62,8 +62,8 @@ npm install --save ecsy
 
       const NUM_ELEMENTS = 50;
       const SPEED_MULTIPLIER = 0.3;
-      const BOX_SIZE = 50;
-      const CIRCLE_RADIUS = 30;
+      const SHAPE_SIZE = 50;
+      const SHAPE_HALF_SIZE = SHAPE_SIZE / 2;
       
       // Initialize canvas
       let canvas = document.querySelector("canvas");
@@ -114,10 +114,10 @@ npm install --save ecsy
             position.x += speed.x * delta;
             position.y += speed.y * delta;
             
-            if (position.x > canvasWidth) position.x = 0;
-            if (position.x < 0) position.x = canvasWidth;
-            if (position.y > canvasHeight) position.y = 0;
-            if (position.y < 0) position.y = canvasHeight;
+            if (position.x > canvasWidth + SHAPE_HALF_SIZE) position.x = - SHAPE_HALF_SIZE;
+            if (position.x < - SHAPE_HALF_SIZE) position.x = canvasWidth + SHAPE_HALF_SIZE;
+            if (position.y > canvasHeight + SHAPE_HALF_SIZE) position.y = - SHAPE_HALF_SIZE;
+            if (position.y < - SHAPE_HALF_SIZE) position.y = canvasHeight + SHAPE_HALF_SIZE;
           });
         }
       }
@@ -151,7 +151,7 @@ npm install --save ecsy
         
         drawCircle(position) {
           ctx.beginPath();
-          ctx.arc(position.x, position.y, CIRCLE_RADIUS, 0, 2 * Math.PI, false);
+          ctx.arc(position.x, position.y, SHAPE_HALF_SIZE, 0, 2 * Math.PI, false);
           ctx.fillStyle= "#39c495";
           ctx.fill();
           ctx.lineWidth = 2;
@@ -161,7 +161,7 @@ npm install --save ecsy
         
         drawBox(position) {
           ctx.beginPath();
-          ctx.rect(position.x - BOX_SIZE / 2, position.y - BOX_SIZE / 2, BOX_SIZE, BOX_SIZE);
+          ctx.rect(position.x - SHAPE_HALF_SIZE, position.y - SHAPE_HALF_SIZE, SHAPE_SIZE, SHAPE_SIZE);
           ctx.fillStyle= "#e2736e";
           ctx.fill();
           ctx.lineWidth = 2;
