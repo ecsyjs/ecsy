@@ -42,90 +42,166 @@ Installing the package via `npm`:
 npm install --save ecsy
 ```
 
-```javascript
-import {World, System} from 'ecsy';
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Hello!</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      html, body: {
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+    
+    <script type="module">
+      import { World, System, TagComponent } from "https://ecsy.io/build/ecsy.module.js";
 
-// Acceleration component
-class Acceleration {
-  constructor() {
-    this.value = 0.1;
-  }
-}
+      const NUM_ELEMENTS = 100;
+      const SPEED_MULTIPLIER = 0.3;
+      const BOX_SIZE = 50;
+      const CIRCLE_RADIUS = 30;
+      
+      // Initialize canvas
+      let canvas = document.querySelector("canvas");
+      let canvasWidth = canvas.width = window.innerWidth;
+      let canvasHeight = canvas.height = window.innerHeight;
+      let ctx = canvas.getContext("2d");
+      
+      // Acceleration component
+      class Speed {
+        constructor() {
+          this.x = this.y = 0;
+        }
+      }
 
-// Position component
-class Position {
-  constructor() {
-    this.x = 0;
-    this.y = 0;
-    this.z = 0;
-  }
-}
+      // Position component
+      class Position {
+        constructor() {
+          this.x = this.y = 0;
+        }
+      }
+      
+      // Box component
+      class Box extends TagComponent {}
+      
+      // Circle component
+      class Circle extends TagComponent {}
 
-// Create world
-var world = new World();
+      //----------------------
+      // Systems
+      //----------------------
+      
+      // MOVABLESYSTEM
+      class MovableSystem extends System {
+        // This method will get called on every frame by default
+        execute(delta, time) {
+          // Iterate through all the entities on the query
+          this.queries.moving.results.forEach(entity => {
+            var speed = entity.getComponent(Speed);
+            var position = entity.getMutableComponent(Position);
+            position.x += speed.x * delta;
+            position.y += speed.y * delta;
+            
+            if (position.x > canvasWidth) position.x = 0;
+            if (position.x < 0) position.x = canvasWidth;
+            if (position.y > canvasHeight) position.y = 0;
+            if (position.y < 0) position.y = canvasHeight;
+          });
+        }
+      }
 
-var entityA = world
-  .createEntity()
-  .addComponent(Position);
+      // Define a query of entities that have "Speed" and "Position" components
+      MovableSystem.queries = {
+        moving: {
+          components: [Speed, Position]
+        }
+      }
 
-for (let i = 0; i < 10; i++) {
-  world
-    .createEntity();
-    .addComponent(Acceleration)
-    .addComponent(Position, { x: Math.random() * 10, y: Math.random() * 10, z: 0});
-}
+      // MOVABLESYSTEM
+      class RendererSystem extends System {
+        // This method will get called on every frame by default
+        execute(delta, time) {
+          
+          ctx.fillStyle = "#d4d4d4";
+          ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+          
+          // Iterate through all the entities on the query
+          this.queries.boxes.results.forEach(entity => {
+            var position = entity.getComponent(Position);
+            
+            // Paint a circle
+            ctx.beginPath();
+            ctx.arc(position.x, position.y, CIRCLE_RADIUS, 0, 2 * Math.PI, false);
+            ctx.fillStyle= "#39c495";
+            ctx.fill();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = "#0b845b";
+            ctx.stroke();
+          });
+          
+          this.queries.circles.results.forEach(entity => {
+            var position = entity.getComponent(Position);
+            
+            // Paint a box
+            ctx.beginPath();
+            ctx.rect(position.x - BOX_SIZE / 2, position.y - BOX_SIZE / 2, BOX_SIZE, BOX_SIZE);
+            ctx.fillStyle= "#e2736e";
+            ctx.fill();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = "#b74843";
+            ctx.stroke();            
+          });          
+        }
+      }
 
-// Systems
-class MovableSystem extends System {
-  init() { // Do whatever you need here }
-  // This method will get called on every frame by default
-  execute(delta, time) {
-    // Iterate through all the entities on the query
-    this.queries.moving.forEach(entity => {
-      var acceleration = entity.getComponent(Acceleration).value;
-      var position = entity.getMutableComponent(Position);
-      position.x += acceleration * delta;
-      position.y += acceleration * delta;
-      position.z += acceleration * delta;
-    });
-  }
-}
+      // Define a query of entities that have "Acceleration" and "Position" components
+      RendererSystem.queries = {
+        boxes: { components: [Box, Position] },
+        circles: { components: [Circle, Position] },
+      }
+      
+      // Create world and register the systems on it
+      var world = new World();
+      world
+        .registerSystem(MovableSystem)
+        .registerSystem(RendererSystem);
 
-// Define a query of entities that have "Acceleration" and "Position" components
-System.queries = {
-  moving: {
-    components: [Acceleration, Position]
-  }
-}
+      for (let i = 0; i < NUM_ELEMENTS; i++) {
+        world
+          .createEntity()
+          .addComponent(Speed, {x: SPEED_MULTIPLIER * (2 * Math.random() - 1), y: SPEED_MULTIPLIER * (2 * Math.random() - 1)})
+          .addComponent(Math.random() >= 0.5 ? Circle : Box)
+          .addComponent(Position, { x: Math.random() * canvasWidth, y: Math.random() * canvasHeight});
+      }
+            
+      // Run!
+      function run() {
+        // Compute delta and elapsed time
+        var time = performance.now();
+        var delta = time - lastTime;
 
-// Initialize entities
-var entityA = world
-  .createEntity()
-  .addComponent(Position);
+        // Run all the systems
+        world.execute(delta, time);
 
-for (let i = 0; i < 10; i++) {
-  world
-    .createEntity();
-    .addComponent(Acceleration)
-    .addComponent(Position, { x: Math.random() * 10, y: Math.random() * 10, z: 0});
-}
+        lastTime = time;
+        requestAnimationFrame(run);
+      }
 
-// Run!
-function run() {
-  // Compute delta and elapsed time
-  var time = performance.now();
-  var delta = time - lastTime;
-
-  // Run all the systems
-  world.execute(delta, time);
-
-  lastTime = time;
-  requestAnimationFrame(animate);
-}
-
-var lastTime = performance.now();
-run();
+      var lastTime = performance.now();
+      run();      
+    </script>
+  </head>  
+  <body>
+    <canvas width="500" height="500"></canvas>
+  </body>
+</html>
 ```
+[Try it on glitch](https://glitch.com/~ecsy-boxes-and-circles)
+
 
 You can also include the hosted javascript directly on your HTML:
 
