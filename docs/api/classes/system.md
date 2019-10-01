@@ -3,6 +3,14 @@
 
 A system that manipulates entities in the world.
 
+## Properties
+
+###  enabled
+
+• **enabled**: *boolean*
+
+Whether the system will execute during the world tick.
+
 ## Methods
 
 ###  play

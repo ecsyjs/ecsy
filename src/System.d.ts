@@ -5,6 +5,10 @@ import {Component, ComponentConstructor} from "./Component";
  */
 export abstract class System {
   /**
+   * Whether the system will execute during the world tick.
+   */
+  enabled:boolean;
+  /**
    * Resume execution of this system.
    */
   play():void
