@@ -75,8 +75,8 @@ npm install --save ecsy
       // Components
       //----------------------
       
-      // Speed component
-      class Speed {
+      // Velocity component
+      class Velocity {
         constructor() {
           this.x = this.y = 0;
         }
@@ -109,10 +109,10 @@ npm install --save ecsy
         execute(delta, time) {
           // Iterate through all the entities on the query
           this.queries.moving.results.forEach(entity => {
-            var speed = entity.getComponent(Speed);
+            var velocity = entity.getComponent(Velocity);
             var position = entity.getMutableComponent(Position);
-            position.x += speed.x * delta;
-            position.y += speed.y * delta;
+            position.x += velocity.x * delta;
+            position.y += velocity.y * delta;
             
             if (position.x > canvasWidth + SHAPE_HALF_SIZE) position.x = - SHAPE_HALF_SIZE;
             if (position.x < - SHAPE_HALF_SIZE) position.x = canvasWidth + SHAPE_HALF_SIZE;
@@ -122,10 +122,10 @@ npm install --save ecsy
         }
       }
 
-      // Define a query of entities that have "Speed" and "Position" components
+      // Define a query of entities that have "Velocity" and "Position" components
       MovableSystem.queries = {
         moving: {
-          components: [Speed, Position]
+          components: [Velocity, Position]
         }
       }
 
@@ -170,7 +170,7 @@ npm install --save ecsy
         }
       }
 
-      // Define a query of entities that have "Acceleration" and "Position" components
+      // Define a query of entities that have "Renderable" and "Shape" components
       RendererSystem.queries = {
         renderables: { components: [Renderable, Shape] }
       }
@@ -182,7 +182,7 @@ npm install --save ecsy
         .registerSystem(RendererSystem);
 
       // Some helper functions when creating the components
-      function getRandomSpeed() {
+      function getRandomVelocity() {
         return {
           x: SPEED_MULTIPLIER * (2 * Math.random() - 1), 
           y: SPEED_MULTIPLIER * (2 * Math.random() - 1)
@@ -205,7 +205,7 @@ npm install --save ecsy
       for (let i = 0; i < NUM_ELEMENTS; i++) {
         world
           .createEntity()
-          .addComponent(Speed, getRandomSpeed())
+          .addComponent(Velocity, getRandomVelocity())
           .addComponent(Shape, getRandomShape())
           .addComponent(Position, getRandomPosition())
           .addComponent(Renderable)        
