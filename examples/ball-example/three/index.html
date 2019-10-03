@@ -156,9 +156,9 @@
     function animate() {
       var delta = clock.getDelta();
       var elapsedTime = clock.elapsedTime;
-      console.time('render');
+      //console.time('render');
       world.execute(delta, elapsedTime);
-      console.timeEnd('render');
+      //console.timeEnd('render');
 
       renderer.render( scene, camera );
     }

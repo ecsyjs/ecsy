@@ -45,7 +45,7 @@
       .content {
         padding: 20px;
       }
-      .sidebar a {
+      .sidebar span {
         display: block;
         margin-bottom: 10px;
       }
@@ -60,6 +60,9 @@
         width: 100%;
         height: 100%;
         overflow: auto;
+      }
+      span a {
+        display: inline;
       }
   </style>
   </head>
@@ -78,11 +81,11 @@
           <div style="text-align: center">
               <h1>ECSY</h1>
           </div>
-          <a href="ball-example/three/index.html" target="viewer">Three.js ball</a>
-          <a href="canvas/index.html" target="viewer">Intersecting circles</a>
-          <a href="circles-boxes/index.html" target="viewer">Circles and boxes</a>
-          <a href="factory/index.html" target="viewer">Factory</a>
-          <a href="systemstatecomponents/index.html" target="viewer">System State Components</a>
+          <span><a href="ball-example/three/index.html" target="viewer">Three.js ball</a> <a href="https://github.com/MozillaReality/ecsy/blob/dev/examples/ball-example/three/index.html" target="viewer">(source)</a></span>
+          <span><a href="canvas/index.html" target="viewer">Intersecting circles</a> <a href="https://github.com/MozillaReality/ecsy/blob/dev/examples/canvas/index.html" target="viewer">(source)</a></span>
+          <span><a href="circles-boxes/index.html" target="viewer">Circles and boxes</a> <a href="ball-example/three/index.html" target="viewer">(source)</a></span>
+          <span><a href="factory/index.html" target="viewer">Factory</a> <a href="ball-example/three/index.html" target="viewer">(source)</a></span>
+          <span><a href="systemstatecomponents/index.html" target="viewer">System State Components</a> <a href="https://github.com/MozillaReality/ecsy/blob/dev/examples/systemstatecomponents/index.html" target="viewer">(source)</a></span>
         </div>
       </div>
       <iframe id="viewer" name="viewer" allowfullscreen="" allowvr="" onmousewheel=""></iframe>
