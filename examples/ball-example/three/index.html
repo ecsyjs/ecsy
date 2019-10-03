@@ -17,38 +17,12 @@
   </head>
   <body>
   </body>
-  <script>
-    var ENGINE = {
-      setObjectMaterialColor: function (object, r, g, b) {
-        object.material.color.setRGB(r, g, b);
-      },
-      setObjectScale: function (object, value) {
-        object.scale.set(value, value, value);
-      },
-      objectsColliding: (function () {
-        let ballWorldPos = new THREE.Vector3();
-        return function (objectA, objectB) {
-          objectA.geometry.computeBoundingSphere();
-          objectB.geometry.computeBoundingSphere();
-
-          ballWorldPos = objectA.getWorldPosition(ballWorldPos);
-
-          let radius = objectA.geometry.boundingSphere.radius;
-          let bsphere = objectB.geometry.boundingSphere;
-          let radiusSum = bsphere.radius + radius;
-
-          return objectB.position.distanceToSquared(ballWorldPos) <= radiusSum * radiusSum;
-        }
-      })()
-    };
-  </script>
   <script type="module">
     import {World} from '../../../build/ecsy.module.js';
     import {Object3D, Collidable, Collider, Recovering, Moving, PulsatingScale, Timeout, PulsatingColor, Colliding, Rotating} from './components.mjs';
     import {RotatingSystem, ColliderSystem, PulsatingColorSystem, PulsatingScaleSystem, MovingSystem,TimeoutSystem} from './systems.mjs';
 
     var world = new World();
-    window.world = world;
 
     world
       .registerSystem(RotatingSystem)
@@ -127,7 +101,6 @@
       var directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
       directionalLight.position.set( 1, 1, 0.5 ).normalize();
       scene.add( directionalLight );
-
 
       var geometry = new THREE.BoxBufferGeometry( size, size, size );
 
