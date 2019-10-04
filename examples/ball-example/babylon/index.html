@@ -56,7 +56,7 @@
 
   var objMoving, states;
 	function init() {
-    var numObjects = 1000;
+    var numObjects = 5000;
     var size = 0.2;
     var w = 100;
 
@@ -85,10 +85,16 @@
 
     states = [];
 
+    var rootMesh = BABYLON.MeshBuilder.CreateBox('box',{size: size}, scene);
+    rootMesh.setEnabled(false);
+
+    BABYLON.StandardMaterial.texturesEnabled = false;
+
     for (var i = 0;i < numObjects; i++) {
       var entity = world.entityManager.createEntity();
 
-      var mesh = BABYLON.MeshBuilder.CreateBox('box',{size: size}, scene);
+      var mesh = rootMesh.clone('box');
+      mesh.alwaysSelectAsActiveMesh = true;
       mesh.position.copyFrom(randomSpherePoint(radius));
 
       var material = new BABYLON.StandardMaterial("material", scene);
@@ -111,10 +117,14 @@
 
       if (Math.random() > 0.5) {
         entity.addComponent(Moving, {offset: i});
+      } else {
+        mesh.freezeWorldMatrix();
       }
 
       entity.addComponent(Collisionable);
     }
+
+    scene.freezeActiveMeshes();
 
     window.addEventListener( 'resize', () => engine.resize());
     var lastTime = performance.now();
