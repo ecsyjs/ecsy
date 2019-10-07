@@ -90,7 +90,7 @@ class PositionLogSystem extends System {
 }
 
 // Define a query of entities that have the "Position" component
-System.queries = {
+PositionLogSystem.queries = {
   position: {
     components: [Position]
   }
@@ -128,7 +128,7 @@ Please note that we are accessing components on an entity by calling:
 
 ```javascript
 // Define a query of entities that have "Acceleration" and "Position" components
-System.queries = {
+MovableSystem.queries = {
   moving: {
     components: [Acceleration, Position]
   }
@@ -184,7 +184,7 @@ run();
 
 ## Putting everything together
 ```javascript
-import {World, System} from 'ecsy';
+import { World, System } from 'ecsy';
 
 // Acceleration component
 class Acceleration {
@@ -202,27 +202,13 @@ class Position {
   }
 }
 
-// Create world
-let world = new World();
-
-let entityA = world
-  .createEntity()
-  .addComponent(Position);
-
-for (let i = 0; i < 10; i++) {
-  world
-    .createEntity()
-    .addComponent(Acceleration)
-    .addComponent(Position, { x: Math.random() * 10, y: Math.random() * 10, z: 0});
-}
-
 // Systems
 class MovableSystem extends System {
-  init() { // Do whatever you need here }
+  init() { /* Do whatever you need here */ }
   // This method will get called on every frame by default
   execute(delta, time) {
     // Iterate through all the entities on the query
-    this.queries.moving.forEach(entity => {
+    this.queries.moving.results.forEach(entity => {
       let acceleration = entity.getComponent(Acceleration).value;
       let position = entity.getMutableComponent(Position);
       position.x += acceleration * delta;
@@ -233,17 +219,25 @@ class MovableSystem extends System {
 }
 
 // Define a query of entities that have "Acceleration" and "Position" components
-System.queries = {
+MovableSystem.queries = {
   moving: {
     components: [Acceleration, Position]
   }
 }
 
-// Initialize entities
+// Create world
+let world = new World();
+
+// Register system
+world
+  .registerSystem(MovableSystem)
+
+// Initialize unmoving entity
 let entityA = world
   .createEntity()
   .addComponent(Position);
 
+// Initialize moving entities
 for (let i = 0; i < 10; i++) {
   world
     .createEntity()
@@ -262,7 +256,7 @@ function run() {
   world.execute(delta, time);
 
   lastTime = time;
-  requestAnimationFrame(animate);
+  requestAnimationFrame(run);
 }
 
 run();
