@@ -5,18 +5,33 @@ import {Component, ComponentConstructor} from "./Component";
  */
 export abstract class System {
   /**
+   * Defines what Components the System will query for.
+   * This needs to be user defined.
+  */
+  static queries: {
+    [queryName: string]: Component[],
+  };
+  /**
    * Whether the system will execute during the world tick.
    */
-  enabled:boolean;
+  enabled: boolean;
   /**
    * Resume execution of this system.
    */
-  play():void
+  play(): void;
 
   /**
    * Stop execution of this system.
    */
-  stop():void
+  stop(): void;
+
+  /**
+   * This function is called for each run of world.
+   * All of the `queries` defined on the class are available here.
+   * @param delta
+   * @param time
+   */
+  abstract execute(delta: number, time: number): void;
 }
 
 export interface SystemConstructor<T extends System> {
