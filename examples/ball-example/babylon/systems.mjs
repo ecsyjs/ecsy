@@ -42,10 +42,10 @@ export class PulsatingColorSystem extends System {
       let entity = entities[i];
       let object = entity.getComponent(Object3D).object;
       if (entity.hasComponent(Colliding)) {
-        object.material.diffuseColor.set(1, 1, 0);
+        object.instancedBuffers.color.set(1, 1, 0, 1);
       } else if (entity.hasComponent(Recovering)) {
         let col = 0.3 + entity.getComponent(Timeout).timer / TIMER_TIME;
-        object.material.diffuseColor.set(col, col, 0);
+        object.instancedBuffers.color.set(col, col, 0, 1);
       } else {
         let r =
           Math.sin(
@@ -53,7 +53,7 @@ export class PulsatingColorSystem extends System {
           ) /
             2 +
           0.5;
-        object.material.diffuseColor.set(r, 0, 0);
+        object.instancedBuffers.color.set(r, 0, 0, 1);
       }
     }
   }
