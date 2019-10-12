@@ -22,7 +22,17 @@ This needs to be user defined.
 
 #### Type declaration:
 
-* \[ **queryName**: *string*\]: [Component](component.md)[]
+* \[ **queryName**: *string*\]: object
+
+* **components**: *[Component](component.md) | [NotComponent](../interfaces/notcomponent.md)[]*
+
+* **listen**(): *object*
+
+  * **added**? : *Boolean*
+
+  * **changed**? : *Boolean | [Component](component.md)[]*
+
+  * **removed**? : *Boolean*
 
 ## Methods
 
