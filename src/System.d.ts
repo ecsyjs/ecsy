@@ -1,5 +1,6 @@
 import {Component, ComponentConstructor} from "./Component";
 
+
 /**
  * A system that manipulates entities in the world.
  */
@@ -9,7 +10,14 @@ export abstract class System {
    * This needs to be user defined.
   */
   static queries: {
-    [queryName: string]: Component[],
+    [queryName: string]: {
+      components: (Component | NotComponent)[],
+      listen?: {
+        added?: Boolean,
+        removed?: Boolean,
+        changed?: Boolean | Component[],
+      },
+    }
   };
   /**
    * Whether the system will execute during the world tick.
@@ -38,7 +46,12 @@ export interface SystemConstructor<T extends System> {
   new (...args: any): T;
 }
 
+export interface NotComponent {
+  type: "not",
+  Component: Component,
+}
+
 /**
  * Use the Not class to negate a component query.
  */
-export function Not<T>(Component:ComponentConstructor<T>):object
+export function Not<T>(Component:ComponentConstructor<T>): NotComponent;

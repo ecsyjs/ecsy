@@ -5,7 +5,7 @@
 
 ###  Not
 
-▸ **Not**<**T**>(`Component`: [ComponentConstructor](interfaces/componentconstructor.md)‹T›): *object*
+▸ **Not**<**T**>(`Component`: [ComponentConstructor](interfaces/componentconstructor.md)‹T›): *[NotComponent](interfaces/notcomponent.md)*
 
 Use the Not class to negate a component query.
 
@@ -19,7 +19,7 @@ Name | Type |
 ------ | ------ |
 `Component` | [ComponentConstructor](interfaces/componentconstructor.md)‹T› |
 
-**Returns:** *object*
+**Returns:** *[NotComponent](interfaces/notcomponent.md)*
 
 ___
 
