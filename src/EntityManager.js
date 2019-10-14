@@ -205,7 +205,7 @@ export class EntityManager {
         var component = entity._componentsToRemove[componentName];
         delete entity._componentsToRemove[componentName];
         this.componentsManager._componentPool[propName].release(component);
-        //this.world.componentsManager.componentRemovedFromEntity(Component);
+        this.world.componentsManager.componentRemovedFromEntity(Component);
 
         //this._entityRemoveComponentSync(entity, Component, index);
       }
