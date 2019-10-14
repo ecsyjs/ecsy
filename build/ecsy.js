@@ -422,6 +422,7 @@
 	    this.freeList = [];
 	    this.count = 0;
 	    this.T = T;
+	    this.isObjectPool = true;
 
 	    var extraArgs = null;
 	    if (arguments.length > 1) {
@@ -790,7 +791,7 @@
 	        var component = entity._componentsToRemove[componentName];
 	        delete entity._componentsToRemove[componentName];
 	        this.componentsManager._componentPool[propName].release(component);
-	        //this.world.componentsManager.componentRemovedFromEntity(Component);
+	        this.world.componentsManager.componentRemovedFromEntity(Component);
 
 	        //this._entityRemoveComponentSync(entity, Component, index);
 	      }
@@ -849,6 +850,7 @@
 
 	class DummyObjectPool {
 	  constructor(T) {
+	    this.isDummyObjectPool = true;
 	    this.count = 0;
 	    this.used = 0;
 	    this.T = T;
@@ -1131,30 +1133,17 @@
 	      queries: {}
 	    };
 
-	    /*
-	    if (this.config) {
-	      var queries = this.queries;
+	    if (this.constructor.queries) {
+	      var queries = this.constructor.queries;
 	      for (let queryName in queries) {
 	        let query = queries[queryName];
 	        json.queries[queryName] = {
 	          key: this._queries[queryName].key
 	        };
-	        if (query.events) {
-	          let events = (json.queries[queryName]["events"] = {});
-	          for (let eventName in query.events) {
-	            let event = query.events[eventName];
-	            events[eventName] = {
-	              eventName: event.event,
-	              numEntities: this.events[queryName][eventName].length
-	            };
-	            if (event.components) {
-	              events[eventName].components = event.components.map(c => c.name);
-	            }
-	          }
-	        }
+
+	        json.queries[queryName].mandatory = query.mandatory === true;
 	      }
 	    }
-	*/
 
 	    return json;
 	  }
