@@ -1,5 +1,8 @@
+import { TypeDefinition } from "./CreateType";
+
 export interface Types {
-  Number:object;
-  Boolean:object;
-  String:object;
+  Number: TypeDefinition<number>;
+  Boolean: TypeDefinition<boolean>;
+  String: TypeDefinition<string>;
+  Array: TypeDefinition<any[]>
 }

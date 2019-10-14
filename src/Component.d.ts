@@ -1,7 +1,13 @@
+import { ComponentSchema } from "./CreateType";
 /**
  * Base class for components.
  */
-export abstract class Component {}
+export class Component {
+  schema?: ComponentSchema
+  copy(src: Component): void
+  reset(): void
+  clear(): void
+}
 
 export interface ComponentConstructor<T extends Component> {
   new (...args: any): T;
