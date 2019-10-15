@@ -1,5 +1,5 @@
 import {Component, ComponentConstructor} from "./Component";
-
+import { Entity } from "./Entity";
 
 /**
  * A system that manipulates entities in the world.
@@ -19,6 +19,19 @@ export abstract class System {
       },
     }
   };
+
+  /**
+   * The results of the queries.
+   * Should be used inside of execute.
+   */
+  queries: {
+    [queryName: string]: {
+      results: Entity[],
+      added?: Entity[],
+      removed?: Entity[],
+      changed?: Entity[],
+    }
+  }
   /**
    * Whether the system will execute during the world tick.
    */

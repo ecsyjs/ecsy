@@ -13,6 +13,27 @@ Whether the system will execute during the world tick.
 
 ___
 
+###  queries
+
+• **queries**: *object*
+
+The results of the queries.
+Should be used inside of execute.
+
+#### Type declaration:
+
+* \[ **queryName**: *string*\]: object
+
+* **added**? : *[Entity](entity.md)[]*
+
+* **changed**? : *[Entity](entity.md)[]*
+
+* **removed**? : *[Entity](entity.md)[]*
+
+* **results**: *[Entity](entity.md)[]*
+
+___
+
 ### `Static` queries
 
 ▪ **queries**: *object*
