@@ -32,7 +32,7 @@ For detailed information on the architecture and API please visit the [documenta
   - babylon: https://ecsy.io/examples/ball-example/babylon
 - 2D Canvas https://ecsy.io/examples/canvas
 - Factory pattern with `Not` operator: https://ecsy.io/examples/factory
-- System state component example: https://ecsy.io/examples/systemstate
+- System state component example: https://ecsy.io/examples/systemstatecomponents
 
 # Usage
 
