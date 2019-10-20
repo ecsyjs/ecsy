@@ -8,7 +8,7 @@ export abstract class System {
   /**
    * Defines what Components the System will query for.
    * This needs to be user defined.
-  */
+   */
   static queries: {
     [queryName: string]: {
       components: (Component | NotComponent)[],
