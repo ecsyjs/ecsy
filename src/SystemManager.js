@@ -3,6 +3,7 @@ export class SystemManager {
     this._systems = [];
     this._executeSystems = []; // Systems that have `execute` method
     this.world = world;
+    this.lastExecutedSystem = null;
   }
 
   registerSystem(System, attributes) {
@@ -36,17 +37,22 @@ export class SystemManager {
     this._systems.splice(index, 1);
   }
 
-  execute(delta, time) {
-    this._executeSystems.forEach(system => {
-      if (system.enabled && system.initialized) {
-        if (system.canExecute()) {
-          let startTime = performance.now();
-          system.execute(delta, time);
-          system.executeTime = performance.now() - startTime;
-        }
-        system.clearEvents();
+  executeSystem(system, delta, time) {
+    if (system.initialized) {
+      if (system.canExecute()) {
+        let startTime = performance.now();
+        system.execute(delta, time);
+        system.executeTime = performance.now() - startTime;
       }
-    });
+      this.lastExecutedSystem = system;
+      system.clearEvents();
+    }
+  }
+
+  execute(delta, time) {
+    this._executeSystems.forEach(
+      system => system.enabled && this.executeSystem(system, delta, time)
+    );
   }
 
   stats() {
