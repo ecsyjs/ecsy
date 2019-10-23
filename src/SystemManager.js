@@ -49,9 +49,10 @@ export class SystemManager {
     }
   }
 
-  execute(delta, time) {
+  execute(delta, time, forcePlay) {
     this._executeSystems.forEach(
-      system => system.enabled && this.executeSystem(system, delta, time)
+      system =>
+        (forcePlay || system.enabled) && this.executeSystem(system, delta, time)
     );
   }
 
