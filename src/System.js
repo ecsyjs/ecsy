@@ -136,6 +136,7 @@ export class System {
   }
 
   stop() {
+    this.executeTime = 0;
     this.enabled = false;
   }
 
