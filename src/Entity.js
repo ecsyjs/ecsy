@@ -32,8 +32,10 @@ export default class Entity {
 
   // COMPONENTS
 
-  getComponent(Component) {
-    var component = this._components[Component.name];
+  getComponent(Component, includeRemoved) {
+    var component =
+      this._components[Component.name] ||
+      (includeRemoved && this._componentsToRemove[Component.name]);
     return DEBUG ? wrapImmutableComponent(Component, component) : component;
   }
 
@@ -79,8 +81,11 @@ export default class Entity {
     return this;
   }
 
-  hasComponent(Component) {
-    return !!~this._ComponentTypes.indexOf(Component);
+  hasComponent(Component, includeRemoved) {
+    return (
+      !!~this._ComponentTypes.indexOf(Component) ||
+      (includeRemoved && this.hasRemovedComponent(Component))
+    );
   }
 
   hasRemovedComponent(Component) {
