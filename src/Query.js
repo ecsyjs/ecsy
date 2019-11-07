@@ -78,6 +78,18 @@ export default class Query {
     );
   }
 
+  toJSON() {
+    return {
+      key: this.key,
+      reactive: this.reactive,
+      components: {
+        included: this.Components.map(C => C.name),
+        not: this.NotComponents.map(C => C.name)
+      },
+      numEntities: this.entities.length
+    };
+  }
+
   /**
    * Return stats for this query
    */
