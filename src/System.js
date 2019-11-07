@@ -26,6 +26,7 @@ export class System {
 
     // Used for stats
     this.executeTime = 0;
+    this.prevReactiveLists = {};
 
     if (attributes && attributes.priority) {
       this.priority = attributes.priority;
@@ -148,10 +149,17 @@ export class System {
   clearEvents() {
     for (let queryName in this.queries) {
       var query = this.queries[queryName];
-      if (query.added) query.added.length = 0;
-      if (query.removed) query.removed.length = 0;
+      if (query.added) {
+        this.prevReactiveLists.added = query.added.length;
+        query.added.length = 0;
+      }
+      if (query.removed) {
+        this.prevReactiveLists.removed = query.removed.length;
+        query.removed.length = 0;
+      }
       if (query.changed) {
         if (Array.isArray(query.changed)) {
+          this.prevReactiveLists.changed = query.changed.length;
           query.changed.length = 0;
         } else {
           for (let name in query.changed) {
@@ -174,12 +182,32 @@ export class System {
     if (this.constructor.queries) {
       var queries = this.constructor.queries;
       for (let queryName in queries) {
-        let query = queries[queryName];
-        json.queries[queryName] = {
+        let query = this.queries[queryName];
+        let queryDefinition = queries[queryName];
+        let jsonQuery = (json.queries[queryName] = {
           key: this._queries[queryName].key
-        };
+        });
 
-        json.queries[queryName].mandatory = query.mandatory === true;
+        jsonQuery.mandatory = queryDefinition.mandatory === true;
+        jsonQuery.reactive =
+          queryDefinition.listen &&
+          (queryDefinition.listen.added === true ||
+            queryDefinition.listen.removed === true ||
+            queryDefinition.listen.changed === true ||
+            isArray(queryDefinition.listen.changed));
+
+        if (jsonQuery.reactive) {
+          jsonQuery.listen = {};
+
+          const methods = ["added", "removed", "changed"];
+          methods.forEach(method => {
+            if (query[method]) {
+              jsonQuery.listen[method] = {
+                entities: this.prevReactiveLists[method]
+              };
+            }
+          });
+        }
       }
     }
 
