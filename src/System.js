@@ -26,7 +26,6 @@ export class System {
 
     // Used for stats
     this.executeTime = 0;
-    this.prevReactiveLists = {};
 
     if (attributes && attributes.priority) {
       this.priority = attributes.priority;
@@ -150,16 +149,13 @@ export class System {
     for (let queryName in this.queries) {
       var query = this.queries[queryName];
       if (query.added) {
-        this.prevReactiveLists.added = query.added.length;
         query.added.length = 0;
       }
       if (query.removed) {
-        this.prevReactiveLists.removed = query.removed.length;
         query.removed.length = 0;
       }
       if (query.changed) {
         if (Array.isArray(query.changed)) {
-          this.prevReactiveLists.changed = query.changed.length;
           query.changed.length = 0;
         } else {
           for (let name in query.changed) {
@@ -194,7 +190,7 @@ export class System {
           (queryDefinition.listen.added === true ||
             queryDefinition.listen.removed === true ||
             queryDefinition.listen.changed === true ||
-            isArray(queryDefinition.listen.changed));
+            Array.isArray(queryDefinition.listen.changed));
 
         if (jsonQuery.reactive) {
           jsonQuery.listen = {};
@@ -203,7 +199,7 @@ export class System {
           methods.forEach(method => {
             if (query[method]) {
               jsonQuery.listen[method] = {
-                entities: this.prevReactiveLists[method]
+                entities: query[method].length
               };
             }
           });
