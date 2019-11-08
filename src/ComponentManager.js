@@ -16,10 +16,10 @@ export class ComponentManager {
 
   componentAddedToEntity(Component) {
     if (!this.numComponents[Component.name]) {
-      this.numComponents[Component.name] = 1;
-    } else {
-      this.numComponents[Component.name]++;
+      this.registerComponent(Component);
     }
+
+    this.numComponents[Component.name]++;
   }
 
   componentRemovedFromEntity(Component) {
