@@ -24,6 +24,7 @@ export class EntityManager {
     // Deferred deletion
     this.entitiesWithComponentsToRemove = [];
     this.entitiesToRemove = [];
+    this.deferredRemovalEnabled = true;
 
     this.numStateComponents = 0;
   }
@@ -188,6 +189,10 @@ export class EntityManager {
   }
 
   processDeferredRemoval() {
+    if (!this.deferredRemovalEnabled) {
+      return;
+    }
+
     for (let i = 0; i < this.entitiesToRemove.length; i++) {
       let entity = this.entitiesToRemove[i];
       let index = this._entities.indexOf(entity);
