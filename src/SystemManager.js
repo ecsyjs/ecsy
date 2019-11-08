@@ -7,6 +7,13 @@ export class SystemManager {
   }
 
   registerSystem(System, attributes) {
+    if (
+      this._systems.find(s => s.constructor.name === System.name) !== undefined
+    ) {
+      console.warn(`System '${System.name}' already registered.`);
+      return this;
+    }
+
     var system = new System(this.world, attributes);
     if (system.init) system.init();
     system.order = this._systems.length;
