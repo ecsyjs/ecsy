@@ -10,12 +10,17 @@ export class ComponentManager {
   }
 
   registerComponent(Component) {
+    if (this.Components[Component.name]) {
+      console.warn(`Component type: '${Component.name}' already registered.`);
+      return;
+    }
+
     this.Components[Component.name] = Component;
     this.numComponents[Component.name] = 0;
   }
 
   componentAddedToEntity(Component) {
-    if (!this.numComponents[Component.name]) {
+    if (!this.Components[Component.name]) {
       this.registerComponent(Component);
     }
 
