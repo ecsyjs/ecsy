@@ -84,7 +84,7 @@ export default class Entity {
   hasComponent(Component, includeRemoved) {
     return (
       !!~this._ComponentTypes.indexOf(Component) ||
-      (includeRemoved && this.hasRemovedComponent(Component))
+      (includeRemoved === true && this.hasRemovedComponent(Component))
     );
   }
 
