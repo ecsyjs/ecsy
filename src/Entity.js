@@ -35,7 +35,7 @@ export default class Entity {
   getComponent(Component, includeRemoved) {
     var component =
       this._components[Component.name] ||
-      (includeRemoved && this._componentsToRemove[Component.name]);
+      (includeRemoved === true && this._componentsToRemove[Component.name]);
     return DEBUG ? wrapImmutableComponent(Component, component) : component;
   }
 
