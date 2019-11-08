@@ -1,4 +1,3 @@
-export class Component {
-}
+export class Component {}
 
 Component.isComponent = true;

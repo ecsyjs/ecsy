@@ -14,7 +14,9 @@ export class World {
     this.eventQueues = {};
 
     if (typeof CustomEvent !== "undefined") {
-      var event = new CustomEvent("ecsy-world-created", { detail: { world: this, version: Version }});
+      var event = new CustomEvent("ecsy-world-created", {
+        detail: { world: this, version: Version }
+      });
       window.dispatchEvent(event);
     }
   }
