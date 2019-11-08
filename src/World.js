@@ -1,6 +1,7 @@
 import { SystemManager } from "./SystemManager.js";
 import { EntityManager } from "./EntityManager.js";
 import { ComponentManager } from "./ComponentManager.js";
+import { Version } from "./Version.js";
 
 export class World {
   constructor() {
@@ -13,7 +14,7 @@ export class World {
     this.eventQueues = {};
 
     if (typeof CustomEvent !== "undefined") {
-      var event = new CustomEvent("ecsy-world-created", { detail: this });
+      var event = new CustomEvent("ecsy-world-created", { detail: { world: this, version: Version }});
       window.dispatchEvent(event);
     }
   }
