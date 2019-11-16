@@ -34,10 +34,5 @@ export function queryKey(Components) {
     }
   }
 
-  return names
-    .map(function(x) {
-      return x.toLowerCase();
-    })
-    .sort()
-    .join("-");
+  return names.sort().join("-");
 }
