@@ -56,6 +56,10 @@ export class SystemManager {
     }
   }
 
+  stop() {
+    this._executeSystems.forEach(system => system.stop());
+  }
+
   execute(delta, time, forcePlay) {
     this._executeSystems.forEach(
       system =>
