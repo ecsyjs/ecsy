@@ -1,13 +1,42 @@
 /* global Peer */
+function generateId(length) {
+  var result = "";
+  var characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  var charactersLength = characters.length;
+  for (var i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result.toUpperCase();
+}
+
+function log(msg) {
+  //console.log(msg);
+}
+
 export function enableRemoteDevtools() {
+  window.generateNewCode = () => {
+    window.localStorage.clear();
+    remoteId = generateId(6);
+    window.localStorage.setItem("ecsyRemoteId", remoteId);
+    window.location.reload(false);
+  };
+
+  let remoteId = window.localStorage.getItem("ecsyRemoteId");
+  if (!remoteId) {
+    remoteId = generateId(6);
+    window.localStorage.setItem("ecsyRemoteId", remoteId);
+  }
+
   let infoDiv = document.createElement("div");
   infoDiv.style.cssText = `
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: 25px;
-    opacity: 0.8;
+    height: 40px;
+    opacity: 0.9;
+    font-size: 1.1em;
     color: #fff;
     display:flex;
     align-items: center;
@@ -15,10 +44,11 @@ export function enableRemoteDevtools() {
     font-family: Arial;
     text-align: center;
     background-color: #333`;
-  let code = "ED23";
-  infoDiv.innerHTML = `Open ECSY devtools and use the code "<b>${code}</b>" to connect to this page`;
+
+  infoDiv.innerHTML = `Open ECSY devtools to connect to this page using the code: "<b>${remoteId}</b>"&nbsp;<button onClick="generateNewCode()">Generate new code</button>`;
   document.body.appendChild(infoDiv);
-  window.__ECSY_REMOVE_DEVTOOLS_INJECTED = true;
+  window.__ECSY_REMOTE_DEVTOOLS_INJECTED = true;
+  window.__ECSY_REMOTE_DEVTOOLS = {};
 
   ////////////
   let Version = "";
@@ -26,29 +56,30 @@ export function enableRemoteDevtools() {
   let onWorldCreated = e => {
     var world = e.detail.world;
     Version = e.detail.version;
-    console.log("World created before", world);
+    log("World created before", world);
     worldsBeforeLoading.push(world);
   };
 
   window.addEventListener("ecsy-world-created", onWorldCreated);
 
   var script = document.createElement("script");
+  // @todo Use link to the ecsy-devtools repo?
   script.src = "https://cdn.jsdelivr.net/npm/peerjs@0.3.20/dist/peer.min.js";
   script.onload = () => {
-    const urlParams = new URLSearchParams(window.location.search);
-
-    let id = urlParams.get("remoteId");
-    id = "ED23";
-    var peer = new Peer(id);
+    var peer = new Peer(remoteId);
     peer.on("open", id => {
-      console.log("My peer ID is: " + id);
-
+      log("My peer ID is: " + id);
       peer.on("connection", conn => {
-        window.conn = conn;
+        log("On connection");
+        window.__ECSY_REMOTE_DEVTOOLS.connection = conn;
+
         conn.on("open", function() {
+          log("On open");
           infoDiv.style.visibility = "hidden";
+
           // Receive messages
           conn.on("data", function(data) {
+            log("On data");
             if (data.type === "init") {
               var script = document.createElement("script");
               script.textContent = data.script;
@@ -101,12 +132,16 @@ export function enableRemoteDevtools() {
               }
             }
           });
-
-          // Send messages
-          //conn.send("Hello!");
         });
       });
     });
   };
   (document.head || document.documentElement).appendChild(script);
+}
+
+const urlParams = new URLSearchParams(window.location.search);
+
+// @todo Provide a way to disable it if needed
+if (urlParams.has("enableRemoteDevtools")) {
+  enableRemoteDevtools();
 }
