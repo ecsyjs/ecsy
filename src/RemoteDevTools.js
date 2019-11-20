@@ -14,7 +14,7 @@ function log(msg) {
   //console.log(msg);
 }
 
-export function enableRemoteDevtools() {
+export function enableRemoteDevtools(remoteId) {
   window.generateNewCode = () => {
     window.localStorage.clear();
     remoteId = generateId(6);
@@ -22,7 +22,7 @@ export function enableRemoteDevtools() {
     window.location.reload(false);
   };
 
-  let remoteId = window.localStorage.getItem("ecsyRemoteId");
+  remoteId = remoteId || window.localStorage.getItem("ecsyRemoteId");
   if (!remoteId) {
     remoteId = generateId(6);
     window.localStorage.setItem("ecsyRemoteId", remoteId);
@@ -45,7 +45,7 @@ export function enableRemoteDevtools() {
     text-align: center;
     background-color: #333`;
 
-  infoDiv.innerHTML = `Open ECSY devtools to connect to this page using the code: "<b>${remoteId}</b>"&nbsp;<button onClick="generateNewCode()">Generate new code</button>`;
+  infoDiv.innerHTML = `Open ECSY devtools to connect to this page using the code:&nbsp;<b>${remoteId}</b>&nbsp;<button onClick="generateNewCode()">Generate new code</button>`;
   document.body.appendChild(infoDiv);
   window.__ECSY_REMOTE_DEVTOOLS_INJECTED = true;
   window.__ECSY_REMOTE_DEVTOOLS = {};
