@@ -19,6 +19,8 @@ export class World {
       });
       window.dispatchEvent(event);
     }
+
+    this.lastTime = performance.now();
   }
 
   registerComponent(Component) {
@@ -40,6 +42,12 @@ export class World {
   }
 
   execute(delta, time) {
+    if (!delta) {
+      let time = performance.now();
+      delta = time - this.lastTime;
+      this.lastTime = time;
+    }
+
     if (this.enabled) {
       this.systemManager.execute(delta, time);
       this.entityManager.processDeferredRemoval();

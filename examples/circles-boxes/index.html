@@ -14,7 +14,9 @@
   </head>
   <body>
     <script type="module">
-      import { World, System, TagComponent } from '../../build/ecsy.module.js';
+      import { enableRemoteDevtools, World, System, TagComponent } from '../../build/ecsy.module.js';
+
+      enableRemoteDevtools();
 
       const NUM_ELEMENTS = 600;
       const SPEED_MULTIPLIER = 0.1;
@@ -130,7 +132,13 @@
 
       // Define a query of entities that have "Renderable" and "Shape" components
       RendererSystem.queries = {
-        renderables: { components: [Renderable, Shape] }
+        renderables: {
+          components: [Renderable, Shape],
+          listen: {
+            added: true,
+            removed: true
+          }
+        }
       }
       
       // Create world and register the systems on it
@@ -184,6 +192,8 @@
 
       var lastTime = performance.now();
       run();
+      window.world = world;
+      window.MovableSystem = MovableSystem;
     </script>
     <canvas></canvas>
   </body>
