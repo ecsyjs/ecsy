@@ -1,3 +1,4 @@
+import "../helpers/common.js";
 import test from "ava";
 import { World } from "../../src/index.js";
 import { FooComponent, BarComponent } from "../helpers/components";
