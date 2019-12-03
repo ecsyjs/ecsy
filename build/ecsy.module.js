@@ -1018,11 +1018,12 @@ var devDependencies = {
 	"babel-eslint": "^10.0.3",
 	"babel-loader": "^8.0.6",
 	concurrently: "^4.1.2",
-	"docsify-cli": "^4.3.0",
+	"docsify-cli": "^4.4.0",
 	eslint: "^5.16.0",
 	"eslint-config-prettier": "^4.3.0",
 	"eslint-plugin-prettier": "^3.1.1",
 	"http-server": "^0.11.1",
+<<<<<<< HEAD
 	nodemon: "^1.19.2",
 	prettier: "^1.18.2",
 <<<<<<< HEAD
@@ -1030,11 +1031,16 @@ var devDependencies = {
 =======
 	rollup: "^1.21.4",
 >>>>>>> Bump dist
+=======
+	nodemon: "^1.19.4",
+	prettier: "^1.19.1",
+	rollup: "^1.27.8",
+>>>>>>> Upgrade dep
 	"rollup-plugin-json": "^4.0.0",
 	"rollup-plugin-terser": "^5.1.2",
-	typedoc: "^0.15.0",
-	"typedoc-plugin-markdown": "^2.2.6",
-	typescript: "^3.6.3"
+	typedoc: "^0.15.3",
+	"typedoc-plugin-markdown": "^2.2.11",
+	typescript: "^3.7.2"
 };
 var pjson = {
 	name: name,
