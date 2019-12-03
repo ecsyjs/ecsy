@@ -52,9 +52,9 @@ export class SystemManager {
         let startTime = performance.now();
         system.execute(delta, time);
         system.executeTime = performance.now() - startTime;
+        this.lastExecutedSystem = system;
+        system.clearEvents();
       }
-      this.lastExecutedSystem = system;
-      system.clearEvents();
     }
   }
 
