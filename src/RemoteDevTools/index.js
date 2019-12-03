@@ -1,14 +1,5 @@
 /* global Peer */
-// @todo Modularize
-function generateId(length) {
-  var result = "";
-  var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  var charactersLength = characters.length;
-  for (var i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-}
+import { generateId, injectScript } from "./utils.js";
 
 function hookConsoleAndErrors(connection) {
   var wrapFunctions = ["error", "warning", "log"];
@@ -60,14 +51,6 @@ function includeRemoteIdHTML(remoteId) {
   document.body.appendChild(infoDiv);
 
   return infoDiv;
-}
-
-function injectScript(src, onLoad) {
-  var script = document.createElement("script");
-  // @todo Use link to the ecsy-devtools repo?
-  script.src = src;
-  script.onload = onLoad;
-  (document.head || document.documentElement).appendChild(script);
 }
 
 export function enableRemoteDevtools(remoteId) {
