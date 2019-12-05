@@ -27,10 +27,15 @@
       let canvasHeight = canvas.height = window.innerHeight;
       let ctx = canvas.getContext("2d");
 
+      window.addEventListener( 'resize', () => {
+        canvasWidth = canvas.width = window.innerWidth
+        canvasHeight = canvas.height = window.innerHeight;
+      }, false );
+
       //----------------------
       // Components
       //----------------------
-      
+
       // Velocity component
       class Velocity {
         constructor() {
@@ -44,21 +49,21 @@
           this.x = this.y = 0;
         }
       }
-      
+
       // Shape component
       class Shape {
         constructor() {
           this.primitive = 'box';
         }
       }
-      
+
       // Renderable component
       class Renderable extends TagComponent {}
-      
+
       //----------------------
       // Systems
       //----------------------
-      
+
       // MovableSystem
       class MovableSystem extends System {
         // This method will get called on every frame by default
@@ -69,7 +74,7 @@
             var position = entity.getMutableComponent(Position);
             position.x += velocity.x * delta;
             position.y += velocity.y * delta;
-            
+
             if (position.x > canvasWidth + SHAPE_HALF_SIZE) position.x = - SHAPE_HALF_SIZE;
             if (position.x < - SHAPE_HALF_SIZE) position.x = canvasWidth + SHAPE_HALF_SIZE;
             if (position.y > canvasHeight + SHAPE_HALF_SIZE) position.y = - SHAPE_HALF_SIZE;
@@ -89,12 +94,12 @@
       class RendererSystem extends System {
         // This method will get called on every frame by default
         execute(delta, time) {
-          
+
           ctx.globalAlpha = 1;
           ctx.fillStyle = "#ffffff";
           ctx.fillRect(0, 0, canvasWidth, canvasHeight);
           //ctx.globalAlpha = 0.6;
-          
+
           // Iterate through all the entities on the query
           this.queries.renderables.results.forEach(entity => {
             var shape = entity.getComponent(Shape);
