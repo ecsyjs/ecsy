@@ -96,7 +96,7 @@ export function enableRemoteDevtools(remoteId) {
           connection.on("data", function(data) {
             if (data.type === "init") {
               var script = document.createElement("script");
-              script.textContent = data.script;
+              script.setAttribute("type", "text/javascript");
               script.onload = () => {
                 script.parentNode.removeChild(script);
 
@@ -112,7 +112,9 @@ export function enableRemoteDevtools(remoteId) {
                   window.dispatchEvent(event);
                 });
               };
+              script.innerHTML = data.script;
               (document.head || document.documentElement).appendChild(script);
+              script.onload();
 
               hookConsoleAndErrors(connection);
             } else if (data.type === "executeScript") {
