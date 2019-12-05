@@ -38,7 +38,7 @@ export class CanvasContext {
 
 export class DemoSettings {
   constructor() {
-    this.speedMultiplier = 1;
+    this.speedMultiplier = 0.001;
   }
 }
 
