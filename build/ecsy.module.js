@@ -958,7 +958,7 @@ class ComponentManager {
 }
 
 var name = "ecsy";
-var version = "0.1.4";
+var version = "0.2.0";
 var description = "Entity Component System in JS";
 var main = "build/ecsy.js";
 var module = "build/ecsy.module.js";
