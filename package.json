@@ -56,6 +56,7 @@
   },
   "homepage": "https://github.com/fernandojsg/ecsy#readme",
   "devDependencies": {
+    "@rollup/plugin-typescript": "^2.1.0",
     "ava": "^1.4.1",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",

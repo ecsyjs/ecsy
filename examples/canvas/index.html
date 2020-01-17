@@ -14,8 +14,8 @@
   </head>
   <body>
     <script type="module">
-      import {World, System} from '../../build/ecsy.module.js';
-      import {Movement, Circle, CanvasContext, DemoSettings, Intersecting} from './components.js';
+      import {World} from '../../build/ecsy.module.js';
+      import {Movement, Circle, CanvasContext, DemoSettings, Intersecting, PerformanceСompensation} from './components.js';
       import {MovementSystem, Renderer, IntersectionSystem} from './systems.js';
       import {random} from './utils.js';
 
@@ -31,6 +31,7 @@
 
       // Used for singleton components
       var singletonEntity = world.createEntity()
+          .addComponent(PerformanceСompensation)
           .addComponent(CanvasContext)
           .addComponent(DemoSettings);
 
@@ -66,12 +67,15 @@
         canvasComponent.height = canvas.height = window.innerHeight;
       }, false );
 
+      const performanceСompensation = singletonEntity.getMutableComponent(PerformanceСompensation);
+
       var lastTime = performance.now();
       function update() {
         var time = performance.now();
-        var delta = time - lastTime;
+        performanceСompensation.delta = time - lastTime;
         lastTime = time;
-        world.execute(delta);
+
+        world.run();
         requestAnimationFrame(update);
       }
 

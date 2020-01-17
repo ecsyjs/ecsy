@@ -14,7 +14,7 @@
   </head>
   <body>
     <script type="module">
-      import { World, System, TagComponent } from '../../build/ecsy.module.js';
+      import { World, SystemBase } from '../../build/ecsy.module.js';
 
       const NUM_ELEMENTS = 600;
       const SPEED_MULTIPLIER = 0.1;
@@ -41,11 +41,19 @@
         constructor() {
           this.x = this.y = 0;
         }
+
+        reset() {
+          this.x = this.y = 0;
+        }
       }
 
       // Position component
       class Position {
         constructor() {
+          this.x = this.y = 0;
+        }
+
+        reset() {
           this.x = this.y = 0;
         }
       }
@@ -55,23 +63,42 @@
         constructor() {
           this.primitive = 'box';
         }
+
+        reset() {
+          this.primitive = 'box';
+        }
       }
 
       // Renderable component
-      class Renderable extends TagComponent {}
+      class Renderable {
+        reset() {}
+      }
+
+      class PerformanceСompensation {
+        constructor() {
+          this.delta = this.time = 0;
+        }
+
+        reset() {
+          this.delta = this.time = 0;
+        }
+      }
 
       //----------------------
       // Systems
       //----------------------
 
       // MovableSystem
-      class MovableSystem extends System {
+      class MovableSystem extends SystemBase {
         // This method will get called on every frame by default
-        execute(delta, time) {
+        run() {
+          var context = this.queries.context.results[0];
+          const delta = context.getComponent(PerformanceСompensation).delta;
           // Iterate through all the entities on the query
           this.queries.moving.results.forEach(entity => {
             var velocity = entity.getComponent(Velocity);
             var position = entity.getMutableComponent(Position);
+            
             position.x += velocity.x * delta;
             position.y += velocity.y * delta;
 
@@ -87,13 +114,14 @@
       MovableSystem.queries = {
         moving: {
           components: [Velocity, Position]
-        }
+        },
+        context: { components: [PerformanceСompensation], mandatory: true }
       }
 
       // RendererSystem
-      class RendererSystem extends System {
+      class RendererSystem extends SystemBase {
         // This method will get called on every frame by default
-        execute(delta, time) {
+        run() {
 
           ctx.globalAlpha = 1;
           ctx.fillStyle = "#ffffff";
@@ -144,6 +172,10 @@
         .registerSystem(MovableSystem)
         .registerSystem(RendererSystem);
 
+      // Used for singleton components
+      const singletonEntity = world.createEntity()
+          .addComponent(PerformanceСompensation);
+
       // Some helper functions when creating the components
       function getRandomVelocity() {
         return {
@@ -173,15 +205,17 @@
           .addComponent(Position, getRandomPosition())
           .addComponent(Renderable)        
       }
+
+      const performanceСompensation = singletonEntity.getMutableComponent(PerformanceСompensation);
             
       // Run!
       function run() {
         // Compute delta and elapsed time
         var time = performance.now();
-        var delta = time - lastTime;
+        performanceСompensation.delta = time - lastTime;
 
         // Run all the systems
-        world.execute(delta, time);
+        world.run();
 
         lastTime = time;
         requestAnimationFrame(run);

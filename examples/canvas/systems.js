@@ -1,19 +1,21 @@
-import { System } from "../../build/ecsy.module.js";
+import { SystemBase } from "../../build/ecsy.module.js";
 import {
   CanvasContext,
   DemoSettings,
   Movement,
   Circle,
-  Intersecting
+  Intersecting,
+  PerformanceСompensation,
 } from "./components.js";
 import { fillCircle, drawLine, intersection } from "./utils.js";
 
-export class MovementSystem extends System {
-  execute(delta) {
+export class MovementSystem extends SystemBase {
+  run() {
     var context = this.queries.context.results[0];
     let canvasWidth = context.getComponent(CanvasContext).width;
     let canvasHeight = context.getComponent(CanvasContext).height;
     let multiplier = context.getComponent(DemoSettings).speedMultiplier;
+    const delta = context.getComponent(PerformanceСompensation).delta;
 
     let entities = this.queries.entities.results;
     for (var i = 0; i < entities.length; i++) {
@@ -50,11 +52,14 @@ export class MovementSystem extends System {
 
 MovementSystem.queries = {
   entities: { components: [Circle, Movement] },
-  context: { components: [CanvasContext, DemoSettings], mandatory: true }
+  context: {
+    components: [CanvasContext, DemoSettings, PerformanceСompensation],
+    mandatory: true
+  }
 };
 
-export class IntersectionSystem extends System {
-  execute() {
+export class IntersectionSystem extends SystemBase {
+  run() {
     let entities = this.queries.entities.results;
 
     for (var i = 0; i < entities.length; i++) {
@@ -106,8 +111,8 @@ IntersectionSystem.queries = {
   entities: { components: [Circle] }
 };
 
-export class Renderer extends System {
-  execute() {
+export class Renderer extends SystemBase {
+  run() {
     var context = this.queries.context.results[0];
     let canvasComponent = context.getComponent(CanvasContext);
     let ctx = canvasComponent.ctx;

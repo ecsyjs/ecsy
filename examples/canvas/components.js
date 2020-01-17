@@ -34,11 +34,31 @@ export class CanvasContext {
     this.width = 0;
     this.height = 0;
   }
+
+  reset() {
+    this.ctx = null;
+    this.width = 0;
+    this.height = 0;
+  }
 }
 
 export class DemoSettings {
   constructor() {
     this.speedMultiplier = 0.001;
+  }
+
+  reset() {
+    this.speedMultiplier = 0.001;
+  }
+}
+
+export class PerformanceСompensation {
+  delta = 0;
+  time = 0;
+
+  reset() {
+    this.delta = 0;
+    this.time = 0;
   }
 }
 

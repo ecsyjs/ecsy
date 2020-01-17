@@ -1,10 +1,11 @@
+import typescript from "@rollup/plugin-typescript";
 import json from "rollup-plugin-json";
 import { terser } from "rollup-plugin-terser";
 
 export default [
   {
-    input: "src/index.js",
-    plugins: [json({ exclude: ["node_modules/**"] })],
+    input: "src/index.ts",
+    plugins: [typescript(), json({ exclude: ["node_modules/**"] })],
     output: [
       {
         format: "umd",
@@ -21,8 +22,8 @@ export default [
     ]
   },
   {
-    input: "src/index.js",
-    plugins: [json({ exclude: ["node_modules/**"] }), terser()],
+    input: "src/index.ts",
+    plugins: [typescript(), json({ exclude: ["node_modules/**"] }), terser()],
     output: [
       {
         format: "umd",
