@@ -1,5 +1,5 @@
 /* global Peer */
-import { generateId, injectScript } from "./utils.js";
+import { injectScript, generateId } from "./utils.js";
 
 function hookConsoleAndErrors(connection) {
   var wrapFunctions = ["error", "warning", "log"];
