@@ -1,6 +1,7 @@
 import { ComponentManager } from './component';
 import { ComponentConstructor } from './component.interface';
 import { Entity, EntityManager } from './entity';
+import { QueryManager } from './entity/query-manager';
 import { SystemManager } from './system';
 import { System, SystemConstructor } from './system.interface';
 
@@ -8,9 +9,6 @@ import { System, SystemConstructor } from './system.interface';
  * The World is the root of the ECS.
  */
 export class World {
-  componentsManager = new ComponentManager();
-  entityManager = new EntityManager(this.componentsManager);
-  systemManager = new SystemManager(this.entityManager);
 
   enabled = true;
 
@@ -21,18 +19,11 @@ export class World {
   /**
    * Create a new World.
    */
-  constructor() {
-
-    if (typeof CustomEvent !== 'undefined') {
-      const event = new CustomEvent('ecsy-world-created', {
-        detail: {
-          world: this,
-          // version: Version,
-        }
-      });
-      window.dispatchEvent(event);
-    }
-  }
+  constructor(
+    public componentsManager = new ComponentManager(),
+    public entityManager = new EntityManager(componentsManager, new QueryManager()),
+    public systemManager = new SystemManager(entityManager),
+  ) {}
 
   /**
    * Register a component.
@@ -65,7 +56,7 @@ export class World {
   /**
    * Get a list of systems registered in this world.
    */
-  getSystems(): System[] {
+  getSystems(): Map<SystemConstructor<any>, System> {
     return this.systemManager.getSystems();
   }
 
