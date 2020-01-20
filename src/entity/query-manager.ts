@@ -36,10 +36,10 @@ export class QueryManager {
     // @todo Use bitmask for checking components?
 
     // Check each indexed query to see if we need to add this entity to the list
-    for (const [_, query] of  this.queries) {
+    for (const [_, query] of this.queries) {
 
         if (
-          !!~query.NotComponents.indexOf(componentConstructor) &&
+          !!~query.notComponentConstructor.indexOf(componentConstructor) &&
           ~query.entities.indexOf(entity)
         ) {
           query.removeEntity(entity);
@@ -51,7 +51,7 @@ export class QueryManager {
         // and Entity has ALL the components of the query
         // and Entity is not already in the query
         if (
-          !~query.Components.indexOf(componentConstructor) ||
+          !~query.componentConstructors.indexOf(componentConstructor) ||
           !query.match(entity) ||
           ~query.entities.indexOf(entity)
         ) {
@@ -73,7 +73,7 @@ export class QueryManager {
     for (const [_, query] of this.queries) {
 
       if (
-        !!~query.NotComponents.indexOf(componentConstructor) &&
+        !!~query.notComponentConstructor.indexOf(componentConstructor) &&
         !~query.entities.indexOf(entity) &&
         query.match(entity)
       ) {
@@ -82,7 +82,7 @@ export class QueryManager {
       }
 
       if (
-        !!~query.Components.indexOf(componentConstructor) &&
+        !!~query.componentConstructors.indexOf(componentConstructor) &&
         !!~query.entities.indexOf(entity) &&
         !query.match(entity)
       ) {
@@ -103,7 +103,7 @@ export class QueryManager {
     let query = this.queries.get(key);
 
     if (!query) {
-      query = new Query(componentConstructors, this.entityManager);
+      query = new Query(componentConstructors, this.entityManager.entities, key);
 
       this.queries.set(key, query);
     }

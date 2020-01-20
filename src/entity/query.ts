@@ -3,6 +3,7 @@ import { queryKey } from '../utils';
 import { Entity } from './entity';
 import { EntityManager } from './entity-manager';
 import { EventDispatcher } from './event-dispatcher';
+import { Not } from '../not';
 
 // tslint:disable:no-bitwise
 
@@ -14,8 +15,8 @@ export enum QueryEvents {
 
 export class Query {
 
-  Components: ComponentConstructor[] = [];
-  NotComponents: ComponentConstructor[] = [];
+  componentConstructors: ComponentConstructor[] = [];
+  notComponentConstructor: ComponentConstructor[] = [];
 
   entities: Entity[] = [];
 
@@ -24,33 +25,31 @@ export class Query {
   // This query is being used by a reactive system
   reactive = false;
 
-  key: any;
-
   /**
    * @param componentConstructors List of types of components to query
    */
   constructor(
-    componentConstructors: (ComponentConstructor | any)[],
-    manager: EntityManager,
+    componentConstructors: (ComponentConstructor | Not)[],
+    entities: Entity[],
+    public key: string,
   ) {
 
     componentConstructors.forEach((componentConstructor) => {
       if (typeof componentConstructor === 'object') {
-        this.NotComponents.push(componentConstructor.component);
+        this.notComponentConstructor.push(componentConstructor.component);
       } else {
-        this.Components.push(componentConstructor);
+        this.componentConstructors.push(componentConstructor);
       }
     });
 
-    if (this.Components.length === 0) {
+    if (this.componentConstructors.length === 0) {
       throw new Error('Can\'t create a query without components');
     }
 
-    this.key = queryKey(componentConstructors);
-
     // Fill the query with the existing entities
-    for (const entity of manager.entities) {
+    for (const entity of entities) {
       if (this.match(entity)) {
+
         // @todo ??? this.addEntity(entity); => preventing the event to be generated
         entity.queries.push(this);
         this.entities.push(entity);
@@ -80,17 +79,14 @@ export class Query {
       index = entity.queries.indexOf(this);
       entity.queries.splice(index, 1);
 
-      this.eventDispatcher.dispatchEvent(
-        QueryEvents.ENTITY_REMOVED,
-        entity
-      );
+      this.eventDispatcher.dispatchEvent(QueryEvents.ENTITY_REMOVED, entity);
     }
   }
 
   match(entity: Entity) {
     return (
-      entity.hasAllComponents(this.Components) &&
-      !entity.hasAnyComponents(this.NotComponents)
+      entity.hasAllComponents(this.componentConstructors) &&
+      !entity.hasAnyComponents(this.notComponentConstructor)
     );
   }
 
@@ -99,8 +95,8 @@ export class Query {
       key: this.key,
       reactive: this.reactive,
       components: {
-        included: this.Components.map(C => C.name),
-        not: this.NotComponents.map(C => C.name)
+        included: this.componentConstructors.map(C => C.name),
+        not: this.notComponentConstructor.map(C => C.name)
       },
       numEntities: this.entities.length
     };
@@ -111,7 +107,7 @@ export class Query {
    */
   stats() {
     return {
-      numComponents: this.Components.length,
+      numComponents: this.componentConstructors.length,
       numEntities: this.entities.length
     };
   }

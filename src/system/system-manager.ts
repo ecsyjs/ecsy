@@ -16,7 +16,7 @@ export class SystemManager {
     private entityManager: EntityManager,
   ) {}
 
-  registerSystem(systemConstructor: SystemConstructor<System>, attributes) {
+  registerSystem(systemConstructor: SystemConstructor<System>, attributes?: any) {
     if (
       this.systems.find((s) => s.constructor.name === systemConstructor.name) !== undefined
     ) {
@@ -48,7 +48,7 @@ export class SystemManager {
             throw new Error('\'components\' attribute can\'t be empty in a query');
           }
 
-          const query = this.entityManager.queryComponents(components);
+          const query = this.entityManager.getQuery(components);
 
           system.queriesOther[queryName] = query;
 

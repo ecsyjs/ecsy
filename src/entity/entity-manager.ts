@@ -1,7 +1,7 @@
 import { ComponentManager } from '../component';
 import { ComponentConstructor } from '../component.interface';
 import { ObjectPool } from '../object-pool';
-import { componentPropertyName, getName } from '../utils';
+import { getName } from '../utils';
 import { Entity } from './entity';
 import { EventDispatcher } from './event-dispatcher';
 import { Query } from './query';
@@ -148,12 +148,11 @@ export class EntityManager {
   entityRemoveComponentSync(entity: Entity, componentConstructor: ComponentConstructor): void {
     // Remove T listing on entity and property ref, then free the component.
     entity.componentTypes.delete(componentConstructor);
-    const propName = componentPropertyName(componentConstructor);
     const componentName = getName(componentConstructor);
     const componentEntity = entity.components.get(componentName);
     entity.components.delete(componentName);
 
-    this.componentManager.componentPool.get(propName).release(componentEntity);
+    this.componentManager.componentPool.get(componentConstructor).release(componentEntity);
   }
 
   /**
@@ -226,13 +225,12 @@ export class EntityManager {
     for (const entity of this.entitiesWithComponentsToRemove) {
       for (const componentTypeToRemove of entity.componentTypesToRemove) {
 
-        const propName = componentPropertyName(componentTypeToRemove);
         const componentName = getName(componentTypeToRemove);
 
         const component = entity.componentsToRemove.get(componentName);
         entity.componentsToRemove.delete(componentName);
 
-        this.componentManager.componentPool.get(propName).release(component);
+        this.componentManager.componentPool.get(componentTypeToRemove).release(component);
       }
 
       entity.componentTypesToRemove.clear();
@@ -245,7 +243,7 @@ export class EntityManager {
    * Get a query based on a list of components
    * @param componentConstructor List of components that will form the query
    */
-  queryComponents(componentConstructor: ComponentConstructor[]): Query {
+  getQuery(componentConstructor: ComponentConstructor[]): Query {
     return this.queryManager.getQuery(componentConstructor);
   }
 
@@ -272,16 +270,14 @@ export class EntityManager {
       eventDispatcher: this.eventDispatcher.stats
     };
 
-    for (const cname in this.componentManager.componentPool) {
-      if (this.componentManager.componentPool.hasOwnProperty(cname)) {
+    for (const [cname, _] of this.componentManager.componentPool) {
 
-        const pool = this.componentManager.componentPool.get(cname);
-        stats.componentPool[cname] = {
-          used: pool.totalUsed(),
-          size: pool.count
-        };
+      const pool = this.componentManager.componentPool.get(cname);
+      stats.componentPool[cname.name] = {
+        used: pool.totalUsed(),
+        size: pool.count
+      };
 
-      }
     }
 
     return stats;

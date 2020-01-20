@@ -25,7 +25,7 @@ export class Renderer implements System {
 
     const context = this.queries.context.results[0];
     const canvasComponent = context.getComponent(CanvasContext);
-    const ctx = canvasComponent.ctx;
+    const ctx: CanvasRenderingContext2D = canvasComponent.ctx;
     const canvasWidth = canvasComponent.width;
     const canvasHeight = canvasComponent.height;
 

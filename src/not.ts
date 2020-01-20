@@ -10,5 +10,5 @@ export const Not = (component: ComponentConstructor): Not => ({
 
 export interface Not {
   operator: 'not';
-  component: Component;
+  component: ComponentConstructor;
 }

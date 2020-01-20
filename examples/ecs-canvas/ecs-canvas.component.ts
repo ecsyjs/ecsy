@@ -80,7 +80,7 @@ export class EcsCanvasComponent {
     canvasComponent.width = canvas.width;
     canvasComponent.height = canvas.height;
 
-    for (let i = 0; i < 150; i++) {
+    for (let i = 0; i < 10; i++) {
       world.createEntity()
         .addComponent(Circle, { radius: random(20, 100) })
         .addComponent(Velocity, {

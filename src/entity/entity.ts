@@ -53,7 +53,7 @@ export class Entity implements Resettable {
     for (const query of this.queries) {
 
       // @todo accelerate this check. Maybe having query._Components as an object
-      if (query.reactive && query.Components.indexOf(componentConstructor) !== -1) {
+      if (query.reactive && query.componentConstructors.indexOf(componentConstructor) !== -1) {
         query.eventDispatcher.dispatchEvent(
           QueryEvents.COMPONENT_CHANGED,
           this,
