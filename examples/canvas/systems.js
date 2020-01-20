@@ -5,7 +5,7 @@ import {
   Movement,
   Circle,
   Intersecting,
-  PerformanceСompensation,
+  PerformanceСompensation
 } from "./components.js";
 import { fillCircle, drawLine, intersection } from "./utils.js";
 
