@@ -1,9 +1,7 @@
 import { ComponentConstructor } from '../component.interface';
-import { queryKey } from '../utils';
-import { Entity } from './entity';
-import { EntityManager } from './entity-manager';
-import { EventDispatcher } from './event-dispatcher';
 import { Not } from '../not';
+import { Entity } from './entity';
+import { EventDispatcher } from './event-dispatcher';
 
 // tslint:disable:no-bitwise
 

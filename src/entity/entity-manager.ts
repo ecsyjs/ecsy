@@ -1,7 +1,7 @@
 import { ComponentManager } from '../component';
 import { ComponentConstructor } from '../component.interface';
-import { ObjectPool } from '../object-pool';
 import { getName } from '../utils';
+import { ObjectPool } from '../utils/object-pool';
 import { Entity } from './entity';
 import { EventDispatcher } from './event-dispatcher';
 import { Query } from './query';
@@ -25,7 +25,6 @@ export class EntityManager {
   // All the entities in this instance
   entities: Entity[] = [];
 
-  queryManager = new QueryManager(this);
   eventDispatcher = new EventDispatcher<EntityManagerEvents>();
   private entityPool = new ObjectPool<Entity>(Entity);
 
@@ -38,6 +37,7 @@ export class EntityManager {
 
   constructor(
     private componentManager: ComponentManager,
+    private queryManager: QueryManager,
   ) {}
 
   /**
@@ -241,10 +241,10 @@ export class EntityManager {
 
   /**
    * Get a query based on a list of components
-   * @param componentConstructor List of components that will form the query
+   * @param componentConstructors List of components that will form the query
    */
-  getQuery(componentConstructor: ComponentConstructor[]): Query {
-    return this.queryManager.getQuery(componentConstructor);
+  getQuery(componentConstructors: ComponentConstructor[]): Query {
+    return this.queryManager.getQuery(componentConstructors, this.entities);
   }
 
   // EXTRAS

@@ -1,7 +1,6 @@
-import { ComponentConstructor, Component } from '../component.interface';
+import { ComponentConstructor } from '../component.interface';
 import { queryKey } from '../utils';
 import { Entity } from './entity';
-import { EntityManager } from './entity-manager';
 import { Query } from './query';
 
 // tslint:disable:no-bitwise
@@ -13,9 +12,7 @@ export class QueryManager {
   // Queries indexed by a unique identifier for the components it has
   queries = new Map<string, Query>();
 
-  constructor(
-    private entityManager: EntityManager,
-  ) {}
+  constructor() {}
 
   onEntityRemoved(entity: Entity): void {
     for (const [_, query] of this.queries) {
@@ -97,13 +94,13 @@ export class QueryManager {
    * Get a query for the specified components
    * @param componentConstructors Components that the query should have
    */
-  getQuery(componentConstructors: ComponentConstructor[]): Query {
+  getQuery(componentConstructors: ComponentConstructor[], entities: Entity[]): Query {
     const key = queryKey(componentConstructors);
 
     let query = this.queries.get(key);
 
     if (!query) {
-      query = new Query(componentConstructors, this.entityManager.entities, key);
+      query = new Query(componentConstructors, entities, key);
 
       this.queries.set(key, query);
     }
