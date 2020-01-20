@@ -1,5 +1,5 @@
-import { Pool } from './pool.interface';
-import { Resettable } from './resettable.interface';
+import { Pool } from '../pool.interface';
+import { Resettable } from '../resettable.interface';
 
 export class ObjectPool<T extends Resettable> implements Pool<T> {
   count = 0;
