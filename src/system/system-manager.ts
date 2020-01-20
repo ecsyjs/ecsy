@@ -7,7 +7,9 @@ import { clearEvents } from './clear-events';
 // tslint:disable:no-bitwise
 
 export class SystemManager {
-  private systems: System[] = [];
+  private systems = new Map<SystemConstructor<System>, System>();
+
+  // order is important
   private executeSystems: System[] = []; // Systems that have `execute` method
 
   lastExecutedSystem = null;
@@ -17,9 +19,7 @@ export class SystemManager {
   ) {}
 
   registerSystem(systemConstructor: SystemConstructor<System>, attributes?: any) {
-    if (
-      this.systems.find((s) => s.constructor.name === systemConstructor.name) !== undefined
-    ) {
+    if (this.systems.has(systemConstructor)) {
       console.warn(`System '${systemConstructor.name}' already registered.`);
 
       return this;
@@ -60,89 +60,98 @@ export class SystemManager {
             results: query.entities
           };
 
-          // Reactive configuration added/removed/changed
-          const validEvents: ['added', 'removed', 'changed'] = ['added', 'removed', 'changed'];
+          const events = {
+            added: () => {
+              const eventList = (system.queries[queryName].added = []);
 
-          const eventMapping = {
-            added: QueryEvents.ENTITY_ADDED,
-            removed: QueryEvents.ENTITY_REMOVED,
-            changed: QueryEvents.COMPONENT_CHANGED // Query.prototype.ENTITY_CHANGED
-          };
+              query.eventDispatcher.addEventListener(QueryEvents.ENTITY_ADDED,
+                (entity) => {
 
-          if (queryConfig.listen) {
+                  // @fixme overhead?
+                  if (eventList.indexOf(entity) === -1) {
 
-            validEvents.forEach((eventName) => {
-              // Is the event enabled on this system's query?
-              if (queryConfig.listen[eventName]) {
-                const event = queryConfig.listen[eventName];
-
-                if (eventName === 'changed') {
-                  query.reactive = true;
-                  if (event === true) {
-                    // Any change on the entity from the components in the query
-                    const eventList = (system.queries[queryName][eventName] = []);
-                    query.eventDispatcher.addEventListener(
-                      QueryEvents.COMPONENT_CHANGED,
-                      (entity) => {
-                        // Avoid duplicates
-                        if (eventList.indexOf(entity) === -1) {
-                          eventList.push(entity);
-                        }
-                      }
-                    );
-                  } else if (Array.isArray(event)) {
-                    const eventList = (system.queries[queryName][eventName] = []);
-                    query.eventDispatcher.addEventListener(
-                      QueryEvents.COMPONENT_CHANGED,
-                      (entity, changedComponent) => {
-                        // Avoid duplicates
-                        if (
-                          event.indexOf(changedComponent.constructor) !== -1 &&
-                          eventList.indexOf(entity) === -1
-                        ) {
-                          eventList.push(entity);
-                        }
-                      }
-                    );
-                  } else {
-                    /*
-                    // Checking just specific components
-                    let changedList = (this.queries[queryName][eventName] = {});
-                    event.forEach(component => {
-                      let eventList = (changedList[
-                        componentPropertyName(component)
-                      ] = []);
-                      query.eventDispatcher.addEventListener(
-                        Query.prototype.COMPONENT_CHANGED,
-                        (entity, changedComponent) => {
-                          if (
-                            changedComponent.constructor === component &&
-                            eventList.indexOf(entity) === -1
-                          ) {
-                            eventList.push(entity);
-                          }
-                        }
-                      );
-                    });
-                    */
+                    eventList.push(entity);
                   }
-                } else {
+                }
+              );
+            },
+            removed: () => {
+              const eventList = (system.queries[queryName].removed = []);
 
-                  const eventList = (system.queries[queryName][eventName] = []);
+              query.eventDispatcher.addEventListener(QueryEvents.ENTITY_REMOVED,
+                (entity) => {
 
-                  query.eventDispatcher.addEventListener(eventMapping[eventName],
-                    (entity) => {
+                  // @fixme overhead?
+                  if (eventList.indexOf(entity) === -1) {
 
-                      // @fixme overhead?
-                      if (eventList.indexOf(entity) === -1) {
+                    eventList.push(entity);
+                  }
+                }
+              );
+            },
+            changed: () => {
+              const event = queryConfig.listen.changed;
 
+              query.reactive = true;
+              if (event === true) {
+                // Any change on the entity from the components in the query
+                const eventList = (system.queries[queryName].changed = []);
+
+                query.eventDispatcher.addEventListener(
+                  QueryEvents.COMPONENT_CHANGED,
+                  (entity) => {
+                    // Avoid duplicates
+                    if (eventList.indexOf(entity) === -1) {
+                      eventList.push(entity);
+                    }
+                  }
+                );
+              } else if (Array.isArray(event)) {
+                const eventList = (system.queries[queryName].changed = []);
+
+                query.eventDispatcher.addEventListener(
+                  QueryEvents.COMPONENT_CHANGED,
+                  (entity, changedComponent) => {
+                    // Avoid duplicates
+                    if (
+                      event.indexOf(changedComponent.constructor) !== -1 &&
+                      eventList.indexOf(entity) === -1
+                    ) {
+                      eventList.push(entity);
+                    }
+                  }
+                );
+              } else {
+                /*
+                // Checking just specific components
+                let changedList = (this.queries[queryName][eventName] = {});
+                event.forEach(component => {
+                  let eventList = (changedList[
+                    componentPropertyName(component)
+                  ] = []);
+                  query.eventDispatcher.addEventListener(
+                    Query.prototype.COMPONENT_CHANGED,
+                    (entity, changedComponent) => {
+                      if (
+                        changedComponent.constructor === component &&
+                        eventList.indexOf(entity) === -1
+                      ) {
                         eventList.push(entity);
                       }
                     }
                   );
-                }
+                });
+                */
               }
-            });
+            }
+          };
+
+          if (queryConfig.listen) {
+            for (const eventName in queryConfig.listen) {
+              if (queryConfig.listen.hasOwnProperty(eventName) && events[eventName]) {
+                events[eventName]();
+              }
+            }
           }
         }
       }
@@ -154,8 +163,8 @@ export class SystemManager {
       system.init();
     }
 
-    system.order = this.systems.length;
-    this.systems.push(system);
+    system.order = this.systems.size;
+    this.systems.set(systemConstructor, system);
 
     if (system.run) {
       this.executeSystems.push(system);
@@ -171,20 +180,16 @@ export class SystemManager {
     });
   }
 
-  getSystem(systemConstructor: SystemConstructor<any>): System {
-    return this.systems.find(s => s instanceof systemConstructor);
+  getSystem(systemConstructor: SystemConstructor<System>): System {
+    return this.systems.get(systemConstructor);
   }
 
-  getSystems(): System[] {
+  getSystems(): Map<SystemConstructor<System>, System> {
     return this.systems;
   }
 
-  removeSystem(system: System): void {
-    const index = this.systems.indexOf(system);
-
-    if (!~index) { return; }
-
-    this.systems.splice(index, 1);
+  removeSystem(systemConstructor: SystemConstructor<System>): void {
+    this.systems.delete(systemConstructor);
   }
 
   runSystem(system: System): void {
@@ -221,7 +226,7 @@ export class SystemManager {
 
   stats() {
     const stats = {
-      numSystems: this.systems.length,
+      numSystems: this.systems.size,
       systems: {}
     };
 
