@@ -1,8 +1,9 @@
 import { Component, ComponentConstructor } from '../component.interface';
-import { ObjectPool } from '../object-pool';
+import { ObjectPool } from '../utils/object-pool';
 import { Pool } from '../pool.interface';
 import { DummyObjectPool } from './dummy-object-pool';
 
+// TODO: add removeComponent method
 export class ComponentManager {
   componentConstructors = new Set<ComponentConstructor>();
   componentPool = new Map<ComponentConstructor, Pool<Component>>();
@@ -32,12 +33,11 @@ export class ComponentManager {
         this.componentPool.set(componentConstructor, new ObjectPool(componentConstructor));
 
       } else {
-
         console.warn(
           `Component '${componentConstructor.name}' won't benefit from pooling because 'reset' method was not implemeneted.`
         );
-        this.componentPool.set(componentConstructor, new DummyObjectPool(componentConstructor));
 
+        this.componentPool.set(componentConstructor, new DummyObjectPool(componentConstructor));
       }
     }
 
