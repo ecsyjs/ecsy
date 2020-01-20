@@ -3,7 +3,7 @@ import { Component } from '../component.interface';
 const proxyMap = new WeakMap();
 
 const proxyHandler = {
-  set(target: any, prop: any) {
+  set(target, prop) {
     throw new Error(
       `Tried to write to "${target.constructor.name}#${String(
         prop
@@ -12,7 +12,7 @@ const proxyHandler = {
   }
 };
 
-export function wrapImmutableComponent(component: Component) {
+export const wrapImmutableComponent = (component: Component) => {
   if (component === undefined) {
     return undefined;
   }
@@ -25,4 +25,4 @@ export function wrapImmutableComponent(component: Component) {
   }
 
   return wrappedComponent;
-}
+};

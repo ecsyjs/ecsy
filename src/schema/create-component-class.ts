@@ -1,6 +1,7 @@
+import { ComponentConstructor } from '../component.interface';
 import { inferType } from './infer-type';
 
-export function createComponentClass(schema, name) {
+export function createComponentClass(schema: any, name: string): ComponentConstructor {
   // var Component = new Function(`return function ${name}() {}`)();
 
   for (const key in schema) {
@@ -124,5 +125,5 @@ export function createComponentClass(schema, name) {
     }
   }
 
-  return Component;
+  return Component as any;
 }

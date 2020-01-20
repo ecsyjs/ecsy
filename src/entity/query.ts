@@ -1,4 +1,4 @@
-import { ComponentConstructor, Component } from '../component.interface';
+import { ComponentConstructor } from '../component.interface';
 import { queryKey } from '../utils';
 import { Entity } from './entity';
 import { EntityManager } from './entity-manager';
@@ -6,18 +6,20 @@ import { EventDispatcher } from './event-dispatcher';
 
 // tslint:disable:no-bitwise
 
+export enum QueryEvents {
+  ENTITY_ADDED,
+  ENTITY_REMOVED,
+  COMPONENT_CHANGED,
+}
+
 export class Query {
 
-  ENTITY_ADDED = 'Query#ENTITY_ADDED';
-  ENTITY_REMOVED = 'Query#ENTITY_REMOVED';
-  COMPONENT_CHANGED = 'Query#COMPONENT_CHANGED';
-
-  Components: ComponentConstructor<Component>[] = [];
-  NotComponents: ComponentConstructor<Component>[] = [];
+  Components: ComponentConstructor[] = [];
+  NotComponents: ComponentConstructor[] = [];
 
   entities: Entity[] = [];
 
-  eventDispatcher = new EventDispatcher();
+  eventDispatcher = new EventDispatcher<QueryEvents>();
 
   // This query is being used by a reactive system
   reactive = false;
@@ -28,7 +30,7 @@ export class Query {
    * @param componentConstructors List of types of components to query
    */
   constructor(
-    componentConstructors: (ComponentConstructor<Component> | any)[],
+    componentConstructors: (ComponentConstructor | any)[],
     manager: EntityManager,
   ) {
 
@@ -63,7 +65,7 @@ export class Query {
     entity.queries.push(this);
     this.entities.push(entity);
 
-    this.eventDispatcher.dispatchEvent(Query.prototype.ENTITY_ADDED, entity);
+    this.eventDispatcher.dispatchEvent(QueryEvents.ENTITY_ADDED, entity);
   }
 
   /**
@@ -79,7 +81,7 @@ export class Query {
       entity.queries.splice(index, 1);
 
       this.eventDispatcher.dispatchEvent(
-        Query.prototype.ENTITY_REMOVED,
+        QueryEvents.ENTITY_REMOVED,
         entity
       );
     }

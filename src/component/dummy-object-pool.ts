@@ -1,31 +1,34 @@
-export class DummyObjectPool {
-  isDummyObjectPool = true;
+import { Pool } from '../pool.interface';
+import { Resettable } from '../resettable.interface';
+
+export class DummyObjectPool<T extends Resettable> implements Pool<T> {
   count = 0;
-  used = 0;
+  private used = 0;
 
   constructor(
-    private T: any
+    private objectConstructor: new (...args: any[]) => T
   ) {}
 
-  aquire() {
+  aquire(): T {
     this.used++;
     this.count++;
-    return new this.T();
+
+    return new this.objectConstructor();
   }
 
-  release() {
+  release(): void {
     this.used--;
   }
 
-  totalSize() {
+  totalSize(): number {
     return this.count;
   }
 
-  totalFree() {
+  totalFree(): number {
     return Infinity;
   }
 
-  totalUsed() {
+  totalUsed(): number {
     return this.used;
   }
 }

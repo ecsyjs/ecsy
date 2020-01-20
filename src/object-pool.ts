@@ -1,54 +1,53 @@
-export class ObjectPool<TInstance, TCLass extends new (...args: any) => TInstance> {
-  freeList: TInstance[] = [];
-  count = 0;
-  isObjectPool = true;
+import { Pool } from './pool.interface';
+import { Resettable } from './resettable.interface';
 
-  createElement: () => TInstance;
+export class ObjectPool<T extends Resettable> implements Pool<T> {
+  count = 0;
+  private freeList: T[] = [];
+
+  private createElement: () => T;
 
   // @todo Add initial size
   constructor(
-    Class: TCLass,
-    initialSize?: any,
+    objectConstructor: new (...args) => T,
+    initialSize?: number,
   ) {
 
-    let extraArgs: any = null;
+    let extraArgs = null;
+
     if (arguments.length > 1) {
       extraArgs = Array.prototype.slice.call(arguments);
       extraArgs.shift();
     }
 
     this.createElement = extraArgs
-      ? () => {
-          return new Class(...extraArgs);
-        }
-      : () => {
-          return new Class();
-        };
+      ? () => new objectConstructor(...extraArgs)
+      : () => new objectConstructor();
 
     if (typeof initialSize !== 'undefined') {
       this.expand(initialSize);
     }
   }
 
-  aquire(): TInstance {
+  aquire(): T {
     // Grow the list by 20%ish if we're out
     if (this.freeList.length <= 0) {
       this.expand(Math.round(this.count * 0.2) + 1);
     }
 
-    const item = this.freeList.pop() as TInstance;
+    const item = this.freeList.pop();
 
     return item;
   }
 
-  release(item: TInstance): void {
-    if ((item as any).reset) {
-      (item as any).reset(); // !!!!!!!!!!!!!!
+  release(item: T): void {
+    if (item.reset) {
+      item.reset();
     }
     this.freeList.push(item);
   }
 
-  expand(count: number): void {
+  private expand(count: number): void {
     for (let n = 0; n < count; n++) {
       this.freeList.push(this.createElement());
     }

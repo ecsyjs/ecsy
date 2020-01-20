@@ -11,8 +11,8 @@ export function systemToJSON(system: System) {
 
   const constructor: SystemConstructor<System> = system.constructor as any;
 
-  if (constructor.queries) {
-    const queries = constructor.queries;
+  if (constructor.systemData) {
+    const queries = constructor.systemData;
 
     for (const queryName in queries) {
       if (queries.hasOwnProperty(queryName)) {

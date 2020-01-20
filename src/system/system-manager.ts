@@ -1,5 +1,5 @@
 import { EntityManager } from '../entity';
-import { Query } from '../entity/query';
+import { QueryEvents } from '../entity/query';
 import { System, SystemConstructor } from '../system.interface';
 import { canExecute } from './can-execute';
 import { clearEvents } from './clear-events';
@@ -10,13 +10,13 @@ export class SystemManager {
   private systems: System[] = [];
   private executeSystems: System[] = []; // Systems that have `execute` method
 
-  lastExecutedSystem: System | null = null;
+  lastExecutedSystem = null;
 
   constructor(
     private entityManager: EntityManager,
   ) {}
 
-  registerSystem(systemConstructor: SystemConstructor<System>, attributes?: any) {
+  registerSystem(systemConstructor: SystemConstructor<System>, attributes) {
     if (
       this.systems.find((s) => s.constructor.name === systemConstructor.name) !== undefined
     ) {
@@ -33,12 +33,14 @@ export class SystemManager {
       system.priority = attributes.priority;
     }
 
-    if (systemConstructor.queries) {
+    if (systemConstructor.systemData) {
+      system.queriesOther = [];
+      system.queries = {};
 
-      for (const queryName in systemConstructor.queries) {
-        if (systemConstructor.queries.hasOwnProperty(queryName)) {
+      for (const queryName in systemConstructor.systemData) {
+        if (systemConstructor.systemData.hasOwnProperty(queryName)) {
 
-          const queryConfig = systemConstructor.queries[queryName];
+          const queryConfig = systemConstructor.systemData[queryName];
 
           const components = queryConfig.components;
 
@@ -59,16 +61,17 @@ export class SystemManager {
           };
 
           // Reactive configuration added/removed/changed
-          const validEvents = ['added', 'removed', 'changed'];
+          const validEvents: ['added', 'removed', 'changed'] = ['added', 'removed', 'changed'];
 
           const eventMapping = {
-            added: Query.prototype.ENTITY_ADDED,
-            removed: Query.prototype.ENTITY_REMOVED,
-            changed: Query.prototype.COMPONENT_CHANGED // Query.prototype.ENTITY_CHANGED
+            added: QueryEvents.ENTITY_ADDED,
+            removed: QueryEvents.ENTITY_REMOVED,
+            changed: QueryEvents.COMPONENT_CHANGED // Query.prototype.ENTITY_CHANGED
           };
 
           if (queryConfig.listen) {
-            validEvents.forEach(eventName => {
+
+            validEvents.forEach((eventName) => {
               // Is the event enabled on this system's query?
               if (queryConfig.listen[eventName]) {
                 const event = queryConfig.listen[eventName];
@@ -79,7 +82,7 @@ export class SystemManager {
                     // Any change on the entity from the components in the query
                     const eventList = (system.queries[queryName][eventName] = []);
                     query.eventDispatcher.addEventListener(
-                      Query.prototype.COMPONENT_CHANGED,
+                      QueryEvents.COMPONENT_CHANGED,
                       (entity) => {
                         // Avoid duplicates
                         if (eventList.indexOf(entity) === -1) {
@@ -90,7 +93,7 @@ export class SystemManager {
                   } else if (Array.isArray(event)) {
                     const eventList = (system.queries[queryName][eventName] = []);
                     query.eventDispatcher.addEventListener(
-                      Query.prototype.COMPONENT_CHANGED,
+                      QueryEvents.COMPONENT_CHANGED,
                       (entity, changedComponent) => {
                         // Avoid duplicates
                         if (
@@ -124,10 +127,12 @@ export class SystemManager {
                     */
                   }
                 } else {
+
                   const eventList = (system.queries[queryName][eventName] = []);
 
                   query.eventDispatcher.addEventListener(eventMapping[eventName],
-                    entity => {
+                    (entity) => {
+
                       // @fixme overhead?
                       if (eventList.indexOf(entity) === -1) {
 
@@ -145,8 +150,8 @@ export class SystemManager {
 
     // ----------
 
-    if ((system as any).init) {
-      (system as any).init();
+    if (system.init) {
+      system.init();
     }
 
     system.order = this.systems.length;
@@ -191,7 +196,7 @@ export class SystemManager {
         // main run;
         system.run();
 
-        (system as any).executeTime = performance.now() - startTime; // ! debag performance
+        system.executeTime = performance.now() - startTime; // ! debag performance
         this.lastExecutedSystem = system;
 
         clearEvents(system);
@@ -202,7 +207,7 @@ export class SystemManager {
   stop(): void {
     for (const system of this.executeSystems) {
       system.stop();
-      (system as any).executeTime = 0; // ! debag performance
+      system.executeTime = 0; // ! debag performance
     }
   }
 

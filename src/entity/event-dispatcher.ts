@@ -1,11 +1,14 @@
-import { ComponentConstructor, Component } from '../component.interface';
+import { Component } from '../component.interface';
 import { Entity } from './entity';
+
+type Listener = (entity: Entity, component?: Component) => void;
 
 /**
  * EventDispatcher
  */
-export class EventDispatcher {
-  listeners = {};
+export class EventDispatcher<T> {
+  listeners = new Map<T, Listener[]>();
+
   stats = {
     fired: 0,
     handled: 0
@@ -19,14 +22,17 @@ export class EventDispatcher {
    * @param eventName Name of the event to listen
    * @param listener Callback to trigger when the event is fired
    */
-  addEventListener(eventName: string, listener: (entity: Entity, componentConstructor?: ComponentConstructor<Component>) => void) {
+  addEventListener(eventName: T, listener: Listener) {
     const listeners = this.listeners;
-    if (listeners[eventName] === undefined) {
-      listeners[eventName] = [];
+
+    if (!listeners.has(eventName)) {
+      listeners.set(eventName, []);
     }
 
-    if (listeners[eventName].indexOf(listener) === -1) {
-      listeners[eventName].push(listener);
+    const listenerArray = listeners.get(eventName);
+
+    if (listenerArray.indexOf(listener) === -1) {
+      listenerArray.push(listener);
     }
   }
 
@@ -35,10 +41,9 @@ export class EventDispatcher {
    * @param eventName Name of the event to check
    * @param listener Callback for the specified event
    */
-  hasEventListener(eventName: string, listener: (entity: Entity, componentConstructor?: ComponentConstructor<Component>) => void) {
+  hasEventListener(eventName: T, listener: Listener) {
     return (
-      this.listeners[eventName] !== undefined &&
-      this.listeners[eventName].indexOf(listener) !== -1
+      this.listeners.has(eventName) && this.listeners.get(eventName).indexOf(listener) !== -1
     );
   }
 
@@ -47,8 +52,9 @@ export class EventDispatcher {
    * @param eventName Name of the event to remove
    * @param listener Callback for the specified event
    */
-  removeEventListener(eventName: string, listener: (entity: Entity, componentConstructor?: ComponentConstructor<Component>) => void) {
-    const listenerArray = this.listeners[eventName];
+  removeEventListener(eventName: T, listener: Listener) {
+    const listenerArray = this.listeners.get(eventName);
+
     if (listenerArray !== undefined) {
       const index = listenerArray.indexOf(listener);
       if (index !== -1) {
@@ -62,10 +68,11 @@ export class EventDispatcher {
    * @param eventName Name of the event to dispatch
    * @param entity (Optional) Entity to emit
    */
-  dispatchEvent(eventName: string, entity?: Entity, component?: Component) {
+  dispatchEvent(eventName: T, entity?: Entity, component?: Component) {
     this.stats.fired++;
 
-    const listenerArray = this.listeners[eventName];
+    const listenerArray = this.listeners.get(eventName);
+
     if (listenerArray !== undefined) {
       const array = listenerArray.slice(0);
 

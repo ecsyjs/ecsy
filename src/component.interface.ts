@@ -1,7 +1,8 @@
-export interface Component {
-  copy?(src: Component): void;
-  reset?(): void;
-};
+import { Resettable } from './resettable.interface';
 
-export type ComponentConstructor<T extends Component> =
-  new (...args: any) => T;
+export interface Component extends Resettable {
+  [key: string]: any;
+  copy?(src: Component): void;
+}
+
+export type ComponentConstructor = new () => Component;

@@ -1,7 +1,8 @@
+import { Component, ComponentConstructor } from '../component.interface';
+import { Resettable } from '../resettable.interface';
 import { EntityManager } from './entity-manager';
-import { Query } from './query';
+import { Query, QueryEvents } from './query';
 import { wrapImmutableComponent } from './wrap-immutable-component';
-import { ComponentConstructor, Component } from '../component.interface';
 
 // tslint:disable:no-bitwise
 
@@ -10,23 +11,23 @@ const DEBUG = false;
 
 let nextId = 0;
 
-export class Entity {
+export class Entity implements Resettable {
   // Unique ID for this entity
   id = nextId++;
 
   // List of components types the entity has
-  ComponentTypes: ComponentConstructor<Component>[] = [];
+  componentTypes = new Set<ComponentConstructor>();
 
   // Instance of the components
-  components: { [key: string]: Component; } = {};
+  components = new Map<string, Component>();
 
-  componentsToRemove: { [key: string]: Component; } = {};
+  componentsToRemove = new Map<string, Component>();
 
   // Queries where the entity is added
   queries: Query[] = [];
 
   // Used for deferred removal
-  ComponentTypesToRemove: ComponentConstructor<Component>[] = [];
+  componentTypesToRemove = new Set<ComponentConstructor>();
 
   alive = false;
 
@@ -36,40 +37,25 @@ export class Entity {
 
   // COMPONENTS
 
-  getComponent<T extends Component>(componentConstructor: ComponentConstructor<T>, includeRemoved?: boolean): T {
-    let component = this.components[componentConstructor.name];
+  getComponent(componentConstructor: ComponentConstructor, includeRemoved?: boolean): Component {
+    let component = this.components.get(componentConstructor.name);
 
     if (!component && includeRemoved === true) {
-      component = this.componentsToRemove[componentConstructor.name];
+      component = this.componentsToRemove.get(componentConstructor.name);
     }
 
     return DEBUG ? wrapImmutableComponent(component) : component;
   }
 
-  getRemovedComponent<T extends Component>(componentConstructor: ComponentConstructor<T>): T {
-    return this.componentsToRemove[componentConstructor.name];
-  }
-
-  getComponents<T extends Component>(): { [key: string]: T; } {
-    return this.components;
-  }
-
-  getComponentsToRemove<T extends Component>(): { [key: string]: T; } {
-    return this.componentsToRemove;
-  }
-
-  getComponentTypes(): ComponentConstructor<Component>[] {
-    return this.ComponentTypes;
-  }
-
-  getMutableComponent<T extends Component>(componentConstructor: ComponentConstructor<T>): T {
-    const component = this.components[componentConstructor.name];
+  getMutableComponent(componentConstructor: ComponentConstructor): Component {
+    const component = this.components.get(componentConstructor.name);
 
     for (const query of this.queries) {
+
       // @todo accelerate this check. Maybe having query._Components as an object
       if (query.reactive && query.Components.indexOf(componentConstructor) !== -1) {
         query.eventDispatcher.dispatchEvent(
-          Query.prototype.COMPONENT_CHANGED,
+          QueryEvents.COMPONENT_CHANGED,
           this,
           component
         );
@@ -79,30 +65,56 @@ export class Entity {
     return component;
   }
 
-  addComponent(componentConstructor: ComponentConstructor<Component>, values?: any): this {
+  /**
+   * Once a component is removed from an entity, it is possible to access its contents
+   */
+  getRemovedComponent(componentConstructor: ComponentConstructor): Component {
+    return this.componentsToRemove.get(componentConstructor.name);
+  }
+
+  getComponents(): Map<string, Component> {
+    return this.components;
+  }
+
+  getComponentsToRemove(): Map<string, Component> {
+    return this.componentsToRemove;
+  }
+
+  getComponentTypes(): Set<ComponentConstructor> {
+    return this.componentTypes;
+  }
+
+
+  addComponent(componentConstructor: ComponentConstructor, values?: { [key: string]: any }): this {
     this.entityManager.entityAddComponent(this, componentConstructor, values);
 
     return this;
   }
 
-  removeComponent(componentConstructor: ComponentConstructor<Component>, forceRemove?: boolean): this {
+  /**
+   * This will mark the component to be removed and will populate all the queues from the
+   * systems that are listening to that event, but the component itself won't be disposed
+   * until the end of the frame, we call it deferred removal. This is done so systems that
+   * need to react to it can still access the data of the components.
+   */
+  removeComponent(componentConstructor: ComponentConstructor, forceRemove?: boolean): this {
     this.entityManager.entityRemoveComponent(this, componentConstructor, forceRemove);
 
     return this;
   }
 
-  hasComponent(componentConstructor: ComponentConstructor<Component>, includeRemoved?: boolean): boolean {
+  hasComponent(componentConstructor: ComponentConstructor, includeRemoved?: boolean): boolean {
     return (
-      !!~this.ComponentTypes.indexOf(componentConstructor) ||
+      this.componentTypes.has(componentConstructor) ||
       (includeRemoved === true && this.hasRemovedComponent(componentConstructor))
     );
   }
 
-  hasRemovedComponent(componentConstructor: ComponentConstructor<Component>): boolean {
-    return !!~this.ComponentTypesToRemove.indexOf(componentConstructor);
+  hasRemovedComponent(componentConstructor: ComponentConstructor): boolean {
+    return this.componentTypesToRemove.has(componentConstructor);
   }
 
-  hasAllComponents(componentConstructors: ComponentConstructor<Component>[]): boolean {
+  hasAllComponents(componentConstructors: ComponentConstructor[]): boolean {
     for (const component of componentConstructors) {
       if (!this.hasComponent(component)) { return false; }
     }
@@ -110,7 +122,7 @@ export class Entity {
     return true;
   }
 
-  hasAnyComponents(componentConstructors: ComponentConstructor<Component>[]): boolean {
+  hasAnyComponents(componentConstructors: ComponentConstructor[]): boolean {
     for (const component of componentConstructors) {
       if (this.hasComponent(component)) { return true; }
     }
@@ -128,9 +140,9 @@ export class Entity {
   reset() {
     this.id = nextId++;
     this.entityManager = null;
-    this.ComponentTypes.length = 0;
+    this.componentTypes.clear();
     this.queries.length = 0;
-    this.components = {};
+    this.components.clear();
   }
 
   remove(forceRemove?: boolean) {

@@ -1,6 +1,6 @@
 import { System } from '../system.interface';
 
-export function canExecute(system: System) {
+export const canExecute = (system: System) => {
   if (system.mandatoryQueries.length === 0) { return true; }
 
   for (const query of system.mandatoryQueries) {
@@ -10,4 +10,4 @@ export function canExecute(system: System) {
   }
 
   return true;
-}
+};

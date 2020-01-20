@@ -5,7 +5,7 @@ import { getName } from './get-name';
  * Get a key from a list of components
  * @param Components Array of components to generate the key
  */
-export function queryKey(componentConstructor: (ComponentConstructor<any> | any)[]) {
+export function queryKey(componentConstructor: (ComponentConstructor | any)[]) {
   const names = [];
 
   for (const T of componentConstructor) {
