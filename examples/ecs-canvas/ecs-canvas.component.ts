@@ -10,7 +10,7 @@ import {
   Velocity,
 } from './components';
 import { Vector2 } from './math';
-import { MovementSystem, IntersectionSystem, Renderer } from './systems';
+import { MovementSystem, IntersectionSystem, RendererCircles, RendererIntersecting, RendererBackground } from './systems';
 import { random } from './utils';
 
 export class EcsCanvasComponent {
@@ -61,7 +61,10 @@ export class EcsCanvasComponent {
       // .registerComponent(Intersecting)
       .registerSystem(MovementSystem)
       .registerSystem(IntersectionSystem)
-      .registerSystem(Renderer);
+      .registerSystem(RendererBackground)
+      .registerSystem(RendererCircles)
+      .registerSystem(RendererIntersecting)
+      ;
 
     // Used for singleton components
     const singletonEntity = world.createEntity()
@@ -80,9 +83,9 @@ export class EcsCanvasComponent {
     canvasComponent.width = canvas.width;
     canvasComponent.height = canvas.height;
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 20; i++) {
       world.createEntity()
-        .addComponent(Circle, { radius: random(20, 100) })
+        .addComponent(Circle, { radius: random(20, 500) })
         .addComponent(Velocity, {
           x: random(-200, 200),
           y: random(-200, 200),

@@ -67,11 +67,11 @@ export class MovementSystem implements System {
       }
 
       if (position.x - circle.radius > canvasWidth) {
-        position.x = 0;
+        position.x = -circle.radius;
       }
 
       if (position.x + circle.radius < 0) {
-        position.x = canvasWidth;
+        position.x = canvasWidth + circle.radius;
       }
     }
   }

@@ -3,11 +3,8 @@ import { System } from '@ecs';
 import { CanvasContext, Circle, Intersecting, Position } from '../components';
 import { drawLine, fillCircle } from '../utils';
 
-export class Renderer implements System {
-
+export class RendererBackground implements System {
   static systemData = {
-    circles: { components: [Circle, Position] },
-    intersectingCircles: { components: [Intersecting] },
     context: { components: [CanvasContext], mandatory: true }
   };
 
@@ -21,8 +18,6 @@ export class Renderer implements System {
 
   run() {
 
-    // console.log(`Renderer`, this, (this as any).executeTime);
-
     const context = this.queries.context.results[0];
     const canvasComponent = context.getComponent(CanvasContext);
     const ctx: CanvasRenderingContext2D = canvasComponent.ctx;
@@ -31,6 +26,37 @@ export class Renderer implements System {
 
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+  }
+
+  play() {
+    this.enabled = true;
+  }
+
+  stop() {
+    this.enabled = false;
+  }
+}
+
+export class RendererCircles implements System {
+
+  static systemData = {
+    circles: { components: [Circle, Position] },
+    context: { components: [CanvasContext], mandatory: true }
+  };
+
+  enabled = true;
+  initialized = true;
+
+  queriesOther = {};
+  queries: any = {};
+
+  mandatoryQueries = [];
+
+  run() {
+
+    const context = this.queries.context.results[0];
+    const canvasComponent = context.getComponent(CanvasContext);
+    const ctx: CanvasRenderingContext2D = canvasComponent.ctx;
 
     const circles = this.queries.circles.results;
 
@@ -51,6 +77,37 @@ export class Renderer implements System {
       ctx.strokeStyle = '#fff';
       ctx.stroke();
     }
+  }
+
+  play() {
+    this.enabled = true;
+  }
+
+  stop() {
+    this.enabled = false;
+  }
+}
+
+export class RendererIntersecting implements System {
+
+  static systemData = {
+    intersectingCircles: { components: [Intersecting] },
+    context: { components: [CanvasContext], mandatory: true }
+  };
+
+  enabled = true;
+  initialized = true;
+
+  queriesOther = {};
+  queries: any = {};
+
+  mandatoryQueries = [];
+
+  run() {
+
+    const context = this.queries.context.results[0];
+    const canvasComponent = context.getComponent(CanvasContext);
+    const ctx: CanvasRenderingContext2D = canvasComponent.ctx;
 
     const intersectingCircles = this.queries.intersectingCircles.results;
 

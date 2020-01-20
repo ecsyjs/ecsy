@@ -47,16 +47,16 @@ export class RemovingComponentsComponent {
   constructor() {
     const world = new World()
       .registerSystem(SystemFoo);
-    
+
     const entity = world.createEntity()
       .addComponent(Box);
-    
+
     world.run(); // Execute frame 1
     // on frame 1 will Iterating on entity with box;
     entity.removeComponent(Box);
     world.run(); // Execute frame 2
     // on frame 2 no box component, no Iterating on entity;
-    
+
     world.run(); // Execute frame 3
   }
 
