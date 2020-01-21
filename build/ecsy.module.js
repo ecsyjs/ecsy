@@ -49,22 +49,17 @@ function __spread() {
 
 var ObjectPool = /** @class */ (function () {
     // @todo Add initial size
-    function ObjectPool(Class, initialSize) {
-        this.freeList = [];
+    function ObjectPool(objectConstructor, initialSize) {
         this.count = 0;
-        this.isObjectPool = true;
+        this.freeList = [];
         var extraArgs = null;
         if (arguments.length > 1) {
             extraArgs = Array.prototype.slice.call(arguments);
             extraArgs.shift();
         }
         this.createElement = extraArgs
-            ? function () {
-                return new (Class.bind.apply(Class, __spread([void 0], extraArgs)))();
-            }
-            : function () {
-                return new Class();
-            };
+            ? function () { return new (objectConstructor.bind.apply(objectConstructor, __spread([void 0], extraArgs)))(); }
+            : function () { return new objectConstructor(); };
         if (typeof initialSize !== 'undefined') {
             this.expand(initialSize);
         }
@@ -79,7 +74,7 @@ var ObjectPool = /** @class */ (function () {
     };
     ObjectPool.prototype.release = function (item) {
         if (item.reset) {
-            item.reset(); // !!!!!!!!!!!!!!
+            item.reset();
         }
         this.freeList.push(item);
     };
@@ -101,61 +96,16 @@ var ObjectPool = /** @class */ (function () {
     return ObjectPool;
 }());
 
-/**
- * Return the name of a component
- */
-function getName(componentConstructor) {
-    return componentConstructor.name;
-}
-
-/**
- * Return a valid property name for the Component
- */
-function componentPropertyName(componentConstructor) {
-    var name = getName(componentConstructor);
-    return name.charAt(0).toLowerCase() + name.slice(1);
-}
-
-/**
- * Get a key from a list of components
- * @param Components Array of components to generate the key
- */
-function queryKey(componentConstructor) {
-    var e_1, _a;
-    var names = [];
-    try {
-        for (var componentConstructor_1 = __values(componentConstructor), componentConstructor_1_1 = componentConstructor_1.next(); !componentConstructor_1_1.done; componentConstructor_1_1 = componentConstructor_1.next()) {
-            var T = componentConstructor_1_1.value;
-            if (typeof T === 'object') {
-                var operator = T.operator === 'not' ? '!' : T.operator;
-                names.push(operator + getName(T.Component));
-            }
-            else {
-                names.push(getName(T));
-            }
-        }
-    }
-    catch (e_1_1) { e_1 = { error: e_1_1 }; }
-    finally {
-        try {
-            if (componentConstructor_1_1 && !componentConstructor_1_1.done && (_a = componentConstructor_1.return)) _a.call(componentConstructor_1);
-        }
-        finally { if (e_1) throw e_1.error; }
-    }
-    return names.sort().join('-');
-}
-
 var DummyObjectPool = /** @class */ (function () {
-    function DummyObjectPool(T) {
-        this.T = T;
-        this.isDummyObjectPool = true;
+    function DummyObjectPool(objectConstructor) {
+        this.objectConstructor = objectConstructor;
         this.count = 0;
         this.used = 0;
     }
     DummyObjectPool.prototype.aquire = function () {
         this.used++;
         this.count++;
-        return new this.T();
+        return new this.objectConstructor();
     };
     DummyObjectPool.prototype.release = function () {
         this.used--;
@@ -172,51 +122,81 @@ var DummyObjectPool = /** @class */ (function () {
     return DummyObjectPool;
 }());
 
+// TODO: add removeComponent method
 var ComponentManager = /** @class */ (function () {
     function ComponentManager() {
-        this.Components = {};
-        this.componentPool = {};
-        this.numComponents = {};
+        this.componentConstructors = new Set();
+        this.componentPool = new Map();
     }
     ComponentManager.prototype.registerComponent = function (componentConstructor) {
-        if (this.Components[componentConstructor.name]) {
+        if (this.componentConstructors.has(componentConstructor)) {
             console.warn("Component type: '" + componentConstructor.name + "' already registered.");
             return;
         }
-        this.Components[componentConstructor.name] = componentConstructor;
-        this.numComponents[componentConstructor.name] = 0;
+        this.componentConstructors.add(componentConstructor);
     };
     ComponentManager.prototype.componentAddedToEntity = function (componentConstructor) {
-        if (!this.Components[componentConstructor.name]) {
+        if (!this.componentConstructors.has(componentConstructor)) {
             this.registerComponent(componentConstructor);
         }
-        this.numComponents[componentConstructor.name]++;
-    };
-    ComponentManager.prototype.componentRemovedFromEntity = function (componentConstructor) {
-        this.numComponents[componentConstructor.name]--;
     };
     ComponentManager.prototype.getComponentsPool = function (componentConstructor) {
-        var componentName = componentPropertyName(componentConstructor);
-        if (!this.componentPool[componentName]) {
+        if (!this.componentPool.has(componentConstructor)) {
             if (componentConstructor.prototype.reset) {
-                this.componentPool[componentName] = new ObjectPool(componentConstructor);
+                this.componentPool.set(componentConstructor, new ObjectPool(componentConstructor));
             }
             else {
                 console.warn("Component '" + componentConstructor.name + "' won't benefit from pooling because 'reset' method was not implemeneted.");
-                this.componentPool[componentName] = new DummyObjectPool(componentConstructor);
+                this.componentPool.set(componentConstructor, new DummyObjectPool(componentConstructor));
             }
         }
-        return this.componentPool[componentName];
+        return this.componentPool.get(componentConstructor);
     };
     return ComponentManager;
 }());
+
+/**
+ * Return the name of a component
+ */
+function getName(componentConstructor) {
+    return componentConstructor.name;
+}
+
+/**
+ * Get a key from a list of components
+ * @param Components Array of components to generate the key
+ */
+function queryKey(componentConstructor) {
+    var e_1, _a;
+    var names = [];
+    try {
+        for (var componentConstructor_1 = __values(componentConstructor), componentConstructor_1_1 = componentConstructor_1.next(); !componentConstructor_1_1.done; componentConstructor_1_1 = componentConstructor_1.next()) {
+            var T = componentConstructor_1_1.value;
+            if (typeof T === 'object') {
+                var operator = T.operator === 'not' ? '!' : T.operator;
+                names.push(operator + getName(T.component));
+            }
+            else {
+                names.push(getName(T));
+            }
+        }
+    }
+    catch (e_1_1) { e_1 = { error: e_1_1 }; }
+    finally {
+        try {
+            if (componentConstructor_1_1 && !componentConstructor_1_1.done && (_a = componentConstructor_1.return)) _a.call(componentConstructor_1);
+        }
+        finally { if (e_1) throw e_1.error; }
+    }
+    return names.sort().join('-');
+}
 
 /**
  * EventDispatcher
  */
 var EventDispatcher = /** @class */ (function () {
     function EventDispatcher() {
-        this.listeners = {};
+        this.listeners = new Map();
         this.stats = {
             fired: 0,
             handled: 0
@@ -229,11 +209,12 @@ var EventDispatcher = /** @class */ (function () {
      */
     EventDispatcher.prototype.addEventListener = function (eventName, listener) {
         var listeners = this.listeners;
-        if (listeners[eventName] === undefined) {
-            listeners[eventName] = [];
+        if (!listeners.has(eventName)) {
+            listeners.set(eventName, []);
         }
-        if (listeners[eventName].indexOf(listener) === -1) {
-            listeners[eventName].push(listener);
+        var listenerArray = listeners.get(eventName);
+        if (listenerArray.indexOf(listener) === -1) {
+            listenerArray.push(listener);
         }
     };
     /**
@@ -242,8 +223,7 @@ var EventDispatcher = /** @class */ (function () {
      * @param listener Callback for the specified event
      */
     EventDispatcher.prototype.hasEventListener = function (eventName, listener) {
-        return (this.listeners[eventName] !== undefined &&
-            this.listeners[eventName].indexOf(listener) !== -1);
+        return (this.listeners.has(eventName) && this.listeners.get(eventName).indexOf(listener) !== -1);
     };
     /**
      * Remove an event listener
@@ -251,7 +231,7 @@ var EventDispatcher = /** @class */ (function () {
      * @param listener Callback for the specified event
      */
     EventDispatcher.prototype.removeEventListener = function (eventName, listener) {
-        var listenerArray = this.listeners[eventName];
+        var listenerArray = this.listeners.get(eventName);
         if (listenerArray !== undefined) {
             var index = listenerArray.indexOf(listener);
             if (index !== -1) {
@@ -267,7 +247,7 @@ var EventDispatcher = /** @class */ (function () {
     EventDispatcher.prototype.dispatchEvent = function (eventName, entity, component) {
         var e_1, _a;
         this.stats.fired++;
-        var listenerArray = this.listeners[eventName];
+        var listenerArray = this.listeners.get(eventName);
         if (listenerArray !== undefined) {
             var array = listenerArray.slice(0);
             try {
@@ -295,38 +275,41 @@ var EventDispatcher = /** @class */ (function () {
 }());
 
 // tslint:disable:no-bitwise
+var QueryEvents;
+(function (QueryEvents) {
+    QueryEvents[QueryEvents["ENTITY_ADDED"] = 0] = "ENTITY_ADDED";
+    QueryEvents[QueryEvents["ENTITY_REMOVED"] = 1] = "ENTITY_REMOVED";
+    QueryEvents[QueryEvents["COMPONENT_CHANGED"] = 2] = "COMPONENT_CHANGED";
+})(QueryEvents || (QueryEvents = {}));
 var Query = /** @class */ (function () {
     /**
      * @param componentConstructors List of types of components to query
      */
-    function Query(componentConstructors, manager) {
+    function Query(componentConstructors, entities, key) {
         var e_1, _a;
         var _this = this;
-        this.ENTITY_ADDED = 'Query#ENTITY_ADDED';
-        this.ENTITY_REMOVED = 'Query#ENTITY_REMOVED';
-        this.COMPONENT_CHANGED = 'Query#COMPONENT_CHANGED';
-        this.Components = [];
-        this.NotComponents = [];
+        this.key = key;
+        this.componentConstructors = [];
+        this.notComponentConstructor = [];
         this.entities = [];
         this.eventDispatcher = new EventDispatcher();
         // This query is being used by a reactive system
         this.reactive = false;
         componentConstructors.forEach(function (componentConstructor) {
             if (typeof componentConstructor === 'object') {
-                _this.NotComponents.push(componentConstructor.component);
+                _this.notComponentConstructor.push(componentConstructor.component);
             }
             else {
-                _this.Components.push(componentConstructor);
+                _this.componentConstructors.push(componentConstructor);
             }
         });
-        if (this.Components.length === 0) {
+        if (this.componentConstructors.length === 0) {
             throw new Error('Can\'t create a query without components');
         }
-        this.key = queryKey(componentConstructors);
         try {
             // Fill the query with the existing entities
-            for (var _b = __values(manager.entities), _c = _b.next(); !_c.done; _c = _b.next()) {
-                var entity = _c.value;
+            for (var entities_1 = __values(entities), entities_1_1 = entities_1.next(); !entities_1_1.done; entities_1_1 = entities_1.next()) {
+                var entity = entities_1_1.value;
                 if (this.match(entity)) {
                     // @todo ??? this.addEntity(entity); => preventing the event to be generated
                     entity.queries.push(this);
@@ -337,7 +320,7 @@ var Query = /** @class */ (function () {
         catch (e_1_1) { e_1 = { error: e_1_1 }; }
         finally {
             try {
-                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                if (entities_1_1 && !entities_1_1.done && (_a = entities_1.return)) _a.call(entities_1);
             }
             finally { if (e_1) throw e_1.error; }
         }
@@ -348,7 +331,7 @@ var Query = /** @class */ (function () {
     Query.prototype.addEntity = function (entity) {
         entity.queries.push(this);
         this.entities.push(entity);
-        this.eventDispatcher.dispatchEvent(Query.prototype.ENTITY_ADDED, entity);
+        this.eventDispatcher.dispatchEvent(QueryEvents.ENTITY_ADDED, entity);
     };
     /**
      * Remove entity from this query
@@ -359,20 +342,20 @@ var Query = /** @class */ (function () {
             this.entities.splice(index, 1);
             index = entity.queries.indexOf(this);
             entity.queries.splice(index, 1);
-            this.eventDispatcher.dispatchEvent(Query.prototype.ENTITY_REMOVED, entity);
+            this.eventDispatcher.dispatchEvent(QueryEvents.ENTITY_REMOVED, entity);
         }
     };
     Query.prototype.match = function (entity) {
-        return (entity.hasAllComponents(this.Components) &&
-            !entity.hasAnyComponents(this.NotComponents));
+        return (entity.hasAllComponents(this.componentConstructors) &&
+            !entity.hasAnyComponents(this.notComponentConstructor));
     };
     Query.prototype.toJSON = function () {
         return {
             key: this.key,
             reactive: this.reactive,
             components: {
-                included: this.Components.map(function (C) { return C.name; }),
-                not: this.NotComponents.map(function (C) { return C.name; })
+                included: this.componentConstructors.map(function (C) { return C.name; }),
+                not: this.notComponentConstructor.map(function (C) { return C.name; })
             },
             numEntities: this.entities.length
         };
@@ -382,7 +365,7 @@ var Query = /** @class */ (function () {
      */
     Query.prototype.stats = function () {
         return {
-            numComponents: this.Components.length,
+            numComponents: this.componentConstructors.length,
             numEntities: this.entities.length
         };
     };
@@ -396,45 +379,33 @@ var Entity = /** @class */ (function () {
         // Unique ID for this entity
         this.id = nextId++;
         // List of components types the entity has
-        this.ComponentTypes = [];
+        this.componentTypes = new Set();
         // Instance of the components
-        this.components = {};
-        this.componentsToRemove = {};
+        this.components = new Map();
+        this.componentsToRemove = new Map();
         // Queries where the entity is added
         this.queries = [];
         // Used for deferred removal
-        this.ComponentTypesToRemove = [];
+        this.componentTypesToRemove = new Set();
         this.alive = false;
     }
     // COMPONENTS
     Entity.prototype.getComponent = function (componentConstructor, includeRemoved) {
-        var component = this.components[componentConstructor.name];
+        var component = this.components.get(componentConstructor.name);
         if (!component && includeRemoved === true) {
-            component = this.componentsToRemove[componentConstructor.name];
+            component = this.componentsToRemove.get(componentConstructor.name);
         }
         return  component;
     };
-    Entity.prototype.getRemovedComponent = function (componentConstructor) {
-        return this.componentsToRemove[componentConstructor.name];
-    };
-    Entity.prototype.getComponents = function () {
-        return this.components;
-    };
-    Entity.prototype.getComponentsToRemove = function () {
-        return this.componentsToRemove;
-    };
-    Entity.prototype.getComponentTypes = function () {
-        return this.ComponentTypes;
-    };
     Entity.prototype.getMutableComponent = function (componentConstructor) {
         var e_1, _a;
-        var component = this.components[componentConstructor.name];
+        var component = this.components.get(componentConstructor.name);
         try {
             for (var _b = __values(this.queries), _c = _b.next(); !_c.done; _c = _b.next()) {
                 var query = _c.value;
                 // @todo accelerate this check. Maybe having query._Components as an object
-                if (query.reactive && query.Components.indexOf(componentConstructor) !== -1) {
-                    query.eventDispatcher.dispatchEvent(Query.prototype.COMPONENT_CHANGED, this, component);
+                if (query.reactive && query.componentConstructors.indexOf(componentConstructor) !== -1) {
+                    query.eventDispatcher.dispatchEvent(QueryEvents.COMPONENT_CHANGED, this, component);
                 }
             }
         }
@@ -447,20 +418,41 @@ var Entity = /** @class */ (function () {
         }
         return component;
     };
+    /**
+     * Once a component is removed from an entity, it is possible to access its contents
+     */
+    Entity.prototype.getRemovedComponent = function (componentConstructor) {
+        return this.componentsToRemove.get(componentConstructor.name);
+    };
+    Entity.prototype.getComponents = function () {
+        return this.components;
+    };
+    Entity.prototype.getComponentsToRemove = function () {
+        return this.componentsToRemove;
+    };
+    Entity.prototype.getComponentTypes = function () {
+        return this.componentTypes;
+    };
     Entity.prototype.addComponent = function (componentConstructor, values) {
         this.entityManager.entityAddComponent(this, componentConstructor, values);
         return this;
     };
+    /**
+     * This will mark the component to be removed and will populate all the queues from the
+     * systems that are listening to that event, but the component itself won't be disposed
+     * until the end of the frame, we call it deferred removal. This is done so systems that
+     * need to react to it can still access the data of the components.
+     */
     Entity.prototype.removeComponent = function (componentConstructor, forceRemove) {
         this.entityManager.entityRemoveComponent(this, componentConstructor, forceRemove);
         return this;
     };
     Entity.prototype.hasComponent = function (componentConstructor, includeRemoved) {
-        return (!!~this.ComponentTypes.indexOf(componentConstructor) ||
+        return (this.componentTypes.has(componentConstructor) ||
             (includeRemoved === true && this.hasRemovedComponent(componentConstructor)));
     };
     Entity.prototype.hasRemovedComponent = function (componentConstructor) {
-        return !!~this.ComponentTypesToRemove.indexOf(componentConstructor);
+        return this.componentTypesToRemove.has(componentConstructor);
     };
     Entity.prototype.hasAllComponents = function (componentConstructors) {
         var e_2, _a;
@@ -508,114 +500,14 @@ var Entity = /** @class */ (function () {
     Entity.prototype.reset = function () {
         this.id = nextId++;
         this.entityManager = null;
-        this.ComponentTypes.length = 0;
+        this.componentTypes.clear();
         this.queries.length = 0;
-        this.components = {};
+        this.components.clear();
     };
     Entity.prototype.remove = function (forceRemove) {
         return this.entityManager.removeEntity(this, forceRemove);
     };
     return Entity;
-}());
-
-// tslint:disable:no-bitwise
-/**
- * QueryManager
- */
-var QueryManager = /** @class */ (function () {
-    function QueryManager(entityManager) {
-        this.entityManager = entityManager;
-        // Queries indexed by a unique identifier for the components it has
-        this.queries = {};
-    }
-    QueryManager.prototype.onEntityRemoved = function (entity) {
-        for (var queryName in this.queries) {
-            if (this.queries.hasOwnProperty(queryName)) {
-                var query = this.queries[queryName];
-                if (entity.queries.indexOf(query) !== -1) {
-                    query.removeEntity(entity);
-                }
-            }
-        }
-    };
-    /**
-     * Callback when a component is added to an entity
-     * @param entity Entity that just got the new component
-     * @param componentConstructor Component added to the entity
-     */
-    QueryManager.prototype.onEntityComponentAdded = function (entity, componentConstructor) {
-        // @todo Use bitmask for checking components?
-        // Check each indexed query to see if we need to add this entity to the list
-        for (var queryName in this.queries) {
-            if (this.queries.hasOwnProperty(queryName)) {
-                var query = this.queries[queryName];
-                if (!!~query.NotComponents.indexOf(componentConstructor) &&
-                    ~query.entities.indexOf(entity)) {
-                    query.removeEntity(entity);
-                    continue;
-                }
-                // Add the entity only if:
-                // Component is in the query
-                // and Entity has ALL the components of the query
-                // and Entity is not already in the query
-                if (!~query.Components.indexOf(componentConstructor) ||
-                    !query.match(entity) ||
-                    ~query.entities.indexOf(entity)) {
-                    continue;
-                }
-                query.addEntity(entity);
-            }
-        }
-    };
-    /**
-     * Callback when a component is removed from an entity
-     * @param entity Entity to remove the component from
-     * @param componentConstructor Component to remove from the entity
-     */
-    QueryManager.prototype.onEntityComponentRemoved = function (entity, componentConstructor) {
-        for (var queryName in this.queries) {
-            if (this.queries.hasOwnProperty(queryName)) {
-                var query = this.queries[queryName];
-                if (!!~query.NotComponents.indexOf(componentConstructor) &&
-                    !~query.entities.indexOf(entity) &&
-                    query.match(entity)) {
-                    query.addEntity(entity);
-                    continue;
-                }
-                if (!!~query.Components.indexOf(componentConstructor) &&
-                    !!~query.entities.indexOf(entity) &&
-                    !query.match(entity)) {
-                    query.removeEntity(entity);
-                    continue;
-                }
-            }
-        }
-    };
-    /**
-     * Get a query for the specified components
-     * @param componentConstructors Components that the query should have
-     */
-    QueryManager.prototype.getQuery = function (componentConstructors) {
-        var key = queryKey(componentConstructors);
-        var query = this.queries[key];
-        if (!query) {
-            this.queries[key] = query = new Query(componentConstructors, this.entityManager);
-        }
-        return query;
-    };
-    /**
-     * Return some stats from this class
-     */
-    QueryManager.prototype.stats = function () {
-        var stats = {};
-        for (var queryName in this.queries) {
-            if (this.queries.hasOwnProperty(queryName)) {
-                stats[queryName] = this.queries[queryName].stats();
-            }
-        }
-        return stats;
-    };
-    return QueryManager;
 }());
 
 /**
@@ -629,19 +521,26 @@ var SystemStateComponent = /** @class */ (function () {
 }());
 
 // tslint:disable:no-bitwise
+var EntityManagerEvents;
+(function (EntityManagerEvents) {
+    EntityManagerEvents[EntityManagerEvents["ENTITY_CREATED"] = 0] = "ENTITY_CREATED";
+    EntityManagerEvents[EntityManagerEvents["ENTITY_REMOVED"] = 1] = "ENTITY_REMOVED";
+    EntityManagerEvents[EntityManagerEvents["COMPONENT_ADDED"] = 2] = "COMPONENT_ADDED";
+    EntityManagerEvents[EntityManagerEvents["COMPONENT_REMOVE"] = 3] = "COMPONENT_REMOVE";
+})(EntityManagerEvents || (EntityManagerEvents = {}));
 /**
  * EntityManager
  */
 var EntityManager = /** @class */ (function () {
-    function EntityManager(componentManager) {
+    function EntityManager(componentManager, queryManager) {
         this.componentManager = componentManager;
+        this.queryManager = queryManager;
         // All the entities in this instance
         this.entities = [];
-        this.queryManager = new QueryManager(this);
         this.eventDispatcher = new EventDispatcher();
         this.entityPool = new ObjectPool(Entity);
         // Deferred deletion
-        this.entitiesWithComponentsToRemove = [];
+        this.entitiesWithComponentsToRemove = new Set();
         this.entitiesToRemove = [];
         this.deferredRemovalEnabled = true;
         this.numStateComponents = 0;
@@ -654,7 +553,7 @@ var EntityManager = /** @class */ (function () {
         entity.alive = true;
         entity.entityManager = this;
         this.entities.push(entity);
-        this.eventDispatcher.dispatchEvent(ENTITY_CREATED, entity);
+        this.eventDispatcher.dispatchEvent(EntityManagerEvents.ENTITY_CREATED, entity);
         return entity;
     };
     // COMPONENTS
@@ -665,16 +564,16 @@ var EntityManager = /** @class */ (function () {
      * @param values Optional values to replace the default attributes
      */
     EntityManager.prototype.entityAddComponent = function (entity, componentConstructor, values) {
-        if (~entity.ComponentTypes.indexOf(componentConstructor)) {
+        if (entity.componentTypes.has(componentConstructor)) {
             return;
         }
-        entity.ComponentTypes.push(componentConstructor);
+        entity.componentTypes.add(componentConstructor);
         if (componentConstructor.__proto__ === SystemStateComponent) {
             this.numStateComponents++;
         }
         var componentPool = this.componentManager.getComponentsPool(componentConstructor);
         var componentFromPool = componentPool.aquire();
-        entity.components[componentConstructor.name] = componentFromPool;
+        entity.components.set(componentConstructor.name, componentFromPool);
         if (values) {
             if (componentFromPool.copy) {
                 componentFromPool.copy(values);
@@ -689,7 +588,7 @@ var EntityManager = /** @class */ (function () {
         }
         this.queryManager.onEntityComponentAdded(entity, componentConstructor);
         this.componentManager.componentAddedToEntity(componentConstructor);
-        this.eventDispatcher.dispatchEvent(COMPONENT_ADDED, entity, componentConstructor);
+        this.eventDispatcher.dispatchEvent(EntityManagerEvents.COMPONENT_ADDED, entity, componentConstructor);
     };
     /**
      * Remove a component from an entity
@@ -698,23 +597,22 @@ var EntityManager = /** @class */ (function () {
      * @param immediately If you want to remove the component immediately instead of deferred (Default is false)
      */
     EntityManager.prototype.entityRemoveComponent = function (entity, componentConstructor, immediately) {
-        var index = entity.ComponentTypes.indexOf(componentConstructor);
-        if (!~index) {
+        if (!entity.componentTypes.has(componentConstructor)) {
             return;
         }
-        this.eventDispatcher.dispatchEvent(COMPONENT_REMOVE, entity, componentConstructor);
+        this.eventDispatcher.dispatchEvent(EntityManagerEvents.COMPONENT_REMOVE, entity, componentConstructor);
         if (immediately) {
-            this._entityRemoveComponentSync(entity, componentConstructor, index);
+            this.entityRemoveComponentSync(entity, componentConstructor);
         }
         else {
-            if (entity.ComponentTypesToRemove.length === 0) {
-                this.entitiesWithComponentsToRemove.push(entity);
+            if (entity.componentTypesToRemove.size === 0) {
+                this.entitiesWithComponentsToRemove.add(entity);
             }
-            entity.ComponentTypes.splice(index, 1);
-            entity.ComponentTypesToRemove.push(componentConstructor);
+            entity.componentTypes.delete(componentConstructor);
+            entity.componentTypesToRemove.add(componentConstructor);
             var componentName = getName(componentConstructor);
-            entity.componentsToRemove[componentName] = entity.components[componentName];
-            delete entity.components[componentName];
+            entity.componentsToRemove.set(componentName, entity.components.get(componentName));
+            entity.components.delete(componentName);
         }
         // Check each indexed query to see if we need to remove it
         this.queryManager.onEntityComponentRemoved(entity, componentConstructor);
@@ -726,26 +624,34 @@ var EntityManager = /** @class */ (function () {
             }
         }
     };
-    EntityManager.prototype._entityRemoveComponentSync = function (entity, componentConstructor, index) {
+    EntityManager.prototype.entityRemoveComponentSync = function (entity, componentConstructor) {
         // Remove T listing on entity and property ref, then free the component.
-        entity.ComponentTypes.splice(index, 1);
-        var propName = componentPropertyName(componentConstructor);
+        entity.componentTypes.delete(componentConstructor);
         var componentName = getName(componentConstructor);
-        var componentEntity = entity.components[componentName];
-        delete entity.components[componentName];
-        this.componentManager.componentPool[propName].release(componentEntity);
-        this.componentManager.componentRemovedFromEntity(componentConstructor);
+        var componentEntity = entity.components.get(componentName);
+        entity.components.delete(componentName);
+        this.componentManager.componentPool.get(componentConstructor).release(componentEntity);
     };
     /**
      * Remove all the components from an entity
      * @param entity Entity from which the components will be removed
      */
     EntityManager.prototype.entityRemoveAllComponents = function (entity, immediately) {
-        var Components = entity.ComponentTypes;
-        for (var j = Components.length - 1; j >= 0; j--) {
-            if (Components[j].__proto__ !== SystemStateComponent) {
-                this.entityRemoveComponent(entity, Components[j], immediately);
+        var e_1, _a;
+        try {
+            for (var _b = __values(entity.componentTypes), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var componentType = _c.value;
+                if (componentType.__proto__ !== SystemStateComponent) {
+                    this.entityRemoveComponent(entity, componentType, immediately);
+                }
             }
+        }
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            }
+            finally { if (e_1) throw e_1.error; }
         }
     };
     /**
@@ -761,10 +667,10 @@ var EntityManager = /** @class */ (function () {
         entity.alive = false;
         if (this.numStateComponents === 0) {
             // Remove from entity list
-            this.eventDispatcher.dispatchEvent(ENTITY_REMOVED, entity);
+            this.eventDispatcher.dispatchEvent(EntityManagerEvents.ENTITY_REMOVED, entity);
             this.queryManager.onEntityRemoved(entity);
             if (immediately === true) {
-                this._releaseEntity(entity, index);
+                this.releaseEntity(entity, index);
             }
             else {
                 this.entitiesToRemove.push(entity);
@@ -772,7 +678,7 @@ var EntityManager = /** @class */ (function () {
         }
         this.entityRemoveAllComponents(entity, immediately);
     };
-    EntityManager.prototype._releaseEntity = function (entity, index) {
+    EntityManager.prototype.releaseEntity = function (entity, index) {
         this.entities.splice(index, 1);
         // Prevent any access and free
         entity.entityManager = null;
@@ -787,55 +693,62 @@ var EntityManager = /** @class */ (function () {
         }
     };
     EntityManager.prototype.processDeferredRemoval = function () {
-        var e_1, _a, e_2, _b;
+        var e_2, _a, e_3, _b, e_4, _c;
         if (!this.deferredRemovalEnabled) {
             return;
         }
         try {
-            for (var _c = __values(this.entitiesToRemove), _d = _c.next(); !_d.done; _d = _c.next()) {
-                var entity = _d.value;
+            for (var _d = __values(this.entitiesToRemove), _e = _d.next(); !_e.done; _e = _d.next()) {
+                var entity = _e.value;
                 var index = this.entities.indexOf(entity);
-                this._releaseEntity(entity, index);
-            }
-        }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
-        finally {
-            try {
-                if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
-            }
-            finally { if (e_1) throw e_1.error; }
-        }
-        this.entitiesToRemove.length = 0;
-        try {
-            for (var _e = __values(this.entitiesWithComponentsToRemove), _f = _e.next(); !_f.done; _f = _e.next()) {
-                var entity = _f.value;
-                while (entity.ComponentTypesToRemove.length > 0) {
-                    var componentToREmove = entity.ComponentTypesToRemove.pop();
-                    var propName = componentPropertyName(componentToREmove);
-                    var componentName = getName(componentToREmove);
-                    var component = entity.componentsToRemove[componentName];
-                    delete entity.componentsToRemove[componentName];
-                    this.componentManager.componentPool[propName].release(component);
-                    this.componentManager.componentRemovedFromEntity(componentToREmove);
-                    // this._entityRemoveComponentSync(entity, Component, index);
-                }
+                this.releaseEntity(entity, index);
             }
         }
         catch (e_2_1) { e_2 = { error: e_2_1 }; }
         finally {
             try {
-                if (_f && !_f.done && (_b = _e.return)) _b.call(_e);
+                if (_e && !_e.done && (_a = _d.return)) _a.call(_d);
             }
             finally { if (e_2) throw e_2.error; }
         }
-        this.entitiesWithComponentsToRemove.length = 0;
+        this.entitiesToRemove.length = 0;
+        try {
+            for (var _f = __values(this.entitiesWithComponentsToRemove), _g = _f.next(); !_g.done; _g = _f.next()) {
+                var entity = _g.value;
+                try {
+                    for (var _h = (e_4 = void 0, __values(entity.componentTypesToRemove)), _j = _h.next(); !_j.done; _j = _h.next()) {
+                        var componentTypeToRemove = _j.value;
+                        var componentName = getName(componentTypeToRemove);
+                        var component = entity.componentsToRemove.get(componentName);
+                        entity.componentsToRemove.delete(componentName);
+                        this.componentManager.componentPool.get(componentTypeToRemove).release(component);
+                    }
+                }
+                catch (e_4_1) { e_4 = { error: e_4_1 }; }
+                finally {
+                    try {
+                        if (_j && !_j.done && (_c = _h.return)) _c.call(_h);
+                    }
+                    finally { if (e_4) throw e_4.error; }
+                }
+                entity.componentTypesToRemove.clear();
+            }
+        }
+        catch (e_3_1) { e_3 = { error: e_3_1 }; }
+        finally {
+            try {
+                if (_g && !_g.done && (_b = _f.return)) _b.call(_f);
+            }
+            finally { if (e_3) throw e_3.error; }
+        }
+        this.entitiesWithComponentsToRemove.clear();
     };
     /**
      * Get a query based on a list of components
-     * @param componentConstructor List of components that will form the query
+     * @param componentConstructors List of components that will form the query
      */
-    EntityManager.prototype.queryComponents = function (componentConstructor) {
-        return this.queryManager.getQuery(componentConstructor);
+    EntityManager.prototype.getQuery = function (componentConstructors) {
+        return this.queryManager.getQuery(componentConstructors, this.entities);
     };
     // EXTRAS
     /**
@@ -848,6 +761,7 @@ var EntityManager = /** @class */ (function () {
      * Return some stats
      */
     EntityManager.prototype.stats = function () {
+        var e_5, _a;
         var stats = {
             numEntities: this.entities.length,
             numQueries: Object.keys(this.queryManager.queries).length,
@@ -857,25 +771,162 @@ var EntityManager = /** @class */ (function () {
             componentPool: {},
             eventDispatcher: this.eventDispatcher.stats
         };
-        for (var cname in this.componentManager.componentPool) {
-            if (this.componentManager.componentPool.hasOwnProperty(cname)) {
-                var pool = this.componentManager.componentPool[cname];
-                stats.componentPool[cname] = {
+        try {
+            for (var _b = __values(this.componentManager.componentPool), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var _d = __read(_c.value, 2), cname = _d[0], _ = _d[1];
+                var pool = this.componentManager.componentPool.get(cname);
+                stats.componentPool[cname.name] = {
                     used: pool.totalUsed(),
                     size: pool.count
                 };
             }
         }
+        catch (e_5_1) { e_5 = { error: e_5_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            }
+            finally { if (e_5) throw e_5.error; }
+        }
         return stats;
     };
     return EntityManager;
 }());
-var ENTITY_CREATED = 'EntityManager#ENTITY_CREATE';
-var ENTITY_REMOVED = 'EntityManager#ENTITY_REMOVED';
-var COMPONENT_ADDED = 'EntityManager#COMPONENT_ADDED';
-var COMPONENT_REMOVE = 'EntityManager#COMPONENT_REMOVE';
 
-function canExecute(system) {
+// tslint:disable:no-bitwise
+/**
+ * QueryManager
+ */
+var QueryManager = /** @class */ (function () {
+    function QueryManager() {
+        // Queries indexed by a unique identifier for the components it has
+        this.queries = new Map();
+    }
+    QueryManager.prototype.onEntityRemoved = function (entity) {
+        var e_1, _a;
+        try {
+            for (var _b = __values(this.queries), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var _d = __read(_c.value, 2), _ = _d[0], query = _d[1];
+                if (entity.queries.indexOf(query) !== -1) {
+                    query.removeEntity(entity);
+                }
+            }
+        }
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            }
+            finally { if (e_1) throw e_1.error; }
+        }
+    };
+    /**
+     * Callback when a component is added to an entity
+     * @param entity Entity that just got the new component
+     * @param componentConstructor Component added to the entity
+     */
+    QueryManager.prototype.onEntityComponentAdded = function (entity, componentConstructor) {
+        // @todo Use bitmask for checking components?
+        var e_2, _a;
+        try {
+            // Check each indexed query to see if we need to add this entity to the list
+            for (var _b = __values(this.queries), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var _d = __read(_c.value, 2), _ = _d[0], query = _d[1];
+                if (!!~query.notComponentConstructor.indexOf(componentConstructor) &&
+                    ~query.entities.indexOf(entity)) {
+                    query.removeEntity(entity);
+                    continue;
+                }
+                // Add the entity only if:
+                // Component is in the query
+                // and Entity has ALL the components of the query
+                // and Entity is not already in the query
+                if (!~query.componentConstructors.indexOf(componentConstructor) ||
+                    !query.match(entity) ||
+                    ~query.entities.indexOf(entity)) {
+                    continue;
+                }
+                query.addEntity(entity);
+            }
+        }
+        catch (e_2_1) { e_2 = { error: e_2_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            }
+            finally { if (e_2) throw e_2.error; }
+        }
+    };
+    /**
+     * Callback when a component is removed from an entity
+     * @param entity Entity to remove the component from
+     * @param componentConstructor Component to remove from the entity
+     */
+    QueryManager.prototype.onEntityComponentRemoved = function (entity, componentConstructor) {
+        var e_3, _a;
+        try {
+            for (var _b = __values(this.queries), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var _d = __read(_c.value, 2), _ = _d[0], query = _d[1];
+                if (!!~query.notComponentConstructor.indexOf(componentConstructor) &&
+                    !~query.entities.indexOf(entity) &&
+                    query.match(entity)) {
+                    query.addEntity(entity);
+                    continue;
+                }
+                if (!!~query.componentConstructors.indexOf(componentConstructor) &&
+                    !!~query.entities.indexOf(entity) &&
+                    !query.match(entity)) {
+                    query.removeEntity(entity);
+                    continue;
+                }
+            }
+        }
+        catch (e_3_1) { e_3 = { error: e_3_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            }
+            finally { if (e_3) throw e_3.error; }
+        }
+    };
+    /**
+     * Get a query for the specified components
+     * @param componentConstructors Components that the query should have
+     */
+    QueryManager.prototype.getQuery = function (componentConstructors, entities) {
+        var key = queryKey(componentConstructors);
+        var query = this.queries.get(key);
+        if (!query) {
+            query = new Query(componentConstructors, entities, key);
+            this.queries.set(key, query);
+        }
+        return query;
+    };
+    /**
+     * Return some stats from this class
+     */
+    QueryManager.prototype.stats = function () {
+        var e_4, _a;
+        var stats = {};
+        try {
+            for (var _b = __values(this.queries), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var _d = __read(_c.value, 2), queryName = _d[0], query = _d[1];
+                stats[queryName] = query.stats();
+            }
+        }
+        catch (e_4_1) { e_4 = { error: e_4_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            }
+            finally { if (e_4) throw e_4.error; }
+        }
+        return stats;
+    };
+    return QueryManager;
+}());
+
+var canExecute = function (system) {
     var e_1, _a;
     if (system.mandatoryQueries.length === 0) {
         return true;
@@ -896,9 +947,9 @@ function canExecute(system) {
         finally { if (e_1) throw e_1.error; }
     }
     return true;
-}
+};
 
-function clearEvents(system) {
+var clearEvents = function (system) {
     for (var queryName in system.queries) {
         if (system.queries.hasOwnProperty(queryName)) {
             var query = system.queries[queryName];
@@ -922,18 +973,19 @@ function clearEvents(system) {
             }
         }
     }
-}
+};
 
 // tslint:disable:no-bitwise
 var SystemManager = /** @class */ (function () {
     function SystemManager(entityManager) {
         this.entityManager = entityManager;
-        this.systems = [];
+        this.systems = new Map();
+        // order is important
         this.executeSystems = []; // Systems that have `execute` method
         this.lastExecutedSystem = null;
     }
     SystemManager.prototype.registerSystem = function (systemConstructor, attributes) {
-        if (this.systems.find(function (s) { return s.constructor.name === systemConstructor.name; }) !== undefined) {
+        if (this.systems.has(systemConstructor)) {
             console.warn("System '" + systemConstructor.name + "' already registered.");
             return this;
         }
@@ -942,15 +994,17 @@ var SystemManager = /** @class */ (function () {
         if (attributes && attributes.priority) {
             system.priority = attributes.priority;
         }
-        if (systemConstructor.queries) {
+        if (systemConstructor.systemData) {
+            system.queriesOther = [];
+            system.queries = {};
             var _loop_1 = function (queryName) {
-                if (systemConstructor.queries.hasOwnProperty(queryName)) {
-                    var queryConfig_1 = systemConstructor.queries[queryName];
+                if (systemConstructor.systemData.hasOwnProperty(queryName)) {
+                    var queryConfig_1 = systemConstructor.systemData[queryName];
                     var components = queryConfig_1.components;
                     if (!components || components.length === 0) {
                         throw new Error('\'components\' attribute can\'t be empty in a query');
                     }
-                    var query_1 = this_1.entityManager.queryComponents(components);
+                    var query_1 = this_1.entityManager.getQuery(components);
                     system.queriesOther[queryName] = query_1;
                     if (queryConfig_1.mandatory === true) {
                         system.mandatoryQueries.push(query_1);
@@ -958,57 +1012,61 @@ var SystemManager = /** @class */ (function () {
                     system.queries[queryName] = {
                         results: query_1.entities
                     };
-                    // Reactive configuration added/removed/changed
-                    var validEvents = ['added', 'removed', 'changed'];
-                    var eventMapping_1 = {
-                        added: Query.prototype.ENTITY_ADDED,
-                        removed: Query.prototype.ENTITY_REMOVED,
-                        changed: Query.prototype.COMPONENT_CHANGED // Query.prototype.ENTITY_CHANGED
+                    var events = {
+                        added: function () {
+                            var eventList = (system.queries[queryName].added = []);
+                            query_1.eventDispatcher.addEventListener(QueryEvents.ENTITY_ADDED, function (entity) {
+                                // @fixme overhead?
+                                if (eventList.indexOf(entity) === -1) {
+                                    eventList.push(entity);
+                                }
+                            });
+                        },
+                        removed: function () {
+                            var eventList = (system.queries[queryName].removed = []);
+                            query_1.eventDispatcher.addEventListener(QueryEvents.ENTITY_REMOVED, function (entity) {
+                                // @fixme overhead?
+                                if (eventList.indexOf(entity) === -1) {
+                                    eventList.push(entity);
+                                }
+                            });
+                        },
+                        changed: function () {
+                            var event = queryConfig_1.listen.changed;
+                            query_1.reactive = true;
+                            if (event === true) {
+                                // Any change on the entity from the components in the query
+                                var eventList_1 = (system.queries[queryName].changed = []);
+                                query_1.eventDispatcher.addEventListener(QueryEvents.COMPONENT_CHANGED, function (entity) {
+                                    // Avoid duplicates
+                                    if (eventList_1.indexOf(entity) === -1) {
+                                        eventList_1.push(entity);
+                                    }
+                                });
+                            }
+                            else if (Array.isArray(event)) {
+                                var eventList_2 = (system.queries[queryName].changed = []);
+                                query_1.eventDispatcher.addEventListener(QueryEvents.COMPONENT_CHANGED, function (entity, changedComponent) {
+                                    // Avoid duplicates
+                                    if (event.indexOf(changedComponent.constructor) !== -1 &&
+                                        eventList_2.indexOf(entity) === -1) {
+                                        eventList_2.push(entity);
+                                    }
+                                });
+                            }
+                        }
                     };
                     if (queryConfig_1.listen) {
-                        validEvents.forEach(function (eventName) {
-                            // Is the event enabled on this system's query?
-                            if (queryConfig_1.listen[eventName]) {
-                                var event_1 = queryConfig_1.listen[eventName];
-                                if (eventName === 'changed') {
-                                    query_1.reactive = true;
-                                    if (event_1 === true) {
-                                        // Any change on the entity from the components in the query
-                                        var eventList_1 = (system.queries[queryName][eventName] = []);
-                                        query_1.eventDispatcher.addEventListener(Query.prototype.COMPONENT_CHANGED, function (entity) {
-                                            // Avoid duplicates
-                                            if (eventList_1.indexOf(entity) === -1) {
-                                                eventList_1.push(entity);
-                                            }
-                                        });
-                                    }
-                                    else if (Array.isArray(event_1)) {
-                                        var eventList_2 = (system.queries[queryName][eventName] = []);
-                                        query_1.eventDispatcher.addEventListener(Query.prototype.COMPONENT_CHANGED, function (entity, changedComponent) {
-                                            // Avoid duplicates
-                                            if (event_1.indexOf(changedComponent.constructor) !== -1 &&
-                                                eventList_2.indexOf(entity) === -1) {
-                                                eventList_2.push(entity);
-                                            }
-                                        });
-                                    }
-                                }
-                                else {
-                                    var eventList_3 = (system.queries[queryName][eventName] = []);
-                                    query_1.eventDispatcher.addEventListener(eventMapping_1[eventName], function (entity) {
-                                        // @fixme overhead?
-                                        if (eventList_3.indexOf(entity) === -1) {
-                                            eventList_3.push(entity);
-                                        }
-                                    });
-                                }
+                        for (var eventName in queryConfig_1.listen) {
+                            if (queryConfig_1.listen.hasOwnProperty(eventName) && events[eventName]) {
+                                events[eventName]();
                             }
-                        });
+                        }
                     }
                 }
             };
             var this_1 = this;
-            for (var queryName in systemConstructor.queries) {
+            for (var queryName in systemConstructor.systemData) {
                 _loop_1(queryName);
             }
         }
@@ -1016,8 +1074,8 @@ var SystemManager = /** @class */ (function () {
         if (system.init) {
             system.init();
         }
-        system.order = this.systems.length;
-        this.systems.push(system);
+        system.order = this.systems.size;
+        this.systems.set(systemConstructor, system);
         if (system.run) {
             this.executeSystems.push(system);
             this.sortSystems();
@@ -1030,17 +1088,13 @@ var SystemManager = /** @class */ (function () {
         });
     };
     SystemManager.prototype.getSystem = function (systemConstructor) {
-        return this.systems.find(function (s) { return s instanceof systemConstructor; });
+        return this.systems.get(systemConstructor);
     };
     SystemManager.prototype.getSystems = function () {
         return this.systems;
     };
-    SystemManager.prototype.removeSystem = function (system) {
-        var index = this.systems.indexOf(system);
-        if (!~index) {
-            return;
-        }
-        this.systems.splice(index, 1);
+    SystemManager.prototype.removeSystem = function (systemConstructor) {
+        this.systems.delete(systemConstructor);
     };
     SystemManager.prototype.runSystem = function (system) {
         if (system.initialized) {
@@ -1092,7 +1146,7 @@ var SystemManager = /** @class */ (function () {
     SystemManager.prototype.stats = function () {
         var e_3, _a;
         var stats = {
-            numSystems: this.systems.length,
+            numSystems: this.systems.size,
             systems: {}
         };
         try {
@@ -1127,21 +1181,16 @@ var World = /** @class */ (function () {
     /**
      * Create a new World.
      */
-    function World() {
-        this.componentsManager = new ComponentManager();
-        this.entityManager = new EntityManager(this.componentsManager);
-        this.systemManager = new SystemManager(this.entityManager);
+    function World(componentsManager, entityManager, systemManager) {
+        if (componentsManager === void 0) { componentsManager = new ComponentManager(); }
+        if (entityManager === void 0) { entityManager = new EntityManager(componentsManager, new QueryManager()); }
+        if (systemManager === void 0) { systemManager = new SystemManager(entityManager); }
+        this.componentsManager = componentsManager;
+        this.entityManager = entityManager;
+        this.systemManager = systemManager;
         this.enabled = true;
         this.eventQueues = {};
         this.lastTime = performance.now();
-        if (typeof CustomEvent !== 'undefined') {
-            var event = new CustomEvent('ecsy-world-created', {
-                detail: {
-                    world: this,
-                }
-            });
-            window.dispatchEvent(event);
-        }
     }
     /**
      * Register a component.
@@ -1209,53 +1258,115 @@ var World = /** @class */ (function () {
     return World;
 }());
 
-var SystemBase = /** @class */ (function () {
-    function SystemBase() {
-        this.enabled = true;
-        this.initialized = true;
-        this.queriesOther = {};
-        this.queries = {};
-        this.mandatoryQueries = [];
+function createType(typeDefinition) {
+    var mandatoryFunctions = [
+        'create',
+        'reset',
+        'clear'
+        /*"copy"*/
+    ];
+    var undefinedFunctions = mandatoryFunctions.filter(function (f) {
+        return !typeDefinition[f];
+    });
+    if (undefinedFunctions.length > 0) {
+        throw new Error("createType expect type definition to implements the following functions: " + undefinedFunctions.join(', '));
     }
-    SystemBase.prototype.run = function () { };
-    SystemBase.prototype.play = function () {
-        this.enabled = true;
-    };
-    SystemBase.prototype.stop = function () {
-        this.enabled = false;
-    };
-    return SystemBase;
-}());
+    typeDefinition.isType = true;
+    return typeDefinition;
+}
 
 /**
- * Use the Not class to negate a component query.
+ * Standard types
  */
-var Not = function (component) { return ({
-    operator: 'not',
-    component: component,
-}); };
-
-var Types;
-(function (Types) {
-    Types["Number"] = "number";
-    Types["Boolean"] = "boolean";
-    Types["String"] = "string";
-    Types["Array"] = "array";
-})(Types || (Types = {}));
 var standardTypes = {
-    number: Types.Number,
-    boolean: Types.Boolean,
-    string: Types.String
+    number: createType({
+        baseType: Number,
+        isSimpleType: true,
+        create: function (defaultValue) {
+            return typeof defaultValue !== 'undefined' ? defaultValue : 0;
+        },
+        reset: function (src, key, defaultValue) {
+            if (typeof defaultValue !== 'undefined') {
+                src[key] = defaultValue;
+            }
+            else {
+                src[key] = 0;
+            }
+        },
+        clear: function (src, key) {
+            src[key] = 0;
+        }
+    }),
+    boolean: createType({
+        baseType: Boolean,
+        isSimpleType: true,
+        create: function (defaultValue) {
+            return typeof defaultValue !== 'undefined' ? defaultValue : false;
+        },
+        reset: function (src, key, defaultValue) {
+            if (typeof defaultValue !== 'undefined') {
+                src[key] = defaultValue;
+            }
+            else {
+                src[key] = false;
+            }
+        },
+        clear: function (src, key) {
+            src[key] = false;
+        }
+    }),
+    string: createType({
+        baseType: String,
+        isSimpleType: true,
+        create: function (defaultValue) {
+            return typeof defaultValue !== 'undefined' ? defaultValue : '';
+        },
+        reset: function (src, key, defaultValue) {
+            if (typeof defaultValue !== 'undefined') {
+                src[key] = defaultValue;
+            }
+            else {
+                src[key] = '';
+            }
+        },
+        clear: function (src, key) {
+            src[key] = '';
+        }
+    }),
+    array: createType({
+        baseType: Array,
+        create: function (defaultValue) {
+            if (typeof defaultValue !== 'undefined') {
+                return defaultValue.slice();
+            }
+            return [];
+        },
+        reset: function (src, key, defaultValue) {
+            if (typeof defaultValue !== 'undefined') {
+                src[key] = defaultValue.slice();
+            }
+            else {
+                src[key].length = 0;
+            }
+        },
+        clear: function (src, key) {
+            src[key].length = 0;
+        },
+        copy: function (src, dst, key) {
+            src[key] = dst[key].slice();
+        }
+    }),
 };
+
 /**
  * Try to infer the type of the value
  * @return Type of the attribute
  */
 function inferType(value) {
     if (Array.isArray(value)) {
-        return Types.Array;
+        return standardTypes.array;
     }
-    if (standardTypes[typeof value]) {
+    else if (standardTypes[typeof value]) {
         return standardTypes[typeof value];
     }
     else {
@@ -1368,8 +1479,4 @@ function createComponentClass(schema, name) {
     return Component;
 }
 
-var version = "0.1.4";
-
-var Version = version;
-
-export { Not, SystemBase, Version, World, createComponentClass };
+export { ComponentManager, Entity, EntityManager, EntityManagerEvents, SystemManager, World, createComponentClass, createType };

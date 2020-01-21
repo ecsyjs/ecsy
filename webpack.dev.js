@@ -12,7 +12,7 @@ module.exports = env => ({
   devtool: 'inline-source-map',
   entry: {
     bundle: './examples/index.ts',
-    canvas: './examples/ecs-canvas/index.ts',
+    canvas: './examples/canvas/index.ts',
   },
   output: {
     filename: '[name].js',
@@ -114,25 +114,16 @@ module.exports = env => ({
     // }),
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
-      // chunks: ['canvas'],
-      filename: 'ecs-canvas.html',
-      template: './examples/ecs-canvas/index.html',
+      template: './examples/index.html',
+      inject: true,
+      chunks: ['bundle'],
+      filename: 'index.html',
     }),
     new HtmlWebpackPlugin({
-      // chunks: ['bundle'],
-      template: './examples/index.html',
+      template: './examples/canvas/index.html',
+      inject: true,
+      chunks: ['canvas'],
+      filename: 'canvas.html',
     }),
-
   ],
-  optimization: {
-    splitChunks: {
-      cacheGroups: {
-        commons: {
-          test: /[\\/]node_modules[\\/]/,
-          name: 'vendors',
-          chunks: 'all'
-        }
-      }
-    }
-  },
 });
