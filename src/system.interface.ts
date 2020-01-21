@@ -1,5 +1,6 @@
 import { ComponentConstructor } from './component.interface';
 import { Entity } from './entity';
+import { Not } from './not';
 
 /**
  * A system that manipulates entities in the world.
@@ -56,14 +57,14 @@ export interface System {
 
 export interface SystemConstructor<T extends System> {
   new (...args: any): T;
-  systemData: {
+  systemData?: {
     [key: string]: {
-      components: ComponentConstructor[];
+      components: (ComponentConstructor | Not)[];
       mandatory?: boolean;
       listen?: {
         added?: boolean;
         removed?: boolean;
-        changed?: boolean;
+        changed?: boolean | (ComponentConstructor | Not)[];
       };
     };
   };

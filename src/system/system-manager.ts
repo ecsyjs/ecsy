@@ -3,11 +3,12 @@ import { QueryEvents } from '../entity/query';
 import { System, SystemConstructor } from '../system.interface';
 import { canExecute } from './can-execute';
 import { clearEvents } from './clear-events';
+import { ComponentConstructor } from 'src/component.interface';
 
 // tslint:disable:no-bitwise
 
 export class SystemManager {
-  private systems = new Map<SystemConstructor<System>, System>();
+  systems = new Map<SystemConstructor<System>, System>();
 
   // order is important
   private executeSystems: System[] = []; // Systems that have `execute` method
@@ -32,6 +33,8 @@ export class SystemManager {
     if (attributes && attributes.priority) {
       system.priority = attributes.priority;
     }
+
+
 
     if (systemConstructor.systemData) {
       system.queriesOther = [];
@@ -114,7 +117,7 @@ export class SystemManager {
                   (entity, changedComponent) => {
                     // Avoid duplicates
                     if (
-                      event.indexOf(changedComponent.constructor) !== -1 &&
+                      event.indexOf(changedComponent.constructor as ComponentConstructor) !== -1 &&
                       eventList.indexOf(entity) === -1
                     ) {
                       eventList.push(entity);

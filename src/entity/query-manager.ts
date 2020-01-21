@@ -1,3 +1,5 @@
+import { Not } from 'src/not';
+
 import { ComponentConstructor } from '../component.interface';
 import { queryKey } from '../utils';
 import { Entity } from './entity';
@@ -94,7 +96,7 @@ export class QueryManager {
    * Get a query for the specified components
    * @param componentConstructors Components that the query should have
    */
-  getQuery(componentConstructors: ComponentConstructor[], entities: Entity[]): Query {
+  getQuery(componentConstructors: (ComponentConstructor | Not)[], entities: Entity[]): Query {
     const key = queryKey(componentConstructors);
 
     let query = this.queries.get(key);

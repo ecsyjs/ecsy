@@ -69,6 +69,7 @@ export function createComponentClass(schema: any, name: string): ComponentConstr
     }
   } else {
     Component.prototype.copy = function(src) {
+
       for (const key in schema) {
         if (src[key]) {
           const type = schema[key].type;

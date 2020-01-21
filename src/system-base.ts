@@ -5,7 +5,7 @@ export abstract class SystemBase implements System {
   initialized = true;
 
   queriesOther = {};
-  queries = {};
+  queries: any = {};
 
   mandatoryQueries = [];
 

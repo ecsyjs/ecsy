@@ -1,3 +1,5 @@
+import { Not } from 'src/not';
+
 import { ComponentManager } from '../component';
 import { ComponentConstructor } from '../component.interface';
 import { getName } from '../utils';
@@ -26,7 +28,7 @@ export class EntityManager {
   entities: Entity[] = [];
 
   eventDispatcher = new EventDispatcher<EntityManagerEvents>();
-  private entityPool = new ObjectPool<Entity>(Entity);
+  entityPool = new ObjectPool<Entity>(Entity);
 
   // Deferred deletion
   entitiesWithComponentsToRemove = new Set<Entity>();
@@ -243,7 +245,7 @@ export class EntityManager {
    * Get a query based on a list of components
    * @param componentConstructors List of components that will form the query
    */
-  getQuery(componentConstructors: ComponentConstructor[]): Query {
+  getQuery(componentConstructors: (ComponentConstructor | Not)[]): Query {
     return this.queryManager.getQuery(componentConstructors, this.entities);
   }
 

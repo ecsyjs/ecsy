@@ -1,7 +1,9 @@
 export class Vector3 {
-  constructor(x, y, z) {
-    this.set(x, y, z);
-  }
+  constructor(
+    public x,
+    public y,
+    public z,
+  ) {}
 
   copy(src) {
     this.x = src.x;

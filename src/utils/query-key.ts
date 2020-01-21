@@ -1,3 +1,5 @@
+import { Not } from 'src/not';
+
 import { ComponentConstructor } from '../component.interface';
 import { getName } from './get-name';
 
@@ -5,13 +7,13 @@ import { getName } from './get-name';
  * Get a key from a list of components
  * @param Components Array of components to generate the key
  */
-export function queryKey(componentConstructor: (ComponentConstructor | any)[]) {
+export function queryKey(componentConstructor: (ComponentConstructor | Not)[]) {
   const names = [];
 
   for (const T of componentConstructor) {
     if (typeof T === 'object') {
       const operator = T.operator === 'not' ? '!' : T.operator;
-      names.push(operator + getName(T.Component));
+      names.push(operator + getName(T.component));
     } else {
       names.push(getName(T));
     }

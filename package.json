@@ -14,9 +14,9 @@
     "lint": "eslint test examples",
     "start": "npm run dev:server",
     "build:dev": "webpack --config webpack.dev.js",
-    "test": "ava",
+    "test": "jest",
     "travis": "npm run lint && npm run test && npm run build",
-    "watch:test": "ava --watch"
+    "watch:test": "jest --watch",
   },
   "repository": {
     "type": "git",
@@ -57,6 +57,7 @@
   "homepage": "https://github.com/fernandojsg/ecsy#readme",
   "devDependencies": {
     "@rollup/plugin-typescript": "^2.1.0",
+    "@types/jest": "^24.9.0",
     "ava": "^1.4.1",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
@@ -72,6 +73,8 @@
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^3.2.0",
     "http-server": "^0.11.1",
+    "jest": "^24.9.0",
+    "jest-environment-jsdom-fourteen": "^1.0.1",
     "node-sass": "^4.13.1",
     "nodemon": "^1.19.4",
     "prettier": "^1.19.1",
@@ -79,6 +82,7 @@
     "rollup-plugin-json": "^4.0.0",
     "rollup-plugin-terser": "^5.1.2",
     "sass-loader": "^8.0.2",
+    "ts-jest": "^24.3.0",
     "ts-loader": "^6.2.1",
     "tsconfig-paths-webpack-plugin": "^3.2.0",
     "typedoc": "^0.15.3",

@@ -1,7 +1,5 @@
 export class FooComponent {
-  constructor() {
-    this.variableFoo = 0;
-  }
+  variableFoo = 0;
 
   copy(src) {
     this.variableFoo = src.variableFoo;
@@ -9,9 +7,7 @@ export class FooComponent {
 }
 
 export class BarComponent {
-  constructor() {
-    this.variableBar = 0;
-  }
+  variableBar = 0;
 
   copy(src) {
     this.variableBar = src.variableBar;
@@ -19,9 +15,7 @@ export class BarComponent {
 }
 
 export class NoCopyComponent {
-  constructor() {
-    this.variable = 0;
-  }
+  variable = 0;
 }
 
 export class EmptyComponent {}
