@@ -3,4 +3,4 @@ import { RemovingComponentsComponent } from './removing-components/removing-comp
 
 console.log(`Main aasds  `);
 
-// new RemovingComponentsComponent(); 
+// new RemovingComponentsComponent();
