@@ -1,4 +1,4 @@
-import { System } from '../system.interface';
+import { System } from './system';
 
 export const clearEvents = (system: System) => {
 

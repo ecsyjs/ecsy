@@ -1,4 +1,5 @@
-import { System, SystemConstructor } from '../system.interface';
+import { SystemConstructor } from '../system.interface';
+import { System } from './system';
 
 export function systemToJSON(system: System) {
   const json = {

@@ -1,4 +1,4 @@
-import { Not } from 'src/not';
+import { NotComponent } from 'src/not';
 
 import { ComponentConstructor } from '../component.interface';
 import { getName } from './get-name';
@@ -7,7 +7,7 @@ import { getName } from './get-name';
  * Get a key from a list of components
  * @param Components Array of components to generate the key
  */
-export function queryKey(componentConstructor: (ComponentConstructor | Not)[]) {
+export function queryKey(componentConstructor: (ComponentConstructor | NotComponent)[]) {
   const names = [];
 
   for (const T of componentConstructor) {

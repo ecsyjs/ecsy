@@ -1,8 +1,7 @@
-import { SystemBase } from '../system-base';
-
-import { SystemStateComponent } from '../entity/system-state-component';
+import { SystemStateComponent } from './system-state-component';
 import { Not } from '../not';
 import { World } from '../world';
+import { System } from '../system';
 
 describe('system-state-components', () => {
   it('reset', () => {
@@ -10,7 +9,7 @@ describe('system-state-components', () => {
 
     class StateComponentA extends SystemStateComponent {}
 
-    class SystemA extends SystemBase {
+    class SystemA extends System {
 
       static queries = {
         added: { components: [FooComponent, Not(StateComponentA)] },

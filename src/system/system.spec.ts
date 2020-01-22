@@ -1,7 +1,7 @@
 import { Not } from '../not';
-import { SystemBase } from '../system-base';
 import { World } from '../world';
 import { clearEvents } from './clear-events';
+import { System } from './system';
 
 describe('system', () => {
 
@@ -52,23 +52,23 @@ describe('system', () => {
     const world = new World();
 
     // System 1
-    class SystemEmpty1 extends SystemBase {}
+    class SystemEmpty1 extends System {}
 
     // System 2
-    class SystemEmpty2 extends SystemBase {
+    class SystemEmpty2 extends System {
       static queries = {};
     }
 
 
     // System 3
-    class SystemEmpty3 extends SystemBase {
+    class SystemEmpty3 extends System {
       static queries = {
         entities: {}
-      };
+      } as any;
     }
 
     // System 4
-    class SystemEmpty4 extends SystemBase {
+    class SystemEmpty4 extends System {
       static queries = {
         entities: { components: [] }
       };
@@ -108,19 +108,19 @@ describe('system', () => {
       entity.addComponent(EmptyComponent);
     }
 
-    class SystemFoo extends SystemBase {
+    class SystemFoo extends System {
       static queries = {
         entities: { components: [FooComponent] }
       };
     }
 
-    class SystemBar extends SystemBase {
+    class SystemBar extends System {
       static queries = {
         entities: { components: [BarComponent] }
       };
     }
 
-    class SystemBoth extends SystemBase {
+    class SystemBoth extends System {
       static queries = {
         entities: { components: [FooComponent, BarComponent] }
       };
@@ -154,7 +154,7 @@ describe('system', () => {
       entity.addComponent(EmptyComponent);
     }
 
-    class SystemNotNot extends SystemBase {
+    class SystemNotNot extends System {
       static queries = {
         notFoo: { components: [Not(FooComponent), Not(BarComponent)] }
       };
@@ -166,7 +166,7 @@ describe('system', () => {
       .toThrowError('Can\'t create a query without components');
 
 
-    class SystemNotBar extends SystemBase {
+    class SystemNotBar extends System {
       static queries = {
         fooNotBar: { components: [FooComponent, Not(BarComponent)] },
         emptyNotBar: { components: [EmptyComponent, Not(BarComponent)] },
@@ -206,7 +206,7 @@ describe('system', () => {
       entity.addComponent(FooComponent);
     }
 
-    class SystemA extends SystemBase {
+    class SystemA extends System {
 
       static queries = {
         entities: {
@@ -227,7 +227,7 @@ describe('system', () => {
     }
 
 
-    class SystemB extends SystemBase {
+    class SystemB extends System {
 
       static queries = {
         entities: {
@@ -289,7 +289,7 @@ describe('system', () => {
       if (i >= 2) { entity.addComponent(BarComponent); }
     }
 
-    class SystemF extends SystemBase {
+    class SystemF extends System {
       static queries = {
         entities: {
           components: [FooComponent],
@@ -305,7 +305,7 @@ describe('system', () => {
       }
     }
 
-    class SystemFB extends SystemBase {
+    class SystemFB extends System {
       static queries = {
         entities: {
           components: [FooComponent, BarComponent],
@@ -324,7 +324,7 @@ describe('system', () => {
       }
     }
 
-    class SystemB extends SystemBase {
+    class SystemB extends System {
       static queries = {
         entities: {
           components: [BarComponent],
@@ -406,7 +406,7 @@ describe('system', () => {
         .addComponent(BarComponent);
     }
 
-    class SystemA extends SystemBase {
+    class SystemA extends System {
       static queries = {
         entities: {
           components: [FooComponent, BarComponent],
@@ -490,7 +490,7 @@ describe('system', () => {
       if (i >= 2) { entity.addComponent(BarComponent); }
     }
 
-    class SystemF extends SystemBase {
+    class SystemF extends System {
       static queries = {
         entities: {
           components: [FooComponent],
@@ -506,7 +506,7 @@ describe('system', () => {
     }
 
 
-    class SystemFB extends SystemBase {
+    class SystemFB extends System {
       static queries = {
         entities: {
           components: [FooComponent, BarComponent],
@@ -526,7 +526,7 @@ describe('system', () => {
     }
 
 
-    class SystemB extends SystemBase {
+    class SystemB extends System {
       static queries = {
         entities: {
           components: [BarComponent],
@@ -599,7 +599,7 @@ describe('system', () => {
   it('Reactive', () => {
     const world = new World();
 
-    class ReactiveSystem extends SystemBase {
+    class ReactiveSystem extends System {
       static queries = {
         entities: {
           components: [FooComponent, BarComponent],
@@ -716,7 +716,7 @@ describe('system', () => {
       c: 0
     };
 
-    class SystemA extends SystemBase {
+    class SystemA extends System {
       static queries = {
         entities: { components: [FooComponent], mandatory: false }
       };
@@ -727,7 +727,7 @@ describe('system', () => {
     }
 
 
-    class SystemB extends SystemBase {
+    class SystemB extends System {
       static queries = {
         entities: { components: [FooComponent], mandatory: true }
       };
@@ -738,7 +738,7 @@ describe('system', () => {
     }
 
 
-    class SystemC extends SystemBase {
+    class SystemC extends System {
       static queries = {
         entities: { components: [BarComponent], mandatory: true }
       };
@@ -780,9 +780,9 @@ describe('system', () => {
   it('Get Systems', () => {
     const world = new World();
 
-    class SystemA extends SystemBase {}
-    class SystemB extends SystemBase {}
-    class SystemC extends SystemBase {}
+    class SystemA extends System {}
+    class SystemB extends System {}
+    class SystemC extends System {}
 
     // Register empty system
     world.registerSystem(SystemA).registerSystem(SystemB);
@@ -799,7 +799,7 @@ describe('system', () => {
     const world = new World();
 
     let counter = 0;
-    class SystemA extends SystemBase {
+    class SystemA extends System {
       run() {
         counter++;
       }
@@ -825,7 +825,7 @@ describe('system', () => {
     const counter = { a: 0, A: 0 };
 
     // tslint:disable-next-line:class-name
-    class System_A extends SystemBase {
+    class System_A extends System {
       static queries = { A: { components: [A] } };
       run() {
         this.queries.A.results.forEach(() => counter.A++);
@@ -833,7 +833,7 @@ describe('system', () => {
     }
 
     // tslint:disable-next-line:class-name
-    class System_a extends SystemBase {
+    class System_a extends System {
       static queries = { a: { components: [a] } };
       run() {
         this.queries.a.results.forEach(() => counter.a++);

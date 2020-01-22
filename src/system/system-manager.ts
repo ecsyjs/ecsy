@@ -1,9 +1,10 @@
+import { ComponentConstructor } from '../component.interface';
 import { EntityManager } from '../entity';
 import { QueryEvents } from '../entity/query';
-import { System, SystemConstructor } from '../system.interface';
+import { SystemConstructor } from '../system.interface';
 import { canExecute } from './can-execute';
 import { clearEvents } from './clear-events';
-import { ComponentConstructor } from 'src/component.interface';
+import { System } from './system';
 
 // tslint:disable:no-bitwise
 

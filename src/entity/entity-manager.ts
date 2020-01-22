@@ -1,4 +1,4 @@
-import { Not } from 'src/not';
+import { NotComponent } from 'src/not';
 
 import { ComponentManager } from '../component';
 import { ComponentConstructor } from '../component.interface';
@@ -245,7 +245,7 @@ export class EntityManager {
    * Get a query based on a list of components
    * @param componentConstructors List of components that will form the query
    */
-  getQuery(componentConstructors: (ComponentConstructor | Not)[]): Query {
+  getQuery(componentConstructors: (ComponentConstructor | NotComponent)[]): Query {
     return this.queryManager.getQuery(componentConstructors, this.entities);
   }
 

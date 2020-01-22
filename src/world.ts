@@ -2,8 +2,8 @@ import { ComponentManager } from './component';
 import { ComponentConstructor } from './component.interface';
 import { Entity, EntityManager } from './entity';
 import { QueryManager } from './entity/query-manager';
-import { SystemManager } from './system';
-import { System, SystemConstructor } from './system.interface';
+import { System, SystemManager } from './system';
+import { SystemConstructor } from './system.interface';
 
 /**
  * The World is the root of the ECS.
