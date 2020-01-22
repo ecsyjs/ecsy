@@ -8,4 +8,6 @@ export * from './component.interface';
 export * from './system';
 export * from './system.interface';
 
+export { SystemBase } from './system-base';
+
 export { createComponentClass, createType } from './schema';

@@ -13,6 +13,7 @@ module.exports = env => ({
   entry: {
     bundle: './examples/index.ts',
     canvas: './examples/canvas/index.ts',
+    'circles-boxes': './examples/circles-boxes/index.ts',
   },
   output: {
     filename: '[name].js',
@@ -117,13 +118,23 @@ module.exports = env => ({
       template: './examples/index.html',
       inject: true,
       chunks: ['bundle'],
-      filename: 'index.html',
+      filename: './examples/index.html',
+    }),
+    new HtmlWebpackPlugin({
+      template: './examples/circles-boxes/index.html',
+      inject: true,
+      chunks: ['circles-boxes'],
+      filename: './circles-boxes/index.html',
     }),
     new HtmlWebpackPlugin({
       template: './examples/canvas/index.html',
       inject: true,
       chunks: ['canvas'],
-      filename: 'canvas.html',
+      filename: './canvas/index.html',
+    }),
+    new HtmlWebpackPlugin({
+      template: './index.html',
+      filename: './index.html',
     }),
   ],
 });
