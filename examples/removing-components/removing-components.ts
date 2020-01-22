@@ -6,7 +6,7 @@ let frame = 1;
 
 class SystemFoo implements System {
 
-  static systemData = {
+  static queries = {
     boxes: {
       components: [ Box ],
       listen: { removed: true }, // To listen for removed entities from the query

@@ -5,7 +5,7 @@ import { intersection } from '../utils';
 
 export class IntersectionSystem implements System {
 
-  static systemData = {
+  static queries = {
     entities: { components: [Circle, Position] }
   };
 

@@ -12,7 +12,7 @@ import {
 
 export class MovementSystem implements System {
 
-  static systemData = {
+  static queries = {
     entities: { components: [Circle, Velocity, Acceleration, Position] },
     context: { components: [PerformanceСompensation, CanvasContext, DemoSettings], mandatory: true }
   };

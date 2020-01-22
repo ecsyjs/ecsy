@@ -36,14 +36,14 @@ export class SystemManager {
 
 
 
-    if (systemConstructor.systemData) {
+    if (systemConstructor.queries) {
       system.queriesOther = [];
       system.queries = {};
 
-      for (const queryName in systemConstructor.systemData) {
-        if (systemConstructor.systemData.hasOwnProperty(queryName)) {
+      for (const queryName in systemConstructor.queries) {
+        if (systemConstructor.queries.hasOwnProperty(queryName)) {
 
-          const queryConfig = systemConstructor.systemData[queryName];
+          const queryConfig = systemConstructor.queries[queryName];
 
           const components = queryConfig.components;
 

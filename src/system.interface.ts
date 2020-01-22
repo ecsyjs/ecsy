@@ -57,7 +57,7 @@ export interface System {
 
 export interface SystemConstructor<T extends System> {
   new (...args: any): T;
-  systemData?: {
+  queries?: {
     [key: string]: {
       components: (ComponentConstructor | Not)[];
       mandatory?: boolean;

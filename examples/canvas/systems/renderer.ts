@@ -4,7 +4,7 @@ import { CanvasContext, Circle, Intersecting, Position } from '../components';
 import { drawLine, fillCircle } from '../utils';
 
 export class RendererBackground implements System {
-  static systemData = {
+  static queries = {
     context: { components: [CanvasContext], mandatory: true }
   };
 
@@ -39,7 +39,7 @@ export class RendererBackground implements System {
 
 export class RendererCircles implements System {
 
-  static systemData = {
+  static queries = {
     circles: { components: [Circle, Position] },
     context: { components: [CanvasContext], mandatory: true }
   };
@@ -90,7 +90,7 @@ export class RendererCircles implements System {
 
 export class RendererIntersecting implements System {
 
-  static systemData = {
+  static queries = {
     intersectingCircles: { components: [Intersecting] },
     context: { components: [CanvasContext], mandatory: true }
   };

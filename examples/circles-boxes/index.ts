@@ -71,7 +71,7 @@ class PerformanceСompensation {
 class MovableSystem extends SystemBase {
 
   // Define a query of entities that have "Velocity" and "Position" components
-  static systemData = {
+  static queries = {
     moving: {
       components: [Velocity, Position]
     },
@@ -104,7 +104,7 @@ class MovableSystem extends SystemBase {
 class RendererSystem extends SystemBase {
 
   // Define a query of entities that have "Renderable" and "Shape" components
-  static systemData = {
+  static queries = {
     renderables: { components: [Renderable, Shape] }
   }
 

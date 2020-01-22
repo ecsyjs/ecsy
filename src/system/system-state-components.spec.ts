@@ -12,7 +12,7 @@ describe('system-state-components', () => {
 
     class SystemA extends SystemBase {
 
-      static systemData = {
+      static queries = {
         added: { components: [FooComponent, Not(StateComponentA)] },
         remove: { components: [Not(FooComponent), StateComponentA] },
         normal: { components: [FooComponent, StateComponentA] }
