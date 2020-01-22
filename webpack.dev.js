@@ -14,6 +14,8 @@ module.exports = env => ({
     bundle: './examples/index.ts',
     canvas: './examples/canvas/index.ts',
     'circles-boxes': './examples/circles-boxes/index.ts',
+    'babylon': './examples/ball-example/babylon/index.ts',
+    'three': './examples/ball-example/three/index.ts',
   },
   output: {
     filename: '[name].js',
@@ -101,7 +103,7 @@ module.exports = env => ({
     // },
     plugins: [
       new TsconfigPathsPlugin({
-        configFile: "./tsconfig.json",
+        configFile: "./tsconfig.app.json",
       }),
     ],
   },
@@ -114,6 +116,10 @@ module.exports = env => ({
     //   chunkFilename: "[id].css"
     // }),
     new CleanWebpackPlugin(),
+    new HtmlWebpackPlugin({
+      template: './index.html',
+      filename: './index.html',
+    }),
     new HtmlWebpackPlugin({
       template: './examples/index.html',
       inject: true,
@@ -133,8 +139,16 @@ module.exports = env => ({
       filename: './canvas/index.html',
     }),
     new HtmlWebpackPlugin({
-      template: './index.html',
-      filename: './index.html',
+      template: './examples/ball-example/babylon/index.html',
+      inject: true,
+      chunks: ['babylon'],
+      filename: './ball-example/babylon/index.html',
+    }),
+    new HtmlWebpackPlugin({
+      template: './examples/ball-example/three/index.html',
+      inject: true,
+      chunks: ['three'],
+      filename: './ball-example/three/index.html',
     }),
   ],
 });

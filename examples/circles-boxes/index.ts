@@ -1,4 +1,4 @@
-import { SystemBase, World } from '@ecs';
+import { System, World } from '@ecs';
 
 const NUM_ELEMENTS = 600;
 const SPEED_MULTIPLIER = 0.1;
@@ -68,7 +68,7 @@ class PerformanceСompensation {
 // ----------------------
 
 // MovableSystem
-class MovableSystem extends SystemBase {
+class MovableSystem extends System {
 
   // Define a query of entities that have "Velocity" and "Position" components
   static queries = {
@@ -101,7 +101,7 @@ class MovableSystem extends SystemBase {
 
 
 // RendererSystem
-class RendererSystem extends SystemBase {
+class RendererSystem extends System {
 
   // Define a query of entities that have "Renderable" and "Shape" components
   static queries = {

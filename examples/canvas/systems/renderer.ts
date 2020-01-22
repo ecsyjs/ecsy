@@ -3,18 +3,10 @@ import { System } from '@ecs';
 import { CanvasContext, Circle, Intersecting, Position } from '../components';
 import { drawLine, fillCircle } from '../utils';
 
-export class RendererBackground implements System {
+export class RendererBackground extends System {
   static queries = {
     context: { components: [CanvasContext], mandatory: true }
   };
-
-  enabled = true;
-  initialized = true;
-
-  queriesOther = {};
-  queries: any = {};
-
-  mandatoryQueries = [];
 
   run() {
 
@@ -27,30 +19,14 @@ export class RendererBackground implements System {
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
   }
-
-  play() {
-    this.enabled = true;
-  }
-
-  stop() {
-    this.enabled = false;
-  }
 }
 
-export class RendererCircles implements System {
+export class RendererCircles extends System {
 
   static queries = {
     circles: { components: [Circle, Position] },
     context: { components: [CanvasContext], mandatory: true }
   };
-
-  enabled = true;
-  initialized = true;
-
-  queriesOther = {};
-  queries: any = {};
-
-  mandatoryQueries = [];
 
   run() {
 
@@ -78,30 +54,14 @@ export class RendererCircles implements System {
       ctx.stroke();
     }
   }
-
-  play() {
-    this.enabled = true;
-  }
-
-  stop() {
-    this.enabled = false;
-  }
 }
 
-export class RendererIntersecting implements System {
+export class RendererIntersecting extends System {
 
   static queries = {
     intersectingCircles: { components: [Intersecting] },
     context: { components: [CanvasContext], mandatory: true }
   };
-
-  enabled = true;
-  initialized = true;
-
-  queriesOther = {};
-  queries: any = {};
-
-  mandatoryQueries = [];
 
   run() {
 
@@ -129,13 +89,5 @@ export class RendererIntersecting implements System {
         drawLine(ctx, points[0], points[1], points[2], points[3]);
       }
     }
-  }
-
-  play() {
-    this.enabled = true;
-  }
-
-  stop() {
-    this.enabled = false;
   }
 }

@@ -1,23 +1,13 @@
-import { System, Entity } from '@ecs';
+import { System } from '@ecs';
 
 import { Circle, Intersecting, Position } from '../components';
 import { intersection } from '../utils';
 
-export class IntersectionSystem implements System {
+export class IntersectionSystem extends System {
 
   static queries = {
     entities: { components: [Circle, Position] }
   };
-
-  enabled = true;
-  initialized = true;
-
-  queriesOther = {};
-  queries: { [key: string]: {
-    results: Entity[]
-  }; } = {};
-
-  mandatoryQueries = [];
 
   run() {
 
@@ -57,13 +47,8 @@ export class IntersectionSystem implements System {
     }
   }
 
-  play() {
-    this.enabled = true;
-  }
-
   stop() {
-    this.enabled = false;
-
+    super.stop();
 
     // Clean up interesection when stopping
     const entities = this.queries.entities.results;

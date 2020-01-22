@@ -4,7 +4,7 @@ class Box {}
 
 let frame = 1;
 
-class SystemFoo implements System {
+class SystemFoo extends System {
 
   static queries = {
     boxes: {
@@ -12,12 +12,6 @@ class SystemFoo implements System {
       listen: { removed: true }, // To listen for removed entities from the query
     }
   };
-
-  enabled = true;
-  initialized = true;
-  queries: any = {};
-  queriesOther: any = {};
-  mandatoryQueries = [];
 
   run() {
 
@@ -31,14 +25,6 @@ class SystemFoo implements System {
     this.queries.boxes.results.forEach((entity) => {
       console.log(' - Iterating on entity: ', entity.id);
     });
-  }
-
-  play() {
-    this.enabled = true;
-  }
-
-  stop() {
-    this.enabled = false;
   }
 }
 
@@ -59,5 +45,4 @@ export class RemovingComponentsComponent {
 
     world.run(); // Execute frame 3
   }
-
 }

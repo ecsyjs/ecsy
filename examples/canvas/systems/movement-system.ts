@@ -10,20 +10,12 @@ import {
   Velocity,
 } from '../components';
 
-export class MovementSystem implements System {
+export class MovementSystem extends System {
 
   static queries = {
     entities: { components: [Circle, Velocity, Acceleration, Position] },
     context: { components: [PerformanceСompensation, CanvasContext, DemoSettings], mandatory: true }
   };
-
-  enabled = true;
-  initialized = true;
-
-  queriesOther = {};
-  queries: any = {};
-
-  mandatoryQueries = [];
 
   run() {
 
@@ -74,13 +66,5 @@ export class MovementSystem implements System {
         position.x = canvasWidth + circle.radius;
       }
     }
-  }
-
-  play() {
-    this.enabled = true;
-  }
-
-  stop() {
-    this.enabled = false;
   }
 }

@@ -83,9 +83,9 @@ export class EcsCanvasComponent {
     canvasComponent.width = canvas.width;
     canvasComponent.height = canvas.height;
 
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 100; i++) {
       world.createEntity()
-        .addComponent(Circle, { radius: random(20, 500) })
+        .addComponent(Circle, { radius: random(10, 50) })
         .addComponent(Velocity, {
           x: random(-200, 200),
           y: random(-200, 200),
@@ -97,7 +97,7 @@ export class EcsCanvasComponent {
         });
     }
 
-    window.addEventListener( 'resize', () => {
+    window.addEventListener('resize', () => {
       canvasComponent.width = canvas.width = window.innerWidth;
       canvasComponent.height = canvas.height = window.innerHeight;
     }, false );
