@@ -6,12 +6,12 @@ import {
   Collisionable,
   Moving,
   Object3D,
+  PerformanceСompensation,
   PulsatingColor,
   PulsatingScale,
   Recovering,
   Rotating,
   Timeout,
-  PerformanceСompensation,
 } from './components';
 
 declare var BABYLON: any;
@@ -111,7 +111,6 @@ export class PulsatingScaleSystem extends System {
     }
   }
 }
-
 
 export class MovingSystem extends System {
 

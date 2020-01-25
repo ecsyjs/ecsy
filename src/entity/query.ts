@@ -1,5 +1,4 @@
-import { ComponentConstructor } from '../component.interface';
-import { NotComponent } from '../not';
+import { ComponentConstructor, Components } from '../component.interface';
 import { Entity } from './entity';
 import { EventDispatcher } from './event-dispatcher';
 
@@ -27,7 +26,7 @@ export class Query {
    * @param componentConstructors List of types of components to query
    */
   constructor(
-    componentConstructors: (ComponentConstructor | NotComponent)[],
+    componentConstructors: Components[],
     entities: Entity[],
     public key: string,
   ) {

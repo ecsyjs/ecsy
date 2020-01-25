@@ -1,4 +1,5 @@
 import { Resettable } from './resettable.interface';
+import { NotComponent } from './not';
 
 export interface Component extends Resettable {
   [key: string]: any;
@@ -6,3 +7,5 @@ export interface Component extends Resettable {
 }
 
 export type ComponentConstructor = new () => Component;
+
+export type Components = ComponentConstructor | NotComponent;

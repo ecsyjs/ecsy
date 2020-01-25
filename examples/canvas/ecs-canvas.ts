@@ -13,7 +13,7 @@ import { Vector2 } from './math';
 import { MovementSystem, IntersectionSystem, RendererCircles, RendererIntersecting, RendererBackground } from './systems';
 import { random } from './utils';
 
-export class EcsCanvasComponent {
+export class EcsCanvas {
 
   renderer = {
     createElement: <K extends keyof HTMLElementTagNameMap>(tagName: K, options?: ElementCreationOptions) =>

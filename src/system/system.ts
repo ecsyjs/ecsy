@@ -1,5 +1,26 @@
-import { ComponentConstructor } from '../component.interface';
-import { NotComponent } from '../not';
+import { Query } from '../system.interface';
+import { Entity } from 'src/entity';
+
+export interface ResultQuery {
+  [key: string]: {
+    /**
+     * All the entities with selected component
+     */
+    results: Entity[];
+    /**
+     * All the entities added to the query since the last call
+     */
+    added?: Entity[];
+    /**
+     * All the entities removed from the query since the last call
+     */
+    removed?: Entity[];
+    /**
+     * All the entities which selected components have changed since the last call
+     */
+    changed?: Entity[];
+  }
+}
 
 /**
  * A system that manipulates entities in the world.
@@ -7,17 +28,7 @@ import { NotComponent } from '../not';
  */
 export abstract class System {
 
-  static queries?: {
-    [key: string]: {
-      components: (ComponentConstructor | NotComponent)[];
-      mandatory?: boolean;
-      listen?: {
-        added?: boolean;
-        removed?: boolean;
-        changed?: boolean | (ComponentConstructor | NotComponent)[];
-      };
-    };
-  };
+  static queries?: Query;
 
   /**
    * Whether the system will execute during the world tick.
@@ -26,7 +37,7 @@ export abstract class System {
   initialized = true;
 
   queriesOther = {};
-  queries: any = {};
+  queries: ResultQuery = {};
 
   mandatoryQueries = [];
 

@@ -4,28 +4,41 @@
   --border-style: 1px solid #E8E8E8;
   --panel-width: 350px;
 }
-html, body {
+
+html,
+body {
   height: 100%;
 }
+
 body {
   margin: 0;
   font-family: 'Chivo', sans-serif;
   font-weight: 300;
 }
-h1, h2, h3, h4, h5, h6 {
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: 'Lora', serif;
   font-weight: 700;
 }
+
 span {
   color: var(--text-color);
 }
+
 a {
   text-decoration: none;
   color: #99A;
+
+  &:hover {
+    color: var(--color-blue);
+  }
 }
-a:hover {
-  color: var(--color-blue);
-}
+
 .sidebar {
   position: fixed;
   left: 0px;
@@ -33,18 +46,23 @@ a:hover {
   border-right: var(--border-style);
   height: 100%;
   z-index: 100;
+
+  span {
+    display: block;
+    margin-bottom: 10px;
+  }
 }
+
 .content {
   padding: 20px;
 }
-.sidebar span {
-  display: block;
-  margin-bottom: 10px;
-}
+
 #viewer {
   padding-left: var(--panel-width);
 }
-#viewer, iframe {
+
+#viewer,
+iframe {
   position: absolute;
   border: 0px;
   left: 0;
@@ -53,10 +71,11 @@ a:hover {
   height: 100%;
   overflow: auto;
 }
+
 span a {
   display: inline;
-}
 
-span a:first-child {
-  font-weight: 600;
+  &:first-child {
+    font-weight: 600;
+  }
 }

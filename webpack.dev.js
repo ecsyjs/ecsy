@@ -1,5 +1,5 @@
 const path = require('path');
-// const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 // const CopyWebpackPlugin = require('copy-webpack-plugin');
@@ -7,15 +7,17 @@ const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 const mode = 'development'
 
-module.exports = env => ({
+module.exports = (env) => ({
   mode,
   devtool: 'inline-source-map',
   entry: {
-    bundle: './examples/index.ts',
+    examples: './examples/index.ts',
     canvas: './examples/canvas/index.ts',
     'circles-boxes': './examples/circles-boxes/index.ts',
     'babylon': './examples/ball-example/babylon/index.ts',
     'three': './examples/ball-example/three/index.ts',
+    'factory': './examples/factory/index.ts',
+    'system-state-components': './examples/system-state-components/index.ts',
   },
   output: {
     filename: '[name].js',
@@ -44,12 +46,9 @@ module.exports = env => ({
       {
         test: /\.scss$/,
         use: [
-          // {
-          //   loader: MiniCssExtractPlugin.loader,
-          //   options: {
-          //     reloadAll: true,
-          //   },
-          // },
+          {
+            loader: MiniCssExtractPlugin.loader,
+          },
           {
             loader: "css-loader",
             options: { sourceMap: true },
@@ -59,48 +58,14 @@ module.exports = env => ({
             loader: "sass-loader",
             options: {
               sourceMap: true,
-              // includePaths: [
-              //   path.resolve(__dirname, 'src/fonts/'),
-              //   path.resolve(__dirname, 'src/styles/'),
-              //   path.resolve(__dirname, 'src/ssr/components/'),
-              // ],
             },
           },
         ],
       },
-      // {
-      //   test: /\.(mov|mp4|png|svg|jpg|gif)$/,
-      //   use: [{
-      //     loader: 'file-loader',
-      //     options: {
-      //       outputPath: 'assets',
-      //       name: '[name].[ext]',
-      //       useRelativePath: true,
-      //     },
-      //   }]
-      // },
-      // {
-      //   test: /\.(woff|woff2|eot|ttf|otf)$/,
-      //   use: [{
-      //     loader: 'file-loader',
-      //     options: {
-      //       outputPath: 'fonts',
-      //       name: '[name].[ext]',
-      //     },
-      //   }]
-      // },
-
     ]
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
-    // alias: {
-    //   fonts: path.resolve(__dirname, 'src/fonts/'),
-    //   images: path.resolve(__dirname, 'src/images/'),
-    //   styles: path.resolve(__dirname, 'src/styles/'),
-    //   templates: path.resolve(__dirname, 'src/ssr/templates/'),
-    //   components: path.resolve(__dirname, 'src/ssr/components/'),
-    // },
     plugins: [
       new TsconfigPathsPlugin({
         configFile: "./tsconfig.app.json",
@@ -108,13 +73,10 @@ module.exports = env => ({
     ],
   },
   plugins: [
-    // new CopyWebpackPlugin([
-    //   { from: 'src/assets', to: 'assets' }
-    // ]),
-    // new MiniCssExtractPlugin({
-    //   filename: "[name].css",
-    //   chunkFilename: "[id].css"
-    // }),
+    new MiniCssExtractPlugin({
+      filename: '[name].css',
+      chunkFilename: '[id].css',
+    }),
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       template: './index.html',
@@ -123,7 +85,7 @@ module.exports = env => ({
     new HtmlWebpackPlugin({
       template: './examples/index.html',
       inject: true,
-      chunks: ['bundle'],
+      chunks: ['examples'],
       filename: './examples/index.html',
     }),
     new HtmlWebpackPlugin({
@@ -149,6 +111,18 @@ module.exports = env => ({
       inject: true,
       chunks: ['three'],
       filename: './ball-example/three/index.html',
+    }),
+    new HtmlWebpackPlugin({
+      template: './examples/factory/index.html',
+      inject: true,
+      chunks: ['factory'],
+      filename: './factory/index.html',
+    }),
+    new HtmlWebpackPlugin({
+      template: './examples/system-state-components/index.html',
+      inject: true,
+      chunks: ['system-state-components'],
+      filename: './system-state-components/index.html',
     }),
   ],
 });

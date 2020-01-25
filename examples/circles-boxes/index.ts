@@ -1,3 +1,5 @@
+import './index.scss';
+
 import { System, World } from '@ecs';
 
 const NUM_ELEMENTS = 600;

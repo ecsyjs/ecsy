@@ -1,4 +1,6 @@
-import { EcsCanvasComponent } from './ecs-canvas.component';
+import './index.scss';
 
-new EcsCanvasComponent()
+import { EcsCanvas } from './ecs-canvas';
+
+new EcsCanvas()
   .run();

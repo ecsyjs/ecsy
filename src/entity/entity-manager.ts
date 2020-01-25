@@ -1,7 +1,5 @@
-import { NotComponent } from 'src/not';
-
 import { ComponentManager } from '../component';
-import { ComponentConstructor } from '../component.interface';
+import { ComponentConstructor, Components } from '../component.interface';
 import { getName } from '../utils';
 import { ObjectPool } from '../utils/object-pool';
 import { Entity } from './entity';
@@ -66,7 +64,10 @@ export class EntityManager {
    */
   entityAddComponent(entity: Entity, componentConstructor: ComponentConstructor, values?: { [key: string]: any }): void {
 
-    if (entity.componentTypes.has(componentConstructor)) { return; }
+    if (entity.componentTypes.has(componentConstructor)) {
+
+      return;
+    }
 
     entity.componentTypes.add(componentConstructor);
 
@@ -245,7 +246,7 @@ export class EntityManager {
    * Get a query based on a list of components
    * @param componentConstructors List of components that will form the query
    */
-  getQuery(componentConstructors: (ComponentConstructor | NotComponent)[]): Query {
+  getQuery(componentConstructors: Components[]): Query {
     return this.queryManager.getQuery(componentConstructors, this.entities);
   }
 

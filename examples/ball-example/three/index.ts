@@ -1,3 +1,5 @@
+import './index.scss';
+
 import { World } from '@ecs';
 
 import {
@@ -6,12 +8,12 @@ import {
   Colliding,
   Moving,
   Object3D,
+  PerformanceСompensation,
   PulsatingColor,
   PulsatingScale,
   Recovering,
   Rotating,
   Timeout,
-  PerformanceСompensation,
 } from './components';
 import {
   ColliderSystem,

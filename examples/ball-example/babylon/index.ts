@@ -1,3 +1,5 @@
+import './index.scss';
+
 import { World } from '@ecs';
 
 import {

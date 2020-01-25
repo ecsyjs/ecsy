@@ -20,14 +20,6 @@ export const clearEvents = (system: System) => {
 
           query.changed.length = 0;
 
-        } else {
-          for (const name in query.changed) {
-            if (query.changed.hasOwnProperty(name)) {
-
-              query.changed[name].length = 0;
-
-            }
-          }
         }
       }
     }

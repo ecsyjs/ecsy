@@ -8,3 +8,4 @@ export { createComponentClass, createType, standardTypes } from './schema';
 export { Version } from './version';
 
 export { Entity } from './entity';
+export * from './system.interface';
