@@ -2,7 +2,6 @@ const path = require('path');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-// const CopyWebpackPlugin = require('copy-webpack-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 const mode = 'development'
@@ -20,9 +19,9 @@ module.exports = (env) => ({
     'system-state-components': './examples/system-state-components/index.ts',
   },
   output: {
+    path: path.resolve(__dirname, 'dist'),
     filename: '[name].js',
     chunkFilename: 'scripts/[name].js',
-    path: path.resolve(__dirname, 'dist'),
   },
   devServer: {
     contentBase: path.join(__dirname, 'dist'),

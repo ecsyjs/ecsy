@@ -5,9 +5,9 @@
   "main": "build/ecsy.js",
   "jsnext:main": "build/ecsy.module.js",
   "module": "build/ecsy.module.js",
-  "types": "src/index.d.ts",
+  "types": "build/src/index.d.ts",
   "scripts": {
-    "build": "rollup -c && npm run docs",
+    "build": "rollup -c && tsc -p tsconfig.lib.json --emitDeclarationOnly && npm run docs",
     "docs": "rm docs/api/_sidebar.md; typedoc --readme none --mode file --excludeExternals --plugin typedoc-plugin-markdown  --theme docs/theme --hideSources --hideBreadcrumbs --out docs/api/ --includeDeclarations --includes 'src/**/*.d.ts' src; touch docs/api/_sidebar.md",
     "dev:docs": "nodemon -e ts -x 'npm run docs' -w src",
     "dev:server": "webpack-dev-server --config webpack.dev.js --verbose",

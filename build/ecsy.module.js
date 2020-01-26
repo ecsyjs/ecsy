@@ -512,6 +512,11 @@ var Entity = /** @class */ (function () {
 
 /**
  * Components that extend the SystemStateComponent are not removed when an entity is deleted.
+ *
+ * System State Components (SSC) are components used by a system to hold internal resources
+ * for an entity. They are not removed when you delete the entity, you must explicitly remove
+ * them when you are done with them. They can be used to detect when an entity has been added
+ * or removed from a query.
  */
 var SystemStateComponent = /** @class */ (function () {
     function SystemStateComponent() {
@@ -963,13 +968,6 @@ var clearEvents = function (system) {
                 if (Array.isArray(query.changed)) {
                     query.changed.length = 0;
                 }
-                else {
-                    for (var name in query.changed) {
-                        if (query.changed.hasOwnProperty(name)) {
-                            query.changed[name].length = 0;
-                        }
-                    }
-                }
             }
         }
     }
@@ -994,12 +992,12 @@ var SystemManager = /** @class */ (function () {
         if (attributes && attributes.priority) {
             system.priority = attributes.priority;
         }
-        if (systemConstructor.systemData) {
+        if (systemConstructor.queries) {
             system.queriesOther = [];
             system.queries = {};
             var _loop_1 = function (queryName) {
-                if (systemConstructor.systemData.hasOwnProperty(queryName)) {
-                    var queryConfig_1 = systemConstructor.systemData[queryName];
+                if (systemConstructor.queries.hasOwnProperty(queryName)) {
+                    var queryConfig_1 = systemConstructor.queries[queryName];
                     var components = queryConfig_1.components;
                     if (!components || components.length === 0) {
                         throw new Error('\'components\' attribute can\'t be empty in a query');
@@ -1066,7 +1064,7 @@ var SystemManager = /** @class */ (function () {
                 }
             };
             var this_1 = this;
-            for (var queryName in systemConstructor.systemData) {
+            for (var queryName in systemConstructor.queries) {
                 _loop_1(queryName);
             }
         }
@@ -1175,6 +1173,38 @@ var SystemManager = /** @class */ (function () {
 }());
 
 /**
+ * A system that manipulates entities in the world.
+ * Every run systems are executed and they create, remove or modify entities and components.
+ */
+var System = /** @class */ (function () {
+    function System() {
+        /**
+         * Whether the system will execute during the world tick.
+         */
+        this.enabled = true;
+        this.initialized = true;
+        this.queriesOther = {};
+        this.queries = {};
+        this.mandatoryQueries = [];
+        this.priority = 0;
+        this.order = 0;
+    }
+    /**
+     * Resume execution of this system.
+     */
+    System.prototype.play = function () {
+        this.enabled = true;
+    };
+    /**
+     * Stop execution of this system.
+     */
+    System.prototype.stop = function () {
+        this.enabled = false;
+    };
+    return System;
+}());
+
+/**
  * The World is the root of the ECS.
  */
 var World = /** @class */ (function () {
@@ -1256,6 +1286,25 @@ var World = /** @class */ (function () {
         console.log(JSON.stringify(stats, null, 2));
     };
     return World;
+}());
+
+/**
+ * Use the Not class to negate a component query.
+ */
+var Not = function (component) { return ({
+    operator: 'not',
+    component: component,
+}); };
+
+/**
+ * Create components that extend TagComponent in order to take advantage of performance optimizations for components
+ * that do not store data
+ */
+var TagComponent = /** @class */ (function () {
+    function TagComponent() {
+    }
+    TagComponent.prototype.reset = function () { };
+    return TagComponent;
 }());
 
 function createType(typeDefinition) {
@@ -1479,4 +1528,9 @@ function createComponentClass(schema, name) {
     return Component;
 }
 
-export { ComponentManager, Entity, EntityManager, EntityManagerEvents, SystemManager, World, createComponentClass, createType };
+var version = "0.1.4";
+
+var Version = version;
+
+export { Entity, Not, System, SystemStateComponent, TagComponent, Version, World, createComponentClass, createType, standardTypes };
+//# sourceMappingURL=ecsy.module.js.map
