@@ -39,7 +39,7 @@ export class ComponentManager {
         this._componentPool[componentName] = new ObjectPool(Component);
       } else {
         console.warn(
-          `Component '${Component.name}' won't benefit from pooling because 'reset' method was not implemeneted.`
+          `Component '${Component.name}' won't benefit from pooling because 'reset' method was not implemented.`
         );
         this._componentPool[componentName] = new DummyObjectPool(Component);
       }
