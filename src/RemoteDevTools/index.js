@@ -139,7 +139,9 @@ export function enableRemoteDevtools(remoteId) {
   );
 }
 
-const urlParams = new URLSearchParams(window.location.search);
+const urlParams = new URLSearchParams(
+  typeof window !== "undefined" && window.location.search
+);
 
 // @todo Provide a way to disable it if needed
 if (urlParams.has("enable-remote-devtools")) {

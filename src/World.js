@@ -2,6 +2,7 @@ import { SystemManager } from "./SystemManager.js";
 import { EntityManager } from "./EntityManager.js";
 import { ComponentManager } from "./ComponentManager.js";
 import { Version } from "./Version.js";
+import { performance } from "./polyfills.js";
 
 export class World {
   constructor() {
