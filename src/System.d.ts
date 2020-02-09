@@ -1,5 +1,6 @@
 import {Component, ComponentConstructor} from "./Component";
 import { Entity } from "./Entity";
+import { TagComponent } from './TagComponent';
 
 /**
  * A system that manipulates entities in the world.
@@ -11,11 +12,11 @@ export abstract class System {
    */
   static queries: {
     [queryName: string]: {
-      components: (Component | NotComponent)[],
+      components: (Component | NotComponent | TagComponent)[],
       listen?: {
-        added?: Boolean,
-        removed?: Boolean,
-        changed?: Boolean | Component[],
+        added?: boolean,
+        removed?: boolean,
+        changed?: boolean | Component[],
       },
     }
   };

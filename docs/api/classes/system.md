@@ -45,15 +45,15 @@ This needs to be user defined.
 
 * \[ **queryName**: *string*\]: object
 
-* **components**: *[Component](component.md) | [NotComponent](../interfaces/notcomponent.md)[]*
+* **components**: *[Component](component.md) | [NotComponent](../interfaces/notcomponent.md) | [TagComponent](tagcomponent.md)[]*
 
 * **listen**(): *object*
 
-  * **added**? : *Boolean*
+  * **added**? : *boolean*
 
-  * **changed**? : *Boolean | [Component](component.md)[]*
+  * **changed**? : *boolean | [Component](component.md)[]*
 
-  * **removed**? : *Boolean*
+  * **removed**? : *boolean*
 
 ## Methods
 
