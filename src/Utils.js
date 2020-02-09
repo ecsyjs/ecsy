@@ -13,8 +13,7 @@ export function getName(Component) {
  * @private
  */
 export function componentPropertyName(Component) {
-  var name = getName(Component);
-  return name.charAt(0).toLowerCase() + name.slice(1);
+  return getName(Component);
 }
 
 /**

@@ -851,3 +851,34 @@ test("Systems with component case sensitive", t => {
   world.execute();
   t.deepEqual(counter, { a: 2, A: 2 });
 });
+
+test("Components with the the same name in uppercase and lowercase", t => {
+  class B {}
+
+  class b {}
+
+  class S extends System {
+    execute() {
+      this.queries.S.results.forEach(entity =>
+        console.log(entity.getComponents())
+      );
+    }
+  }
+  S.queries = { S: { components: [B, b] } };
+
+  const world = new World();
+  world.registerSystem(S);
+  world
+    .createEntity()
+    .addComponent(B)
+    .addComponent(b);
+
+  let query = world.getSystem(S).queries.S;
+  let entity = query.results[0];
+  let components = entity.getComponents();
+  t.deepEqual(Object.keys(components), ["B", "b"]);
+  t.deepEqual(
+    Object.values(components).map(c => c.constructor.name),
+    ["B", "b"]
+  );
+});
