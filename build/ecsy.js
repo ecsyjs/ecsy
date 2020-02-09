@@ -9,6 +9,11 @@
 	}()));
 }(this, (function (exports) { 'use strict';
 
+	const performance =
+	  typeof window !== "undefined" && typeof window.performance !== "undefined"
+	    ? window.performance
+	    : require("perf_hooks").performance;
+
 	class SystemManager {
 	  constructor(world) {
 	    this._systems = [];
@@ -958,7 +963,7 @@
 	        this._componentPool[componentName] = new ObjectPool(Component);
 	      } else {
 	        console.warn(
-	          `Component '${Component.name}' won't benefit from pooling because 'reset' method was not implemeneted.`
+	          `Component '${Component.name}' won't benefit from pooling because 'reset' method was not implemented.`
 	        );
 	        this._componentPool[componentName] = new DummyObjectPool(Component);
 	      }
@@ -1735,7 +1740,9 @@
 	  );
 	}
 
-	const urlParams = new URLSearchParams(window.location.search);
+	const urlParams = new URLSearchParams(
+	  typeof window !== "undefined" && window.location.search
+	);
 
 	// @todo Provide a way to disable it if needed
 	if (urlParams.has("enable-remote-devtools")) {
