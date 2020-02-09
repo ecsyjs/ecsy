@@ -9,6 +9,11 @@
 	}()));
 }(this, (function (exports) { 'use strict';
 
+	const performance =
+	  typeof window !== "undefined" && typeof window.performance !== "undefined"
+	    ? window.performance
+	    : require("perf_hooks").performance;
+
 	class SystemManager {
 	  constructor(world) {
 	    this._systems = [];
@@ -1734,7 +1739,9 @@
 	  );
 	}
 
-	const urlParams = new URLSearchParams(window.location.search);
+	const urlParams = new URLSearchParams(
+	  typeof window !== "undefined" && window.location.search
+	);
 
 	// @todo Provide a way to disable it if needed
 	if (urlParams.has("enable-remote-devtools")) {
