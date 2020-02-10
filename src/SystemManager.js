@@ -1,5 +1,3 @@
-import { performance } from "./polyfills.js";
-
 export class SystemManager {
   constructor(world) {
     this._systems = [];
