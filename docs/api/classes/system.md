@@ -45,7 +45,7 @@ This needs to be user defined.
 
 * \[ **queryName**: *string*\]: object
 
-* **components**: *[Component](component.md) | [NotComponent](../interfaces/notcomponent.md) | [TagComponent](tagcomponent.md)[]*
+* **components**: *[Component](component.md)‹› | [NotComponent](../interfaces/notcomponent.md) | [TagComponent](tagcomponent.md)‹›[]*
 
 * **listen**(): *object*
 
