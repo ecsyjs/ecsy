@@ -17,6 +17,8 @@ export class EntityManager {
     // All the entities in this instance
     this._entities = [];
 
+    this._entitiesByNames = {};
+
     this._queryManager = new QueryManager(this);
     this.eventDispatcher = new EventDispatcher();
     this._entityPool = new ObjectPool(Entity);
@@ -29,12 +31,25 @@ export class EntityManager {
     this.numStateComponents = 0;
   }
 
+  getEntityByName(name) {
+    return this._entitiesByNames[name];
+  }
+
   /**
    * Create a new entity
    */
-  createEntity() {
+  createEntity(name) {
     var entity = this._entityPool.aquire();
     entity.alive = true;
+    entity.name = name || "";
+    if (name) {
+      if (this._entitiesByNames[name]) {
+        console.warn(`Entity name '${name}' already exist`);
+      } else {
+        this._entitiesByNames[name] = entity;
+      }
+    }
+
     entity._world = this;
     this._entities.push(entity);
     this.eventDispatcher.dispatchEvent(ENTITY_CREATED, entity);

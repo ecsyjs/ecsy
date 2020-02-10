@@ -62,8 +62,8 @@ export class World {
     this.enabled = true;
   }
 
-  createEntity() {
-    return this.entityManager.createEntity();
+  createEntity(name) {
+    return this.entityManager.createEntity(name);
   }
 
   stats() {
