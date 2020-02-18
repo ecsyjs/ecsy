@@ -28,6 +28,9 @@ export default class Entity {
     this._ComponentTypesToRemove = [];
 
     this.alive = false;
+
+    //if there are state components on a entity, it can't be removed completely
+    this.numStateComponents = 0;
   }
 
   // COMPONENTS
