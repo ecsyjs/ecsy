@@ -1,6 +1,7 @@
 import {Component, ComponentConstructor} from "./Component";
 import { Entity } from "./Entity";
 import { TagComponent } from './TagComponent';
+import { World } from "./World";
 
 /**
  * A system that manipulates entities in the world.
@@ -33,6 +34,8 @@ export abstract class System {
       changed?: Entity[],
     }
   }
+
+  world: World;
   /**
    * Whether the system will execute during the world tick.
    */
