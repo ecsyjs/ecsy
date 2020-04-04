@@ -15,7 +15,7 @@ export class SystemManager {
     }
 
     var system = new System(this.world, attributes);
-    if (system.init) system.init();
+    if (system.init) system.init(attributes);
     system.order = this._systems.length;
     this._systems.push(system);
     if (system.execute) {
