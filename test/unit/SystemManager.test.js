@@ -21,12 +21,12 @@ test("registerSystems", t => {
 test("passes attributes to system.init", t => {
   var world = new World();
 
-  var mockAttributes = {test: 10}
-  var initArg1
+  var mockAttributes = { test: 10 };
+  var initArg1;
 
   class mockSystem {
     init(attributes) {
-      initArg1 = attributes
+      initArg1 = attributes;
     }
   }
 
