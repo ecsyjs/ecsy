@@ -15,6 +15,17 @@ export class SystemManager {
     }
 
     var system = new System(this.world, attributes);
+
+    if (attributes) {
+      if (system.copy) {
+        system.copy(attributes);
+      } else {
+        for (var name in attributes) {
+          system[name] = attributes[name];
+        }
+      }
+    }
+
     if (system.init) system.init();
     system.order = this._systems.length;
     this._systems.push(system);

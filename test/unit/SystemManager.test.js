@@ -17,3 +17,14 @@ test("registerSystems", t => {
   world.registerSystem(SystemA);
   t.is(world.systemManager._systems.length, 2);
 });
+
+test("Copies attributes to created system", t => {
+  var world = new World();
+
+  var mockAttributes = { testAttribute: 10 };
+
+  class mockSystem {}
+
+  world.registerSystem(mockSystem, mockAttributes);
+  t.is(world.systemManager._systems[0].testAttribute, 10);
+});

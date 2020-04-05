@@ -14,7 +14,7 @@ export class System {
     return true;
   }
 
-  constructor(world, attributes) {
+  constructor(world) {
     this.world = world;
     this.enabled = true;
 
@@ -26,10 +26,6 @@ export class System {
 
     // Used for stats
     this.executeTime = 0;
-
-    if (attributes && attributes.priority) {
-      this.priority = attributes.priority;
-    }
 
     this._mandatoryQueries = [];
 
