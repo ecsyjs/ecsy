@@ -8,4 +8,6 @@ export interface Component extends Resettable {
 
 export type ComponentConstructor = new () => Component;
 
+export type Constructor<T> = new () => T;
+
 export type Components = ComponentConstructor | NotComponent;

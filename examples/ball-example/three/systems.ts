@@ -113,7 +113,7 @@ export class PulsatingScaleSystem extends System {
 export class MovingSystem extends System {
 
   static queries = {
-    entities: { components: [Moving] },
+    entities: { components: [PulsatingScale] },
     context: { components: [PerformanceСompensation], mandatory: true }
   };
 
@@ -125,7 +125,7 @@ export class MovingSystem extends System {
     const entities = this.queries.entities.results;
     for (const entity of entities) {
       const object = entity.getComponent(Object3D).object;
-      const offset = entity.getComponent(Moving).offset;
+      const offset = entity.getComponent(PulsatingScale).offset;
       const radius = 5;
       const maxRadius = 5;
       object.position.z = Math.cos(time + 3 * offset) * maxRadius + radius;

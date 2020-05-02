@@ -25,8 +25,6 @@ export class EcsCanvas {
     nativeElement: document.body,
   };
 
-  constructor() {}
-
   run() {
     const world = new World();
 

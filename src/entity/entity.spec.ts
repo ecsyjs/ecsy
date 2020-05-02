@@ -79,7 +79,9 @@ describe('entity', () => {
 
     it('property should be taken from addComponent args', () => {
       // Component with no constructor
-      class BazComponent {}
+      class BazComponent {
+        spam?: string;
+      }
 
       const world = new World();
 
@@ -92,7 +94,9 @@ describe('entity', () => {
 
     it('property should be cleared since it is not specified in addComponent args', () => {
 
-      class BazComponent {}
+      class BazComponent {
+        spam?: string;
+      }
 
       const world = new World();
 

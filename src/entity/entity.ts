@@ -1,4 +1,4 @@
-import { Component, ComponentConstructor } from '../component.interface';
+import { Component, ComponentConstructor, Constructor } from '../component.interface';
 import { Resettable } from '../resettable.interface';
 import { EntityManager } from './entity-manager';
 import { Query, QueryEvents } from './query';
@@ -37,18 +37,18 @@ export class Entity implements Resettable {
 
   // COMPONENTS
 
-  getComponent(componentConstructor: ComponentConstructor, includeRemoved?: boolean): Component {
-    let component = this.components.get(componentConstructor.name);
+  getComponent<T>(componentConstructor: Constructor<T>, includeRemoved?: boolean): T {
+    let component = this.components.get(componentConstructor.name) as T;
 
     if (!component && includeRemoved === true) {
-      component = this.componentsToRemove.get(componentConstructor.name);
+      component = this.componentsToRemove.get(componentConstructor.name) as T;
     }
 
     return DEBUG ? wrapImmutableComponent(component) : component;
   }
 
-  getMutableComponent(componentConstructor: ComponentConstructor): Component {
-    const component = this.components.get(componentConstructor.name);
+  getMutableComponent<T>(componentConstructor: Constructor<T> ): T {
+    const component = this.components.get(componentConstructor.name) as T;
 
     for (const query of this.queries) {
 

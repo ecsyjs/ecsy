@@ -6,18 +6,42 @@ const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 const mode = 'development'
 
+const configs = {
+  examples: 'examples',
+  canvas: 'examples/canvas',
+  'circles-boxes': 'examples/circles-boxes',
+  'babylon': 'examples/ball-example/babylon',
+  'three': 'examples/ball-example/three',
+  'factory': 'examples/factory',
+  'system-state-components': 'examples/system-state-components',
+  'attraction-and-repulsion': 'examples/three-pix-droid/attraction-and-repulsion',
+}
+
+const projects = {
+  entry: Object.entries(configs).reduce((accumulator, [key, value]) => {
+    accumulator[key] = `./${value}/index.ts`;
+
+    return accumulator;
+  }, {}),
+  htmlWebpackPlugins: Object.entries(configs).reduce((accumulator, [key, value]) => {
+
+    const htmlWebpackPlugin = new HtmlWebpackPlugin({
+      template: `./${value}/index.html`,
+      inject: true,
+      chunks: [key],
+      filename: `./${value}/index.html`,
+    })
+
+    accumulator.push(htmlWebpackPlugin);
+
+    return accumulator;
+  }, []),
+}
+
 module.exports = (env) => ({
   mode,
   devtool: 'inline-source-map',
-  entry: {
-    examples: './examples/index.ts',
-    canvas: './examples/canvas/index.ts',
-    'circles-boxes': './examples/circles-boxes/index.ts',
-    'babylon': './examples/ball-example/babylon/index.ts',
-    'three': './examples/ball-example/three/index.ts',
-    'factory': './examples/factory/index.ts',
-    'system-state-components': './examples/system-state-components/index.ts',
-  },
+  entry: projects.entry,
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].js',
@@ -76,52 +100,11 @@ module.exports = (env) => ({
       filename: '[name].css',
       chunkFilename: '[id].css',
     }),
-    new CleanWebpackPlugin(),
+    // new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       template: './index.html',
       filename: './index.html',
     }),
-    new HtmlWebpackPlugin({
-      template: './examples/index.html',
-      inject: true,
-      chunks: ['examples'],
-      filename: './examples/index.html',
-    }),
-    new HtmlWebpackPlugin({
-      template: './examples/circles-boxes/index.html',
-      inject: true,
-      chunks: ['circles-boxes'],
-      filename: './circles-boxes/index.html',
-    }),
-    new HtmlWebpackPlugin({
-      template: './examples/canvas/index.html',
-      inject: true,
-      chunks: ['canvas'],
-      filename: './canvas/index.html',
-    }),
-    new HtmlWebpackPlugin({
-      template: './examples/ball-example/babylon/index.html',
-      inject: true,
-      chunks: ['babylon'],
-      filename: './ball-example/babylon/index.html',
-    }),
-    new HtmlWebpackPlugin({
-      template: './examples/ball-example/three/index.html',
-      inject: true,
-      chunks: ['three'],
-      filename: './ball-example/three/index.html',
-    }),
-    new HtmlWebpackPlugin({
-      template: './examples/factory/index.html',
-      inject: true,
-      chunks: ['factory'],
-      filename: './factory/index.html',
-    }),
-    new HtmlWebpackPlugin({
-      template: './examples/system-state-components/index.html',
-      inject: true,
-      chunks: ['system-state-components'],
-      filename: './system-state-components/index.html',
-    }),
+    ...projects.htmlWebpackPlugins,
   ],
 });
