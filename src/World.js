@@ -3,6 +3,9 @@ import { EntityManager } from "./EntityManager.js";
 import { ComponentManager } from "./ComponentManager.js";
 import { Version } from "./Version.js";
 
+const hasWindow = typeof window !== "undefined";
+const hasCustomEvent = typeof CustomEvent !== "undefined";
+
 export class World {
   constructor() {
     this.componentsManager = new ComponentManager(this);
@@ -13,7 +16,7 @@ export class World {
 
     this.eventQueues = {};
 
-    if (typeof CustomEvent !== "undefined") {
+    if (hasWindow && hasCustomEvent) {
       var event = new CustomEvent("ecsy-world-created", {
         detail: { world: this, version: Version }
       });
