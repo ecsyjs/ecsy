@@ -10,16 +10,21 @@ export class ComponentManager {
   }
 
   registerComponent(Component) {
+    if (this.Components[Component.name]) {
+      console.warn(`Component type: '${Component.name}' already registered.`);
+      return;
+    }
+
     this.Components[Component.name] = Component;
     this.numComponents[Component.name] = 0;
   }
 
   componentAddedToEntity(Component) {
-    if (!this.numComponents[Component.name]) {
-      this.numComponents[Component.name] = 1;
-    } else {
-      this.numComponents[Component.name]++;
+    if (!this.Components[Component.name]) {
+      this.registerComponent(Component);
     }
+
+    this.numComponents[Component.name]++;
   }
 
   componentRemovedFromEntity(Component) {
@@ -34,7 +39,7 @@ export class ComponentManager {
         this._componentPool[componentName] = new ObjectPool(Component);
       } else {
         console.warn(
-          `Component '${Component.name}' won't benefit from pooling because 'reset' method was not implemeneted.`
+          `Component '${Component.name}' won't benefit from pooling because 'reset' method was not implemented.`
         );
         this._componentPool[componentName] = new DummyObjectPool(Component);
       }

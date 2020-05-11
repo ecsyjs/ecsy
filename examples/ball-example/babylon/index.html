@@ -56,7 +56,7 @@
 
   var objMoving, states;
 	function init() {
-    var numObjects = 1000;
+    var numObjects = 10000;
     var size = 0.2;
     var w = 100;
 
@@ -85,22 +85,29 @@
 
     states = [];
 
+    var rootMesh = BABYLON.MeshBuilder.CreateBox('box',{size: size}, scene);
+    var material = new BABYLON.StandardMaterial("material", scene);
+    material.diffuseColor = new BABYLON.Color3(1, 1, 1);
+    rootMesh.material = material;
+    rootMesh.setEnabled(false);
+    
+    rootMesh.registerInstancedBuffer("color", 4);    
+    rootMesh.instancedBuffers.color = new BABYLON.Color4(1, 0, 0, 1);
+
     for (var i = 0;i < numObjects; i++) {
       var entity = world.entityManager.createEntity();
 
-      var mesh = BABYLON.MeshBuilder.CreateBox('box',{size: size}, scene);
+      var mesh = rootMesh.createInstance('box');      
+      mesh.instancedBuffers.color = new BABYLON.Color4(1, 0, 0, 1);
+      mesh.alwaysSelectAsActiveMesh = true;
       mesh.position.copyFrom(randomSpherePoint(radius));
-
-      var material = new BABYLON.StandardMaterial("material", scene);
-      material.diffuseColor = new BABYLON.Color3(1, 0, 0);
-      mesh.material = material;
 
       var state = {
         mesh: mesh,
         colliding: false,
         rotationSpeed: 0,
-        originalColor: new BABYLON.Color3(1,0,0),
-        tmpColor: new BABYLON.Color3()
+        originalColor: new BABYLON.Color4(1, 0, 0, 1),
+        tmpColor: new BABYLON.Color4()
       };
 
       states.push(state);
@@ -116,6 +123,8 @@
       entity.addComponent(Collisionable);
     }
 
+    scene.freezeActiveMeshes();
+
     window.addEventListener( 'resize', () => engine.resize());
     var lastTime = performance.now();
     engine.runRenderLoop(function() {
@@ -124,7 +133,7 @@
       lastTime = time;
       scene.render();
 
-      world.systemManager.execute(delta, time);
+      world.execute(delta, time);
     });
 	}
   </script>

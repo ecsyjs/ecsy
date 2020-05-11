@@ -12,43 +12,17 @@
         color: #fff;
 			}
 		</style>
-    <script src="https://raw.githack.com/mrdoob/three.js/r105/build/three.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/109/three.min.js"></script>
 
   </head>
   <body>
   </body>
-  <script>
-    var ENGINE = {
-      setObjectMaterialColor: function (object, r, g, b) {
-        object.material.color.setRGB(r, g, b);
-      },
-      setObjectScale: function (object, value) {
-        object.scale.set(value, value, value);
-      },
-      objectsColliding: (function () {
-        let ballWorldPos = new THREE.Vector3();
-        return function (objectA, objectB) {
-          objectA.geometry.computeBoundingSphere();
-          objectB.geometry.computeBoundingSphere();
-
-          ballWorldPos = objectA.getWorldPosition(ballWorldPos);
-
-          let radius = objectA.geometry.boundingSphere.radius;
-          let bsphere = objectB.geometry.boundingSphere;
-          let radiusSum = bsphere.radius + radius;
-
-          return objectB.position.distanceToSquared(ballWorldPos) <= radiusSum * radiusSum;
-        }
-      })()
-    };
-  </script>
   <script type="module">
     import {World} from '../../../build/ecsy.module.js';
     import {Object3D, Collidable, Collider, Recovering, Moving, PulsatingScale, Timeout, PulsatingColor, Colliding, Rotating} from './components.mjs';
     import {RotatingSystem, ColliderSystem, PulsatingColorSystem, PulsatingScaleSystem, MovingSystem,TimeoutSystem} from './systems.mjs';
 
     var world = new World();
-    window.world = world;
 
     world
       .registerSystem(RotatingSystem)
@@ -128,7 +102,6 @@
       directionalLight.position.set( 1, 1, 0.5 ).normalize();
       scene.add( directionalLight );
 
-
       var geometry = new THREE.BoxBufferGeometry( size, size, size );
 
       for (var i = 0;i < numObjects; i++) {
@@ -183,9 +156,9 @@
     function animate() {
       var delta = clock.getDelta();
       var elapsedTime = clock.elapsedTime;
-      console.time('render');
+      //console.time('render');
       world.execute(delta, elapsedTime);
-      console.timeEnd('render');
+      //console.timeEnd('render');
 
       renderer.render( scene, camera );
     }

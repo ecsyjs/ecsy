@@ -28,12 +28,20 @@ export default class Entity {
     this._ComponentTypesToRemove = [];
 
     this.alive = false;
+
+    //if there are state components on a entity, it can't be removed completely
+    this.numStateComponents = 0;
   }
 
   // COMPONENTS
 
-  getComponent(Component) {
+  getComponent(Component, includeRemoved) {
     var component = this._components[Component.name];
+
+    if (!component && includeRemoved === true) {
+      component = this._componentsToRemove[Component.name];
+    }
+
     return DEBUG ? wrapImmutableComponent(Component, component) : component;
   }
 
@@ -74,13 +82,16 @@ export default class Entity {
     return this;
   }
 
-  removeComponent(Component, forceRemove) {
-    this._world.entityRemoveComponent(this, Component, forceRemove);
+  removeComponent(Component, forceImmediate) {
+    this._world.entityRemoveComponent(this, Component, forceImmediate);
     return this;
   }
 
-  hasComponent(Component) {
-    return !!~this._ComponentTypes.indexOf(Component);
+  hasComponent(Component, includeRemoved) {
+    return (
+      !!~this._ComponentTypes.indexOf(Component) ||
+      (includeRemoved === true && this.hasRemovedComponent(Component))
+    );
   }
 
   hasRemovedComponent(Component) {
@@ -101,8 +112,8 @@ export default class Entity {
     return false;
   }
 
-  removeAllComponents(forceRemove) {
-    return this._world.entityRemoveAllComponents(this, forceRemove);
+  removeAllComponents(forceImmediate) {
+    return this._world.entityRemoveAllComponents(this, forceImmediate);
   }
 
   // EXTRAS
@@ -116,7 +127,7 @@ export default class Entity {
     this._components = {};
   }
 
-  remove(forceRemove) {
-    return this._world.removeEntity(this, forceRemove);
+  remove(forceImmediate) {
+    return this._world.removeEntity(this, forceImmediate);
   }
 }

@@ -9,7 +9,7 @@ export interface ComponentPropertyDefinition {
 export type ComponentSchema = { [propertyName: string]: ComponentPropertyDefinition };
 
 /**
- * Create a component class from a schemaa.
+ * Create a component class from a schema.
  * @param schema An object that describes the schema of the component
  * @param name The name of the component
  */

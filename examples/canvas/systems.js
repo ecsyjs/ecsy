@@ -140,7 +140,7 @@ export class Renderer extends System {
       let intersect = intersectingCircles[i].getComponent(Intersecting);
       for (var j = 0; j < intersect.points.length; j++) {
         var points = intersect.points[j];
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 2;
         ctx.strokeStyle = "#ff9";
 
         ctx.fillStyle = "rgba(255, 255,255, 0.2)";
@@ -151,7 +151,6 @@ export class Renderer extends System {
         fillCircle(ctx, points[0], points[1], 3);
         fillCircle(ctx, points[2], points[3], 3);
 
-        ctx.strokeStyle = "#ff9";
         drawLine(ctx, points[0], points[1], points[2], points[3]);
       }
     }

@@ -1,5 +1,6 @@
 export default class DummyObjectPool {
   constructor(T) {
+    this.isDummyObjectPool = true;
     this.count = 0;
     this.used = 0;
     this.T = T;

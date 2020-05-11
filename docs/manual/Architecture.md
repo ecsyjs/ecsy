@@ -23,7 +23,7 @@ The usual workflow when building an ECS based application is:
 Let's say we want to create a game where the player fights with wolves and dragons.
 We will start by defining components that will be attached to entities:
 - `Walker` and `Flyer` for entities that will walk and fly (resp.).
-- `Enemy` for enemy entitites.
+- `Enemy` for enemy entities.
 - `Model3D` for all the entities that will have a 3d Model.
 
 Then we use these components to define our main entities:
@@ -88,7 +88,7 @@ entity.addComponent(Enemy);
 ### Single value components
 
 Components could be made of multiple attributes, but sometimes they just contain a single attribute.
-It these cases using the attribute's name to match the component's name may seem handy:
+In these cases using the attribute's name to match the component's name may seem handy:
 ```javascript
 class Acceleration {
   constructor() {

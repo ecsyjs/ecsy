@@ -136,6 +136,7 @@ export class System {
   }
 
   stop() {
+    this.executeTime = 0;
     this.enabled = false;
   }
 
@@ -147,8 +148,12 @@ export class System {
   clearEvents() {
     for (let queryName in this.queries) {
       var query = this.queries[queryName];
-      if (query.added) query.added.length = 0;
-      if (query.removed) query.removed.length = 0;
+      if (query.added) {
+        query.added.length = 0;
+      }
+      if (query.removed) {
+        query.removed.length = 0;
+      }
       if (query.changed) {
         if (Array.isArray(query.changed)) {
           query.changed.length = 0;
@@ -170,30 +175,37 @@ export class System {
       queries: {}
     };
 
-    /*
-    if (this.config) {
-      var queries = this.queries;
+    if (this.constructor.queries) {
+      var queries = this.constructor.queries;
       for (let queryName in queries) {
-        let query = queries[queryName];
-        json.queries[queryName] = {
+        let query = this.queries[queryName];
+        let queryDefinition = queries[queryName];
+        let jsonQuery = (json.queries[queryName] = {
           key: this._queries[queryName].key
-        };
-        if (query.events) {
-          let events = (json.queries[queryName]["events"] = {});
-          for (let eventName in query.events) {
-            let event = query.events[eventName];
-            events[eventName] = {
-              eventName: event.event,
-              numEntities: this.events[queryName][eventName].length
-            };
-            if (event.components) {
-              events[eventName].components = event.components.map(c => c.name);
+        });
+
+        jsonQuery.mandatory = queryDefinition.mandatory === true;
+        jsonQuery.reactive =
+          queryDefinition.listen &&
+          (queryDefinition.listen.added === true ||
+            queryDefinition.listen.removed === true ||
+            queryDefinition.listen.changed === true ||
+            Array.isArray(queryDefinition.listen.changed));
+
+        if (jsonQuery.reactive) {
+          jsonQuery.listen = {};
+
+          const methods = ["added", "removed", "changed"];
+          methods.forEach(method => {
+            if (query[method]) {
+              jsonQuery.listen[method] = {
+                entities: query[method].length
+              };
             }
-          }
+          });
         }
       }
     }
-*/
 
     return json;
   }

@@ -71,7 +71,7 @@
         var time = performance.now();
         var delta = time - lastTime;
         lastTime = time;
-        world.execute(delta / 1000);
+        world.execute(delta);
         requestAnimationFrame(update);
       }
 

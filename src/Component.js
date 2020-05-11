@@ -3,3 +3,5 @@ export class Component {
   reset() {}
   clear() {}
 }
+
+Component.isComponent = true;

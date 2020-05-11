@@ -23,23 +23,31 @@
         textarea.innerHTML += msg + '\n';
       }
 
-      import {World, System, Not} from '../../build/ecsy.module.js';
+      import {World, System, TagComponent, Not} from '../../build/ecsy.module.js';
 
       const names = [ 'Isabel', 'Scot', 'Francene', 'Robert', 'Kizzie', 'Leroy', 'Layla', 'Stella', 'Marianela', 'Devorah'];
       const sizes = [ 'XS', 'S', 'M', 'L', 'XL' ];
       const colors = [ 'white', 'red', 'yellow', 'purple', 'pink', 'blue', 'cyan', 'black' ];
 
       // Components
-      class NPC {}
+      class NPC extends TagComponent {}
 
       class Name {
         constructor() {
+          this.reset();
+        }
+
+        reset() {
           this.value = '';
         }
       }
 
       class Tshirt {
         constructor() {
+          this.reset();
+        }
+
+        reset() {
           this.color = 'white';
           this.size = 'XL';
         }
@@ -74,7 +82,7 @@
       TshirtSystem.queries = {
         entities: { components: [NPC, Not(Tshirt)] }
       };
-      
+
       // Initialize our world
       var world = new World();
 

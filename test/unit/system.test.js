@@ -1,6 +1,4 @@
-global.performance =
-  typeof performance !== "undefined" ? performance : { now: () => 0 };
-
+import "../helpers/common.js";
 import test from "ava";
 import { World, System, Not } from "../../src/index.js";
 import {
@@ -809,4 +807,78 @@ test("Systems without queries", t => {
     world.execute();
   }
   t.is(counter, 10);
+});
+
+test("Systems with component case sensitive", t => {
+  var world = new World();
+
+  class A {}
+  class a {}
+
+  var counter = { a: 0, A: 0 };
+
+  class System_A extends System {
+    execute() {
+      this.queries.A.results.forEach(() => counter.A++);
+    }
+  }
+  System_A.queries = { A: { components: [A] } };
+
+  class System_a extends System {
+    execute() {
+      this.queries.a.results.forEach(() => counter.a++);
+    }
+  }
+  System_a.queries = { a: { components: [a] } };
+
+  // Register empty system
+  world.registerSystem(System_A);
+  world.registerSystem(System_a);
+
+  world.execute();
+  t.deepEqual(counter, { a: 0, A: 0 });
+  let entity_A = world.createEntity();
+  entity_A.addComponent(A);
+  world.execute();
+  t.deepEqual(counter, { a: 0, A: 1 });
+
+  let entity_a = world.createEntity();
+  entity_a.addComponent(a);
+  world.execute();
+  t.deepEqual(counter, { a: 1, A: 2 });
+
+  entity_A.removeComponent(A);
+  world.execute();
+  t.deepEqual(counter, { a: 2, A: 2 });
+});
+
+test("Components with the the same name in uppercase and lowercase", t => {
+  class B {}
+
+  class b {}
+
+  class S extends System {
+    execute() {
+      this.queries.S.results.forEach(entity =>
+        console.log(entity.getComponents())
+      );
+    }
+  }
+  S.queries = { S: { components: [B, b] } };
+
+  const world = new World();
+  world.registerSystem(S);
+  world
+    .createEntity()
+    .addComponent(B)
+    .addComponent(b);
+
+  let query = world.getSystem(S).queries.S;
+  let entity = query.results[0];
+  let components = entity.getComponents();
+  t.deepEqual(Object.keys(components), ["B", "b"]);
+  t.deepEqual(
+    Object.values(components).map(c => c.constructor.name),
+    ["B", "b"]
+  );
 });

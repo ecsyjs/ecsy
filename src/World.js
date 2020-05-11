@@ -1,6 +1,10 @@
 import { SystemManager } from "./SystemManager.js";
 import { EntityManager } from "./EntityManager.js";
 import { ComponentManager } from "./ComponentManager.js";
+import { Version } from "./Version.js";
+
+const hasWindow = typeof window !== "undefined";
+const hasCustomEvent = typeof CustomEvent !== "undefined";
 
 export class World {
   constructor() {
@@ -12,10 +16,14 @@ export class World {
 
     this.eventQueues = {};
 
-    if (typeof CustomEvent !== "undefined") {
-      var event = new CustomEvent("ecsy-world-created", { detail: this });
+    if (hasWindow && hasCustomEvent) {
+      var event = new CustomEvent("ecsy-world-created", {
+        detail: { world: this, version: Version }
+      });
       window.dispatchEvent(event);
     }
+
+    this.lastTime = performance.now();
   }
 
   registerComponent(Component) {
@@ -37,6 +45,12 @@ export class World {
   }
 
   execute(delta, time) {
+    if (!delta) {
+      let time = performance.now();
+      delta = time - this.lastTime;
+      this.lastTime = time;
+    }
+
     if (this.enabled) {
       this.systemManager.execute(delta, time);
       this.entityManager.processDeferredRemoval();
@@ -51,8 +65,8 @@ export class World {
     this.enabled = true;
   }
 
-  createEntity() {
-    return this.entityManager.createEntity();
+  createEntity(name) {
+    return this.entityManager.createEntity(name);
   }
 
   stats() {

@@ -13,8 +13,7 @@ export function getName(Component) {
  * @private
  */
 export function componentPropertyName(Component) {
-  var name = getName(Component);
-  return name.charAt(0).toLowerCase() + name.slice(1);
+  return getName(Component);
 }
 
 /**
@@ -34,10 +33,5 @@ export function queryKey(Components) {
     }
   }
 
-  return names
-    .map(function(x) {
-      return x.toLowerCase();
-    })
-    .sort()
-    .join("-");
+  return names.sort().join("-");
 }

@@ -1,7 +1,5 @@
 // @todo Define this globally for all the test?
-global.performance =
-  typeof performance !== "undefined" ? performance : { now: () => 0 };
-
+import "../helpers/common.js";
 import test from "ava";
 import { World, Not, System, SystemStateComponent } from "../../src/index.js";
 import { FooComponent } from "../helpers/components";

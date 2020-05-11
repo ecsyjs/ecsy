@@ -1,3 +1,4 @@
+import "../helpers/common.js";
 import test from "ava";
 import { World } from "../../src/index.js";
 import { FooComponent, BarComponent } from "../helpers/components";
@@ -169,4 +170,23 @@ test("remove entity", async t => {
   t.is(world.entityManager.count(), 1);
   world.entityManager.processDeferredRemoval();
   t.is(world.entityManager.count(), 0);
+});
+
+test("get component includeRemoved", async t => {
+  var world = new World();
+
+  // Sync
+  var entity = world.createEntity();
+  entity.addComponent(FooComponent);
+  const component = entity.getComponent(FooComponent);
+  entity.removeComponent(FooComponent);
+
+  t.is(entity.hasComponent(FooComponent), false);
+  t.is(entity.getComponent(FooComponent), undefined);
+
+  t.is(entity.hasRemovedComponent(FooComponent), true);
+  t.deepEqual(entity.getRemovedComponent(FooComponent), component);
+
+  t.is(entity.hasComponent(FooComponent, true), true);
+  t.deepEqual(entity.getComponent(FooComponent, true), component);
 });

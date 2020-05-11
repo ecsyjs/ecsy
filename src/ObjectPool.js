@@ -4,6 +4,7 @@ export default class ObjectPool {
     this.freeList = [];
     this.count = 0;
     this.T = T;
+    this.isObjectPool = true;
 
     var extraArgs = null;
     if (arguments.length > 1) {

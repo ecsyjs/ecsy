@@ -7,22 +7,32 @@
 		factory(exports);
 		exports.noConflict = function () { global.ECSY = current; return exports; };
 	}()));
-}(this, function (exports) { 'use strict';
+}(this, (function (exports) { 'use strict';
 
 	class SystemManager {
 	  constructor(world) {
 	    this._systems = [];
 	    this._executeSystems = []; // Systems that have `execute` method
 	    this.world = world;
+	    this.lastExecutedSystem = null;
 	  }
 
 	  registerSystem(System, attributes) {
+	    if (
+	      this._systems.find(s => s.constructor.name === System.name) !== undefined
+	    ) {
+	      console.warn(`System '${System.name}' already registered.`);
+	      return this;
+	    }
+
 	    var system = new System(this.world, attributes);
 	    if (system.init) system.init();
 	    system.order = this._systems.length;
 	    this._systems.push(system);
-	    if (system.execute) this._executeSystems.push(system);
-	    this.sortSystems();
+	    if (system.execute) {
+	      this._executeSystems.push(system);
+	      this.sortSystems();
+	    }
 	    return this;
 	  }
 
@@ -47,17 +57,27 @@
 	    this._systems.splice(index, 1);
 	  }
 
-	  execute(delta, time) {
-	    this._executeSystems.forEach(system => {
-	      if (system.enabled && system.initialized) {
-	        if (system.canExecute()) {
-	          let startTime = performance.now();
-	          system.execute(delta, time);
-	          system.executeTime = performance.now() - startTime;
-	        }
+	  executeSystem(system, delta, time) {
+	    if (system.initialized) {
+	      if (system.canExecute()) {
+	        let startTime = performance.now();
+	        system.execute(delta, time);
+	        system.executeTime = performance.now() - startTime;
+	        this.lastExecutedSystem = system;
 	        system.clearEvents();
 	      }
-	    });
+	    }
+	  }
+
+	  stop() {
+	    this._executeSystems.forEach(system => system.stop());
+	  }
+
+	  execute(delta, time, forcePlay) {
+	    this._executeSystems.forEach(
+	      system =>
+	        (forcePlay || system.enabled) && this.executeSystem(system, delta, time)
+	    );
 	  }
 
 	  stats() {
@@ -178,8 +198,7 @@
 	 * @private
 	 */
 	function componentPropertyName(Component) {
-	  var name = getName(Component);
-	  return name.charAt(0).toLowerCase() + name.slice(1);
+	  return getName(Component);
 	}
 
 	/**
@@ -199,12 +218,7 @@
 	    }
 	  }
 
-	  return names
-	    .map(function(x) {
-	      return x.toLowerCase();
-	    })
-	    .sort()
-	    .join("-");
+	  return names.sort().join("-");
 	}
 
 	class Query {
@@ -284,6 +298,18 @@
 	    );
 	  }
 
+	  toJSON() {
+	    return {
+	      key: this.key,
+	      reactive: this.reactive,
+	      components: {
+	        included: this.Components.map(C => C.name),
+	        not: this.NotComponents.map(C => C.name)
+	      },
+	      numEntities: this.entities.length
+	    };
+	  }
+
 	  /**
 	   * Return stats for this query
 	   */
@@ -323,12 +349,20 @@
 	    this._ComponentTypesToRemove = [];
 
 	    this.alive = false;
+
+	    //if there are state components on a entity, it can't be removed
+	    this.numStateComponents = 0;
 	  }
 
 	  // COMPONENTS
 
-	  getComponent(Component) {
+	  getComponent(Component, includeRemoved) {
 	    var component = this._components[Component.name];
+
+	    if (!component && includeRemoved === true) {
+	      component = this._componentsToRemove[Component.name];
+	    }
+
 	    return  component;
 	  }
 
@@ -374,8 +408,11 @@
 	    return this;
 	  }
 
-	  hasComponent(Component) {
-	    return !!~this._ComponentTypes.indexOf(Component);
+	  hasComponent(Component, includeRemoved) {
+	    return (
+	      !!~this._ComponentTypes.indexOf(Component) ||
+	      (includeRemoved === true && this.hasRemovedComponent(Component))
+	    );
 	  }
 
 	  hasRemovedComponent(Component) {
@@ -422,6 +459,7 @@
 	    this.freeList = [];
 	    this.count = 0;
 	    this.T = T;
+	    this.isObjectPool = true;
 
 	    var extraArgs = null;
 	    if (arguments.length > 1) {
@@ -590,6 +628,8 @@
 
 	class SystemStateComponent {}
 
+	SystemStateComponent.isSystemStateComponent = true;
+
 	/**
 	 * @private
 	 * @class EntityManager
@@ -602,6 +642,8 @@
 	    // All the entities in this instance
 	    this._entities = [];
 
+	    this._entitiesByNames = {};
+
 	    this._queryManager = new QueryManager(this);
 	    this.eventDispatcher = new EventDispatcher();
 	    this._entityPool = new ObjectPool(Entity);
@@ -609,16 +651,28 @@
 	    // Deferred deletion
 	    this.entitiesWithComponentsToRemove = [];
 	    this.entitiesToRemove = [];
+	    this.deferredRemovalEnabled = true;
+	  }
 
-	    this.numStateComponents = 0;
+	  getEntityByName(name) {
+	    return this._entitiesByNames[name];
 	  }
 
 	  /**
 	   * Create a new entity
 	   */
-	  createEntity() {
+	  createEntity(name) {
 	    var entity = this._entityPool.aquire();
 	    entity.alive = true;
+	    entity.name = name || "";
+	    if (name) {
+	      if (this._entitiesByNames[name]) {
+	        console.warn(`Entity name '${name}' already exist`);
+	      } else {
+	        this._entitiesByNames[name] = entity;
+	      }
+	    }
+
 	    entity._world = this;
 	    this._entities.push(entity);
 	    this.eventDispatcher.dispatchEvent(ENTITY_CREATED, entity);
@@ -639,7 +693,7 @@
 	    entity._ComponentTypes.push(Component);
 
 	    if (Component.__proto__ === SystemStateComponent) {
-	      this.numStateComponents++;
+	      entity.numStateComponents++;
 	    }
 
 	    var componentPool = this.world.componentsManager.getComponentsPool(
@@ -696,10 +750,10 @@
 	    this._queryManager.onEntityComponentRemoved(entity, Component);
 
 	    if (Component.__proto__ === SystemStateComponent) {
-	      this.numStateComponents--;
+	      entity.numStateComponents--;
 
 	      // Check if the entity was a ghost waiting for the last system state component to be removed
-	      if (this.numStateComponents === 0 && !entity.alive) {
+	      if (entity.numStateComponents === 0 && !entity.alive) {
 	        entity.remove();
 	      }
 	    }
@@ -741,7 +795,7 @@
 
 	    entity.alive = false;
 
-	    if (this.numStateComponents === 0) {
+	    if (entity.numStateComponents === 0) {
 	      // Remove from entity list
 	      this.eventDispatcher.dispatchEvent(ENTITY_REMOVED, entity);
 	      this._queryManager.onEntityRemoved(entity);
@@ -773,6 +827,10 @@
 	  }
 
 	  processDeferredRemoval() {
+	    if (!this.deferredRemovalEnabled) {
+	      return;
+	    }
+
 	    for (let i = 0; i < this.entitiesToRemove.length; i++) {
 	      let entity = this.entitiesToRemove[i];
 	      let index = this._entities.indexOf(entity);
@@ -790,7 +848,7 @@
 	        var component = entity._componentsToRemove[componentName];
 	        delete entity._componentsToRemove[componentName];
 	        this.componentsManager._componentPool[propName].release(component);
-	        //this.world.componentsManager.componentRemovedFromEntity(Component);
+	        this.world.componentsManager.componentRemovedFromEntity(Component);
 
 	        //this._entityRemoveComponentSync(entity, Component, index);
 	      }
@@ -849,6 +907,7 @@
 
 	class DummyObjectPool {
 	  constructor(T) {
+	    this.isDummyObjectPool = true;
 	    this.count = 0;
 	    this.used = 0;
 	    this.T = T;
@@ -885,16 +944,21 @@
 	  }
 
 	  registerComponent(Component) {
+	    if (this.Components[Component.name]) {
+	      console.warn(`Component type: '${Component.name}' already registered.`);
+	      return;
+	    }
+
 	    this.Components[Component.name] = Component;
 	    this.numComponents[Component.name] = 0;
 	  }
 
 	  componentAddedToEntity(Component) {
-	    if (!this.numComponents[Component.name]) {
-	      this.numComponents[Component.name] = 1;
-	    } else {
-	      this.numComponents[Component.name]++;
+	    if (!this.Components[Component.name]) {
+	      this.registerComponent(Component);
 	    }
+
+	    this.numComponents[Component.name]++;
 	  }
 
 	  componentRemovedFromEntity(Component) {
@@ -909,7 +973,7 @@
 	        this._componentPool[componentName] = new ObjectPool(Component);
 	      } else {
 	        console.warn(
-	          `Component '${Component.name}' won't benefit from pooling because 'reset' method was not implemeneted.`
+	          `Component '${Component.name}' won't benefit from pooling because 'reset' method was not implemented.`
 	        );
 	        this._componentPool[componentName] = new DummyObjectPool(Component);
 	      }
@@ -918,6 +982,105 @@
 	    return this._componentPool[componentName];
 	  }
 	}
+
+	var name = "ecsy";
+	var version = "0.2.2";
+	var description = "Entity Component System in JS";
+	var main = "build/ecsy.js";
+	var module = "build/ecsy.module.js";
+	var types = "src/index.d.ts";
+	var scripts = {
+		build: "rollup -c && npm run docs",
+		docs: "rm docs/api/_sidebar.md; typedoc --readme none --mode file --excludeExternals --plugin typedoc-plugin-markdown  --theme docs/theme --hideSources --hideBreadcrumbs --out docs/api/ --includeDeclarations --includes 'src/**/*.d.ts' src; touch docs/api/_sidebar.md",
+		"dev:docs": "nodemon -e ts -x 'npm run docs' -w src",
+		dev: "concurrently --names 'ROLLUP,DOCS,HTTP' -c 'bgBlue.bold,bgYellow.bold,bgGreen.bold' 'rollup -c -w -m inline' 'npm run dev:docs' 'npm run dev:server'",
+		"dev:server": "http-server -c-1 -p 8080 --cors",
+		lint: "eslint src test examples",
+		start: "npm run dev",
+		test: "ava",
+		travis: "npm run lint && npm run test && npm run build",
+		"watch:test": "ava --watch"
+	};
+	var repository = {
+		type: "git",
+		url: "git+https://github.com/fernandojsg/ecsy.git"
+	};
+	var keywords = [
+		"ecs",
+		"entity component system"
+	];
+	var author = "Fernando Serrano <fernandojsg@gmail.com> (http://fernandojsg.com)";
+	var license = "MIT";
+	var bugs = {
+		url: "https://github.com/fernandojsg/ecsy/issues"
+	};
+	var ava = {
+		files: [
+			"test/**/*.test.js"
+		],
+		sources: [
+			"src/**/*.js"
+		],
+		require: [
+			"babel-register",
+			"esm"
+		]
+	};
+	var jspm = {
+		files: [
+			"package.json",
+			"LICENSE",
+			"README.md",
+			"build/ecsy.js",
+			"build/ecsy.min.js",
+			"build/ecsy.module.js"
+		],
+		directories: {
+		}
+	};
+	var homepage = "https://github.com/fernandojsg/ecsy#readme";
+	var devDependencies = {
+		ava: "^1.4.1",
+		"babel-cli": "^6.26.0",
+		"babel-core": "^6.26.3",
+		"babel-eslint": "^10.0.3",
+		"babel-loader": "^8.0.6",
+		concurrently: "^4.1.2",
+		"docsify-cli": "^4.4.0",
+		eslint: "^5.16.0",
+		"eslint-config-prettier": "^4.3.0",
+		"eslint-plugin-prettier": "^3.1.2",
+		"http-server": "^0.11.1",
+		nodemon: "^1.19.4",
+		prettier: "^1.19.1",
+		rollup: "^1.29.0",
+		"rollup-plugin-json": "^4.0.0",
+		"rollup-plugin-terser": "^5.2.0",
+		typedoc: "^0.15.8",
+		"typedoc-plugin-markdown": "^2.2.16",
+		typescript: "^3.7.5"
+	};
+	var pjson = {
+		name: name,
+		version: version,
+		description: description,
+		main: main,
+		"jsnext:main": "build/ecsy.module.js",
+		module: module,
+		types: types,
+		scripts: scripts,
+		repository: repository,
+		keywords: keywords,
+		author: author,
+		license: license,
+		bugs: bugs,
+		ava: ava,
+		jspm: jspm,
+		homepage: homepage,
+		devDependencies: devDependencies
+	};
+
+	const Version = pjson.version;
 
 	class World {
 	  constructor() {
@@ -930,9 +1093,13 @@
 	    this.eventQueues = {};
 
 	    if (typeof CustomEvent !== "undefined") {
-	      var event = new CustomEvent("ecsy-world-created", { detail: this });
+	      var event = new CustomEvent("ecsy-world-created", {
+	        detail: { world: this, version: Version }
+	      });
 	      window.dispatchEvent(event);
 	    }
+
+	    this.lastTime = performance.now();
 	  }
 
 	  registerComponent(Component) {
@@ -954,6 +1121,12 @@
 	  }
 
 	  execute(delta, time) {
+	    if (!delta) {
+	      let time = performance.now();
+	      delta = time - this.lastTime;
+	      this.lastTime = time;
+	    }
+
 	    if (this.enabled) {
 	      this.systemManager.execute(delta, time);
 	      this.entityManager.processDeferredRemoval();
@@ -968,8 +1141,8 @@
 	    this.enabled = true;
 	  }
 
-	  createEntity() {
-	    return this.entityManager.createEntity();
+	  createEntity(name) {
+	    return this.entityManager.createEntity(name);
 	  }
 
 	  stats() {
@@ -1097,6 +1270,7 @@
 	  }
 
 	  stop() {
+	    this.executeTime = 0;
 	    this.enabled = false;
 	  }
 
@@ -1108,8 +1282,12 @@
 	  clearEvents() {
 	    for (let queryName in this.queries) {
 	      var query = this.queries[queryName];
-	      if (query.added) query.added.length = 0;
-	      if (query.removed) query.removed.length = 0;
+	      if (query.added) {
+	        query.added.length = 0;
+	      }
+	      if (query.removed) {
+	        query.removed.length = 0;
+	      }
 	      if (query.changed) {
 	        if (Array.isArray(query.changed)) {
 	          query.changed.length = 0;
@@ -1131,30 +1309,37 @@
 	      queries: {}
 	    };
 
-	    /*
-	    if (this.config) {
-	      var queries = this.queries;
+	    if (this.constructor.queries) {
+	      var queries = this.constructor.queries;
 	      for (let queryName in queries) {
-	        let query = queries[queryName];
-	        json.queries[queryName] = {
+	        let query = this.queries[queryName];
+	        let queryDefinition = queries[queryName];
+	        let jsonQuery = (json.queries[queryName] = {
 	          key: this._queries[queryName].key
-	        };
-	        if (query.events) {
-	          let events = (json.queries[queryName]["events"] = {});
-	          for (let eventName in query.events) {
-	            let event = query.events[eventName];
-	            events[eventName] = {
-	              eventName: event.event,
-	              numEntities: this.events[queryName][eventName].length
-	            };
-	            if (event.components) {
-	              events[eventName].components = event.components.map(c => c.name);
+	        });
+
+	        jsonQuery.mandatory = queryDefinition.mandatory === true;
+	        jsonQuery.reactive =
+	          queryDefinition.listen &&
+	          (queryDefinition.listen.added === true ||
+	            queryDefinition.listen.removed === true ||
+	            queryDefinition.listen.changed === true ||
+	            Array.isArray(queryDefinition.listen.changed));
+
+	        if (jsonQuery.reactive) {
+	          jsonQuery.listen = {};
+
+	          const methods = ["added", "removed", "changed"];
+	          methods.forEach(method => {
+	            if (query[method]) {
+	              jsonQuery.listen[method] = {
+	                entities: query[method].length
+	              };
 	            }
-	          }
+	          });
 	        }
 	      }
 	    }
-	*/
 
 	    return json;
 	  }
@@ -1169,9 +1354,13 @@
 
 	class Component {}
 
+	Component.isComponent = true;
+
 	class TagComponent {
 	  reset() {}
 	}
+
+	TagComponent.isTagComponent = true;
 
 	function createType(typeDefinition) {
 	  var mandatoryFunctions = [
@@ -1403,16 +1592,183 @@
 	  return Component;
 	}
 
+	function generateId(length) {
+	  var result = "";
+	  var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+	  var charactersLength = characters.length;
+	  for (var i = 0; i < length; i++) {
+	    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+	  }
+	  return result;
+	}
+
+	function injectScript(src, onLoad) {
+	  var script = document.createElement("script");
+	  // @todo Use link to the ecsy-devtools repo?
+	  script.src = src;
+	  script.onload = onLoad;
+	  (document.head || document.documentElement).appendChild(script);
+	}
+
+	/* global Peer */
+
+	function hookConsoleAndErrors(connection) {
+	  var wrapFunctions = ["error", "warning", "log"];
+	  wrapFunctions.forEach(key => {
+	    if (typeof console[key] === "function") {
+	      var fn = console[key].bind(console);
+	      console[key] = (...args) => {
+	        connection.send({
+	          method: "console",
+	          type: key,
+	          args: JSON.stringify(args)
+	        });
+	        return fn.apply(null, args);
+	      };
+	    }
+	  });
+
+	  window.addEventListener("error", error => {
+	    connection.send({
+	      method: "error",
+	      error: JSON.stringify({
+	        message: error.error.message,
+	        stack: error.error.stack
+	      })
+	    });
+	  });
+	}
+
+	function includeRemoteIdHTML(remoteId) {
+	  let infoDiv = document.createElement("div");
+	  infoDiv.style.cssText = `
+    align-items: center;
+    background-color: #333;
+    color: #aaa;
+    display:flex;
+    font-family: Arial;
+    font-size: 1.1em;
+    height: 40px;
+    justify-content: center;
+    left: 0;
+    opacity: 0.9;
+    position: absolute;
+    right: 0;
+    text-align: center;
+    top: 0;
+  `;
+
+	  infoDiv.innerHTML = `Open ECSY devtools to connect to this page using the code:&nbsp;<b style="color: #fff">${remoteId}</b>&nbsp;<button onClick="generateNewCode()">Generate new code</button>`;
+	  document.body.appendChild(infoDiv);
+
+	  return infoDiv;
+	}
+
+	function enableRemoteDevtools(remoteId) {
+	  window.generateNewCode = () => {
+	    window.localStorage.clear();
+	    remoteId = generateId(6);
+	    window.localStorage.setItem("ecsyRemoteId", remoteId);
+	    window.location.reload(false);
+	  };
+
+	  remoteId = remoteId || window.localStorage.getItem("ecsyRemoteId");
+	  if (!remoteId) {
+	    remoteId = generateId(6);
+	    window.localStorage.setItem("ecsyRemoteId", remoteId);
+	  }
+
+	  let infoDiv = includeRemoteIdHTML(remoteId);
+
+	  window.__ECSY_REMOTE_DEVTOOLS_INJECTED = true;
+	  window.__ECSY_REMOTE_DEVTOOLS = {};
+
+	  let Version = "";
+
+	  // This is used to collect the worlds created before the communication is being established
+	  let worldsBeforeLoading = [];
+	  let onWorldCreated = e => {
+	    var world = e.detail.world;
+	    Version = e.detail.version;
+	    worldsBeforeLoading.push(world);
+	  };
+	  window.addEventListener("ecsy-world-created", onWorldCreated);
+
+	  let onLoaded = () => {
+	    var peer = new Peer(remoteId);
+	    peer.on("open", (/* id */) => {
+	      peer.on("connection", connection => {
+	        window.__ECSY_REMOTE_DEVTOOLS.connection = connection;
+	        connection.on("open", function() {
+	          // infoDiv.style.visibility = "hidden";
+	          infoDiv.innerHTML = "Connected";
+
+	          // Receive messages
+	          connection.on("data", function(data) {
+	            if (data.type === "init") {
+	              var script = document.createElement("script");
+	              script.setAttribute("type", "text/javascript");
+	              script.onload = () => {
+	                script.parentNode.removeChild(script);
+
+	                // Once the script is injected we don't need to listen
+	                window.removeEventListener(
+	                  "ecsy-world-created",
+	                  onWorldCreated
+	                );
+	                worldsBeforeLoading.forEach(world => {
+	                  var event = new CustomEvent("ecsy-world-created", {
+	                    detail: { world: world, version: Version }
+	                  });
+	                  window.dispatchEvent(event);
+	                });
+	              };
+	              script.innerHTML = data.script;
+	              (document.head || document.documentElement).appendChild(script);
+	              script.onload();
+
+	              hookConsoleAndErrors(connection);
+	            } else if (data.type === "executeScript") {
+	              let value = eval(data.script);
+	              if (data.returnEval) {
+	                connection.send({
+	                  method: "evalReturn",
+	                  value: value
+	                });
+	              }
+	            }
+	          });
+	        });
+	      });
+	    });
+	  };
+
+	  // Inject PeerJS script
+	  injectScript(
+	    "https://cdn.jsdelivr.net/npm/peerjs@0.3.20/dist/peer.min.js",
+	    onLoaded
+	  );
+	}
+
+	const urlParams = new URLSearchParams(window.location.search);
+
+	// @todo Provide a way to disable it if needed
+	if (urlParams.has("enable-remote-devtools")) {
+	  enableRemoteDevtools();
+	}
+
 	exports.Component = Component;
 	exports.Not = Not;
 	exports.System = System;
 	exports.SystemStateComponent = SystemStateComponent;
 	exports.TagComponent = TagComponent;
 	exports.Types = Types;
+	exports.Version = Version;
 	exports.World = World;
 	exports.createComponentClass = createComponentClass;
 	exports.createType = createType;
+	exports.enableRemoteDevtools = enableRemoteDevtools;
 
 	Object.defineProperty(exports, '__esModule', { value: true });
 
-}));
+})));

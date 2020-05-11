@@ -1,34 +1,11 @@
 
-# ecsy
-
-## Index
-
-### Classes
-
-* [Component](classes/component.md)
-* [Entity](classes/entity.md)
-* [System](classes/system.md)
-* [SystemStateComponent](classes/systemstatecomponent.md)
-* [TagComponent](classes/tagcomponent.md)
-* [World](classes/world.md)
-
-### Interfaces
-
-* [ComponentConstructor](interfaces/componentconstructor.md)
-* [SystemConstructor](interfaces/systemconstructor.md)
-* [Types](interfaces/types.md)
-
-### Functions
-
-* [Not](README.md#not)
-* [createComponentClass](README.md#createcomponentclass)
-* [createType](README.md#createtype)
+# ecsy - v0.2.2
 
 ## Functions
 
 ###  Not
 
-▸ **Not**<**T**>(`Component`: [ComponentConstructor](interfaces/componentconstructor.md)‹T›): *object*
+▸ **Not**<**T**>(`Component`: [ComponentConstructor](interfaces/componentconstructor.md)‹T›): *[NotComponent](interfaces/notcomponent.md)*
 
 Use the Not class to negate a component query.
 
@@ -42,7 +19,7 @@ Name | Type |
 ------ | ------ |
 `Component` | [ComponentConstructor](interfaces/componentconstructor.md)‹T› |
 
-**Returns:** *object*
+**Returns:** *[NotComponent](interfaces/notcomponent.md)*
 
 ___
 
@@ -50,7 +27,7 @@ ___
 
 ▸ **createComponentClass**<**T**>(`schema`: object, `name`: string): *[ComponentConstructor](interfaces/componentconstructor.md)‹T›*
 
-Create a component class from a schemaa.
+Create a component class from a schema.
 
 **Type parameters:**
 

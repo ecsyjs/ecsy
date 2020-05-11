@@ -17,6 +17,8 @@ export class EntityManager {
     // All the entities in this instance
     this._entities = [];
 
+    this._entitiesByNames = {};
+
     this._queryManager = new QueryManager(this);
     this.eventDispatcher = new EventDispatcher();
     this._entityPool = new ObjectPool(Entity);
@@ -24,16 +26,28 @@ export class EntityManager {
     // Deferred deletion
     this.entitiesWithComponentsToRemove = [];
     this.entitiesToRemove = [];
+    this.deferredRemovalEnabled = true;
+  }
 
-    this.numStateComponents = 0;
+  getEntityByName(name) {
+    return this._entitiesByNames[name];
   }
 
   /**
    * Create a new entity
    */
-  createEntity() {
+  createEntity(name) {
     var entity = this._entityPool.aquire();
     entity.alive = true;
+    entity.name = name || "";
+    if (name) {
+      if (this._entitiesByNames[name]) {
+        console.warn(`Entity name '${name}' already exist`);
+      } else {
+        this._entitiesByNames[name] = entity;
+      }
+    }
+
     entity._world = this;
     this._entities.push(entity);
     this.eventDispatcher.dispatchEvent(ENTITY_CREATED, entity);
@@ -49,12 +63,19 @@ export class EntityManager {
    * @param {Object} values Optional values to replace the default attributes
    */
   entityAddComponent(entity, Component, values) {
-    if (~entity._ComponentTypes.indexOf(Component)) return;
+    if (~entity._ComponentTypes.indexOf(Component)) {
+      console.warn(
+        "Component type already exists on entity.",
+        entity,
+        Component
+      );
+      return;
+    }
 
     entity._ComponentTypes.push(Component);
 
     if (Component.__proto__ === SystemStateComponent) {
-      this.numStateComponents++;
+      entity.numStateComponents++;
     }
 
     var componentPool = this.world.componentsManager.getComponentsPool(
@@ -111,10 +132,10 @@ export class EntityManager {
     this._queryManager.onEntityComponentRemoved(entity, Component);
 
     if (Component.__proto__ === SystemStateComponent) {
-      this.numStateComponents--;
+      entity.numStateComponents--;
 
       // Check if the entity was a ghost waiting for the last system state component to be removed
-      if (this.numStateComponents === 0 && !entity.alive) {
+      if (entity.numStateComponents === 0 && !entity.alive) {
         entity.remove();
       }
     }
@@ -156,7 +177,7 @@ export class EntityManager {
 
     entity.alive = false;
 
-    if (this.numStateComponents === 0) {
+    if (entity.numStateComponents === 0) {
       // Remove from entity list
       this.eventDispatcher.dispatchEvent(ENTITY_REMOVED, entity);
       this._queryManager.onEntityRemoved(entity);
@@ -188,6 +209,10 @@ export class EntityManager {
   }
 
   processDeferredRemoval() {
+    if (!this.deferredRemovalEnabled) {
+      return;
+    }
+
     for (let i = 0; i < this.entitiesToRemove.length; i++) {
       let entity = this.entitiesToRemove[i];
       let index = this._entities.indexOf(entity);
@@ -205,7 +230,7 @@ export class EntityManager {
         var component = entity._componentsToRemove[componentName];
         delete entity._componentsToRemove[componentName];
         this.componentsManager._componentPool[propName].release(component);
-        //this.world.componentsManager.componentRemovedFromEntity(Component);
+        this.world.componentsManager.componentRemovedFromEntity(Component);
 
         //this._entityRemoveComponentSync(entity, Component, index);
       }
