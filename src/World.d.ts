@@ -59,5 +59,5 @@ export class World {
   /**
    * Create a new entity
    */
-  createEntity(name: string?):Entity
+  createEntity(name?: string):Entity
 }
