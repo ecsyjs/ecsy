@@ -139,9 +139,11 @@ export function enableRemoteDevtools(remoteId) {
   );
 }
 
-const urlParams = new URLSearchParams(window.location.search);
+if (typeof window !== "undefined") {
+  const urlParams = new URLSearchParams(window.location.search);
 
-// @todo Provide a way to disable it if needed
-if (urlParams.has("enable-remote-devtools")) {
-  enableRemoteDevtools();
+  // @todo Provide a way to disable it if needed
+  if (urlParams.has("enable-remote-devtools")) {
+    enableRemoteDevtools();
+  }
 }
