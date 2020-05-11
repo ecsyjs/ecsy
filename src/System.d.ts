@@ -3,6 +3,10 @@ import { Entity } from "./Entity";
 import { TagComponent } from './TagComponent';
 import { World } from "./World";
 
+interface Attributes {
+    priority?: number;
+}
+
 /**
  * A system that manipulates entities in the world.
  */
@@ -21,6 +25,8 @@ export abstract class System {
       },
     }
   };
+
+  constructor(world: World, attributes?: Attributes);
 
   /**
    * The results of the queries.

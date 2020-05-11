@@ -80,7 +80,7 @@ class PositionLogSystem extends System {
   // This method will get called on every frame
   execute(delta, time) {
     // Iterate through all the entities on the query
-    this.queries.position.result.forEach(entity => {
+    this.queries.position.results.forEach(entity => {
       // Access the component `Position` on the current entity
       let pos = entity.getComponent(Position);
 
@@ -107,7 +107,7 @@ class MovableSystem extends System {
   execute(delta, time) {
 
     // Iterate through all the entities on the query
-    this.queries.moving.result.forEach(entity => {
+    this.queries.moving.results.forEach(entity => {
 
       // Get the `Acceleration` component as Read-only
       let acceleration = entity.getComponent(Acceleration).value;
@@ -141,8 +141,8 @@ Please notice that we could create an arbitrary number of queries if needed and 
 ```javascript
 class SystemDemo extends System {
   execute() {
-    this.queries.boxes.result.forEach(entity => { /* do things */});
-    this.queries.balls.result.forEach(entity => { /* do things */});
+    this.queries.boxes.results.forEach(entity => { /* do things */});
+    this.queries.balls.results.forEach(entity => { /* do things */});
   }
 }
 

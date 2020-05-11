@@ -349,6 +349,9 @@
 	    this._ComponentTypesToRemove = [];
 
 	    this.alive = false;
+
+	    //if there are state components on a entity, it can't be removed
+	    this.numStateComponents = 0;
 	  }
 
 	  // COMPONENTS
@@ -649,8 +652,6 @@
 	    this.entitiesWithComponentsToRemove = [];
 	    this.entitiesToRemove = [];
 	    this.deferredRemovalEnabled = true;
-
-	    this.numStateComponents = 0;
 	  }
 
 	  getEntityByName(name) {
@@ -692,7 +693,7 @@
 	    entity._ComponentTypes.push(Component);
 
 	    if (Component.__proto__ === SystemStateComponent) {
-	      this.numStateComponents++;
+	      entity.numStateComponents++;
 	    }
 
 	    var componentPool = this.world.componentsManager.getComponentsPool(
@@ -749,10 +750,10 @@
 	    this._queryManager.onEntityComponentRemoved(entity, Component);
 
 	    if (Component.__proto__ === SystemStateComponent) {
-	      this.numStateComponents--;
+	      entity.numStateComponents--;
 
 	      // Check if the entity was a ghost waiting for the last system state component to be removed
-	      if (this.numStateComponents === 0 && !entity.alive) {
+	      if (entity.numStateComponents === 0 && !entity.alive) {
 	        entity.remove();
 	      }
 	    }
@@ -794,7 +795,7 @@
 
 	    entity.alive = false;
 
-	    if (this.numStateComponents === 0) {
+	    if (entity.numStateComponents === 0) {
 	      // Remove from entity list
 	      this.eventDispatcher.dispatchEvent(ENTITY_REMOVED, entity);
 	      this._queryManager.onEntityRemoved(entity);
