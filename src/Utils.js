@@ -35,3 +35,9 @@ export function queryKey(Components) {
 
   return names.sort().join("-");
 }
+
+// performance polyfill for nodejs
+if( typeof performance === 'undefined' ){
+	const nowOffset = Date.now();
+	global.performance = {now(){return Date.now() - nowOffset}}
+}
