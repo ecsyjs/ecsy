@@ -37,7 +37,11 @@ export function queryKey(Components) {
 }
 
 // performance polyfill for nodejs
-if( typeof performance === 'undefined' ){
-	const nowOffset = Date.now();
-	global.performance = {now(){return Date.now() - nowOffset}}
+if (typeof performance === "undefined") {
+  const nowOffset = Date.now();
+  global.performance = {
+    now() {
+      return Date.now() - nowOffset;
+    }
+  };
 }
