@@ -7,9 +7,7 @@ export class SystemManager {
   }
 
   registerSystem(System, attributes) {
-    if (
-      this._systems.find(s => s.constructor.name === System.name) !== undefined
-    ) {
+    if (this.getSystem(System) !== undefined) {
       console.warn(`System '${System.name}' already registered.`);
       return this;
     }
