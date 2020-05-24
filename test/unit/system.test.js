@@ -892,7 +892,6 @@ test("Unregister systems", t => {
   const world = new World();
   world.registerSystem(SystemA).registerSystem(SystemB);
 
-
   t.is(world.systemManager._systems.length, 2);
   t.is(world.systemManager._executeSystems.length, 1);
 

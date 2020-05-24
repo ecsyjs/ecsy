@@ -121,7 +121,6 @@ test("Reactive queries with Not operator", t => {
   });
 });
 
-
 test("Entity living just within the frame", t => {
   var world = new World();
 

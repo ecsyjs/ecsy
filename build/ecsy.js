@@ -81,6 +81,23 @@
 	    return this;
 	  }
 
+	  unregisterSystem(System) {
+	    let system = this.getSystem(System);
+	    if (system === undefined) {
+	      console.warn(`Can unregister system '${System.name}'. It doesn't exist.`);
+	      return this;
+	    }
+
+	    this._systems.splice(this._systems.indexOf(system), 1);
+
+	    if (system.execute) {
+	      this._executeSystems.splice(this._executeSystems.indexOf(system), 1);
+	    }
+
+	    // @todo Add system.unregister() call to free resources
+	    return this;
+	  }
+
 	  sortSystems() {
 	    this._executeSystems.sort((a, b) => {
 	      return a.priority - b.priority || a.order - b.order;
@@ -134,7 +151,8 @@
 	    for (var i = 0; i < this._systems.length; i++) {
 	      var system = this._systems[i];
 	      var systemStats = (stats.systems[system.constructor.name] = {
-	        queries: {}
+	        queries: {},
+	        executeTime: system.executeTime
 	      });
 	      for (var name in system.ctx) {
 	        systemStats.queries[name] = system.ctx[name].stats();
@@ -1127,6 +1145,11 @@
 	    return this;
 	  }
 
+	  unregisterSystem(System) {
+	    this.systemManager.unregisterSystem(System);
+	    return this;
+	  }
+
 	  getSystem(SystemClass) {
 	    return this.systemManager.getSystem(SystemClass);
 	  }
@@ -1137,7 +1160,7 @@
 
 	  execute(delta, time) {
 	    if (!delta) {
-	      let time = now();
+	      time = now();
 	      delta = time - this.lastTime;
 	      this.lastTime = time;
 	    }
