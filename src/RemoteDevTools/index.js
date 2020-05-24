@@ -1,5 +1,6 @@
 /* global Peer */
 import { injectScript, generateId } from "./utils.js";
+import { hasWindow } from "../Utils.js";
 
 function hookConsoleAndErrors(connection) {
   var wrapFunctions = ["error", "warning", "log"];
@@ -54,6 +55,11 @@ function includeRemoteIdHTML(remoteId) {
 }
 
 export function enableRemoteDevtools(remoteId) {
+  if (!hasWindow) {
+    console.warn("Remote devtools not available outside the browser");
+    return;
+  }
+
   window.generateNewCode = () => {
     window.localStorage.clear();
     remoteId = generateId(6);
@@ -139,9 +145,11 @@ export function enableRemoteDevtools(remoteId) {
   );
 }
 
-const urlParams = new URLSearchParams(window.location.search);
+if (hasWindow) {
+  const urlParams = new URLSearchParams(window.location.search);
 
-// @todo Provide a way to disable it if needed
-if (urlParams.has("enable-remote-devtools")) {
-  enableRemoteDevtools();
+  // @todo Provide a way to disable it if needed
+  if (urlParams.has("enable-remote-devtools")) {
+    enableRemoteDevtools();
+  }
 }

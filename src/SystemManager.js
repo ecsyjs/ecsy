@@ -1,3 +1,5 @@
+import { now } from "./Utils.js";
+
 export class SystemManager {
   constructor(world) {
     this._systems = [];
@@ -47,9 +49,9 @@ export class SystemManager {
   executeSystem(system, delta, time) {
     if (system.initialized) {
       if (system.canExecute()) {
-        let startTime = performance.now();
+        let startTime = now();
         system.execute(delta, time);
-        system.executeTime = performance.now() - startTime;
+        system.executeTime = now() - startTime;
         this.lastExecutedSystem = system;
         system.clearEvents();
       }
