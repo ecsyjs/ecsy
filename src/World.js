@@ -34,6 +34,11 @@ export class World {
     return this;
   }
 
+  unregisterSystem(System) {
+    this.systemManager.unregisterSystem(System);
+    return this;
+  }
+
   getSystem(SystemClass) {
     return this.systemManager.getSystem(SystemClass);
   }

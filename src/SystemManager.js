@@ -25,6 +25,23 @@ export class SystemManager {
     return this;
   }
 
+  unregisterSystem(System) {
+    let system = this.getSystem(System);
+    if (system === undefined) {
+      console.warn(`Can unregister system '${System.name}'. It doesn't exist.`);
+      return this;
+    }
+
+    this._systems.splice(this._systems.indexOf(system), 1);
+
+    if (system.execute) {
+      this._executeSystems.splice(this._executeSystems.indexOf(system), 1);
+    }
+
+    // @todo Add system.unregister() call to free resources
+    return this;
+  }
+
   sortSystems() {
     this._executeSystems.sort((a, b) => {
       return a.priority - b.priority || a.order - b.order;
