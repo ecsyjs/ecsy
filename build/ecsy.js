@@ -9,6 +9,53 @@
 	}()));
 }(this, (function (exports) { 'use strict';
 
+	/**
+	 * Return the name of a component
+	 * @param {Component} Component
+	 * @private
+	 */
+	function getName(Component) {
+	  return Component.name;
+	}
+
+	/**
+	 * Return a valid property name for the Component
+	 * @param {Component} Component
+	 * @private
+	 */
+	function componentPropertyName(Component) {
+	  return getName(Component);
+	}
+
+	/**
+	 * Get a key from a list of components
+	 * @param {Array(Component)} Components Array of components to generate the key
+	 * @private
+	 */
+	function queryKey(Components) {
+	  var names = [];
+	  for (var n = 0; n < Components.length; n++) {
+	    var T = Components[n];
+	    if (typeof T === "object") {
+	      var operator = T.operator === "not" ? "!" : T.operator;
+	      names.push(operator + getName(T.Component));
+	    } else {
+	      names.push(getName(T));
+	    }
+	  }
+
+	  return names.sort().join("-");
+	}
+
+	// Detector for browser's "window"
+	const hasWindow = typeof window !== "undefined";
+
+	// performance.now() "polyfill"
+	const now =
+	  hasWindow && typeof window.performance !== "undefined"
+	    ? performance.now.bind(performance)
+	    : Date.now.bind(Date);
+
 	class SystemManager {
 	  constructor(world) {
 	    this._systems = [];
@@ -58,9 +105,9 @@
 	  executeSystem(system, delta, time) {
 	    if (system.initialized) {
 	      if (system.canExecute()) {
-	        let startTime = performance.now();
+	        let startTime = now();
 	        system.execute(delta, time);
-	        system.executeTime = performance.now() - startTime;
+	        system.executeTime = now() - startTime;
 	        this.lastExecutedSystem = system;
 	        system.clearEvents();
 	      }
@@ -179,44 +226,6 @@
 	  resetCounters() {
 	    this.stats.fired = this.stats.handled = 0;
 	  }
-	}
-
-	/**
-	 * Return the name of a component
-	 * @param {Component} Component
-	 * @private
-	 */
-	function getName(Component) {
-	  return Component.name;
-	}
-
-	/**
-	 * Return a valid property name for the Component
-	 * @param {Component} Component
-	 * @private
-	 */
-	function componentPropertyName(Component) {
-	  return getName(Component);
-	}
-
-	/**
-	 * Get a key from a list of components
-	 * @param {Array(Component)} Components Array of components to generate the key
-	 * @private
-	 */
-	function queryKey(Components) {
-	  var names = [];
-	  for (var n = 0; n < Components.length; n++) {
-	    var T = Components[n];
-	    if (typeof T === "object") {
-	      var operator = T.operator === "not" ? "!" : T.operator;
-	      names.push(operator + getName(T.Component));
-	    } else {
-	      names.push(getName(T));
-	    }
-	  }
-
-	  return names.sort().join("-");
 	}
 
 	class Query {
@@ -1098,14 +1107,14 @@
 
 	    this.eventQueues = {};
 
-	    if (typeof CustomEvent !== "undefined") {
+	    if (hasWindow && typeof CustomEvent !== "undefined") {
 	      var event = new CustomEvent("ecsy-world-created", {
 	        detail: { world: this, version: Version }
 	      });
 	      window.dispatchEvent(event);
 	    }
 
-	    this.lastTime = performance.now();
+	    this.lastTime = now();
 	  }
 
 	  registerComponent(Component) {
@@ -1128,7 +1137,7 @@
 
 	  execute(delta, time) {
 	    if (!delta) {
-	      let time = performance.now();
+	      let time = now();
 	      delta = time - this.lastTime;
 	      this.lastTime = time;
 	    }
@@ -1671,6 +1680,11 @@
 	}
 
 	function enableRemoteDevtools(remoteId) {
+	  if (!hasWindow) {
+	    console.warn("Remote devtools not available outside the browser");
+	    return;
+	  }
+
 	  window.generateNewCode = () => {
 	    window.localStorage.clear();
 	    remoteId = generateId(6);
@@ -1756,11 +1770,13 @@
 	  );
 	}
 
-	const urlParams = new URLSearchParams(window.location.search);
+	if (hasWindow) {
+	  const urlParams = new URLSearchParams(window.location.search);
 
-	// @todo Provide a way to disable it if needed
-	if (urlParams.has("enable-remote-devtools")) {
-	  enableRemoteDevtools();
+	  // @todo Provide a way to disable it if needed
+	  if (urlParams.has("enable-remote-devtools")) {
+	    enableRemoteDevtools();
+	  }
 	}
 
 	exports.Component = Component;
