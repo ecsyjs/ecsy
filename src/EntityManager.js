@@ -63,7 +63,14 @@ export class EntityManager {
    * @param {Object} values Optional values to replace the default attributes
    */
   entityAddComponent(entity, Component, values) {
-    if (~entity._ComponentTypes.indexOf(Component)) return;
+    if (~entity._ComponentTypes.indexOf(Component)) {
+      console.warn(
+        "Component type already exists on entity.",
+        entity,
+        Component
+      );
+      return;
+    }
 
     entity._ComponentTypes.push(Component);
 
