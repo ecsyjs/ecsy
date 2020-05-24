@@ -62,6 +62,16 @@ export class System {
 
         if (queryConfig.listen) {
           validEvents.forEach(eventName => {
+            if (!this.execute) {
+              console.warn(
+                `System '${
+                  this.constructor.name
+                }' has defined listen events (${validEvents.join(
+                  ", "
+                )}) for query '${queryName}' but it does not implement the 'execute' method.`
+              );
+            }
+
             // Is the event enabled on this system's query?
             if (queryConfig.listen[eventName]) {
               let event = queryConfig.listen[eventName];
