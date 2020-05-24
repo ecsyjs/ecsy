@@ -1,4 +1,3 @@
-import "../helpers/common.js";
 import test from "ava";
 import { World, System, Not } from "../../src/index.js";
 import {
