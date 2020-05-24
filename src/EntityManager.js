@@ -64,10 +64,11 @@ export class EntityManager {
    */
   entityAddComponent(entity, Component, values) {
     if (~entity._ComponentTypes.indexOf(Component)) {
+      // @todo Just on debug mode
       console.warn(
         "Component type already exists on entity.",
         entity,
-        Component
+        Component.name
       );
       return;
     }
