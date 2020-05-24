@@ -78,7 +78,8 @@ export class SystemManager {
     for (var i = 0; i < this._systems.length; i++) {
       var system = this._systems[i];
       var systemStats = (stats.systems[system.constructor.name] = {
-        queries: {}
+        queries: {},
+        executeTime: system.executeTime
       });
       for (var name in system.ctx) {
         systemStats.queries[name] = system.ctx[name].stats();
