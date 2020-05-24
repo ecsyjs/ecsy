@@ -44,7 +44,7 @@ export class World {
 
   execute(delta, time) {
     if (!delta) {
-      let time = now();
+      time = now();
       delta = time - this.lastTime;
       this.lastTime = time;
     }
