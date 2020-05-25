@@ -1,5 +1,4 @@
 import test from "ava";
-import "../helpers/common.js";
 import {
   Component,
   TagComponent,
