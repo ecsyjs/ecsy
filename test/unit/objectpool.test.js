@@ -1,97 +1,59 @@
 import test from "ava";
-import DummyObjectPool from "../../src/DummyObjectPool";
-import ObjectPool from "../../src/ObjectPool";
-import { ComponentManager } from "../../src/ComponentManager";
-import { TagComponent } from "../../src/TagComponent";
+import "../helpers/common.js";
+import {
+  Component,
+  TagComponent,
+  World,
+  Types,
+  ObjectPool
+} from "../../src/index";
 
 test("Detecting Pool", t => {
-  var componentManager = new ComponentManager();
+  var world = new World();
 
-  class NoPoolComponent {}
-  class PoolComponent {
-    constructor() {
-      this.num = Math.random();
-    }
-
-    reset() {
-      this.num = Math.random();
-    }
-  }
+  class NoPoolComponent extends Component {}
+  class PoolComponent extends Component {}
+  PoolComponent.schema = {
+    num: { type: Types.Number }
+  };
   class PoolTagComponent extends TagComponent {}
+  class CustomPoolComponent extends Component {}
+
+  world.registerComponent(PoolComponent);
+  world.registerComponent(PoolTagComponent);
+  world.registerComponent(NoPoolComponent, false);
+
+  var customPool = new ObjectPool(new CustomPoolComponent(), 10);
+  world.registerComponent(CustomPoolComponent, customPool);
 
   t.true(
-    componentManager.getComponentsPool(NoPoolComponent) instanceof
-      DummyObjectPool
+    world.componentsManager.getComponentsPool(NoPoolComponent) === undefined
   );
   t.true(
-    componentManager.getComponentsPool(PoolComponent) instanceof ObjectPool
+    world.componentsManager.getComponentsPool(PoolComponent) instanceof
+      ObjectPool
   );
   t.true(
-    componentManager.getComponentsPool(PoolTagComponent) instanceof ObjectPool
+    world.componentsManager.getComponentsPool(PoolTagComponent) instanceof
+      ObjectPool
   );
-});
-
-test("DummyPool", t => {
-  var id = 0;
-
-  class T {
-    constructor() {
-      this.id = id++;
-    }
-  }
-
-  var pool = new DummyObjectPool(T);
-  var components = [];
-
-  // Create 10 components
-
-  for (let i = 0; i < 10; i++) {
-    components.push(pool.acquire());
-  }
-
-  t.is(pool.totalSize(), 10);
-  t.is(pool.totalFree(), Infinity);
-  t.is(pool.totalUsed(), 10);
-
-  for (let i = 0; i < 10; i++) {
-    t.is(components[i].id, i);
-  }
-
-  // Release 3 components
-
-  pool.release(components[0]);
-  pool.release(components[1]);
-  pool.release(components[2]);
-
-  t.is(pool.totalSize(), 10);
-  t.is(pool.totalFree(), Infinity);
-  t.is(pool.totalUsed(), 7);
-
-  // Create new components
-  for (let i = 0; i < 5; i++) {
-    var component = pool.acquire();
-    t.is(component.id, i + 10);
-  }
-
-  t.is(pool.totalSize(), 15);
-  t.is(pool.totalFree(), Infinity);
-  t.is(pool.totalUsed(), 12);
+  t.is(
+    world.componentsManager.getComponentsPool(CustomPoolComponent),
+    customPool
+  );
 });
 
 test("ObjectPool", t => {
   var id = 0;
 
-  class T {
+  class T extends Component {
     constructor() {
-      this.id = id++;
-    }
-
-    reset() {
+      super();
       this.id = id++;
     }
   }
 
-  var pool = new ObjectPool(T);
+  var pool = new ObjectPool(new T());
   var components = [];
 
   // Create 10 components

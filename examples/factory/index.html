@@ -23,7 +23,7 @@
         textarea.innerHTML += msg + '\n';
       }
 
-      import {World, System, TagComponent, Not} from '../../build/ecsy.module.js';
+      import {World, System, Component, TagComponent, Not, Types} from '../../build/ecsy.module.js';
 
       const names = [ 'Isabel', 'Scot', 'Francene', 'Robert', 'Kizzie', 'Leroy', 'Layla', 'Stella', 'Marianela', 'Devorah'];
       const sizes = [ 'XS', 'S', 'M', 'L', 'XL' ];
@@ -32,26 +32,18 @@
       // Components
       class NPC extends TagComponent {}
 
-      class Name {
-        constructor() {
-          this.reset();
-        }
+      class Name extends Component {}
 
-        reset() {
-          this.value = '';
-        }
-      }
+      Name.schema = {
+        value: { type: Types.String }
+      };
 
-      class Tshirt {
-        constructor() {
-          this.reset();
-        }
+      class Tshirt extends Component {}
 
-        reset() {
-          this.color = 'white';
-          this.size = 'XL';
-        }
-      }
+      Tshirt.schema = {
+        color: { type: Types.String, default: 'white' },
+        size: { type: Types.String, default: 'XL' }
+      };
 
       // Systems
       class NameSystem extends System {

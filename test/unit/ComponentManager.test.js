@@ -10,7 +10,7 @@ test("registerComponents", t => {
   world.registerComponent(BarComponent);
   t.is(Object.keys(world.componentsManager.Components).length, 2);
 
-  // Can't register twice the same component
+  // Can't register the same component twice
   world.registerComponent(FooComponent);
   t.is(Object.keys(world.componentsManager.Components).length, 2);
 });
