@@ -31,7 +31,17 @@
 
       var world = new World();
 
-      world.systemManager
+      world
+        .registerComponent(Object3D)
+        .registerComponent(Collisionable)
+        .registerComponent(Collider)
+        .registerComponent(Recovering)
+        .registerComponent(Moving)
+        .registerComponent(PulsatingScale)
+        .registerComponent(Timeout)
+        .registerComponent(PulsatingColor)
+        .registerComponent(Colliding)
+        .registerComponent(Rotating)
         .registerSystem(RotatingSystem)
         .registerSystem(PulsatingColorSystem)
         .registerSystem(PulsatingScaleSystem)

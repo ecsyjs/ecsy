@@ -1,7 +1,8 @@
-import ObjectPool from "./ObjectPool.js";
+import Entity from "./Entity.js";
+import { ObjectPool } from "./ObjectPool.js";
 import QueryManager from "./QueryManager.js";
 import EventDispatcher from "./EventDispatcher.js";
-import { componentPropertyName, getName } from "./Utils.js";
+import { getName } from "./Utils.js";
 import { SystemStateComponent } from "./SystemStateComponent.js";
 
 /**
@@ -15,13 +16,14 @@ export class EntityManager {
 
     // All the entities in this instance
     this._entities = [];
+    this._nextEntityId = 0;
 
     this._entitiesByNames = {};
 
     this._queryManager = new QueryManager(this);
     this.eventDispatcher = new EventDispatcher();
     this._entityPool = new ObjectPool(
-      this.world.options.entityClass,
+      new this.world.options.entityClass(this),
       this.world.options.entityPoolSize
     );
 
@@ -50,7 +52,6 @@ export class EntityManager {
       }
     }
 
-    entity._world = this;
     this._entities.push(entity);
     this.eventDispatcher.dispatchEvent(ENTITY_CREATED, entity);
     return entity;
@@ -65,6 +66,12 @@ export class EntityManager {
    * @param {Object} values Optional values to replace the default attributes
    */
   entityAddComponent(entity, Component, values) {
+    if (!this.world.componentsManager.Components[Component.name]) {
+      throw new Error(
+        `Attempted to add unregistered component "${Component.name}"`
+      );
+    }
+
     if (~entity._ComponentTypes.indexOf(Component)) {
       // @todo Just on debug mode
       console.warn(
@@ -84,19 +91,16 @@ export class EntityManager {
     var componentPool = this.world.componentsManager.getComponentsPool(
       Component
     );
-    var component = componentPool.acquire();
+
+    var component = componentPool
+      ? componentPool.acquire()
+      : new Component(values);
+
+    if (componentPool && values) {
+      component.copy(values);
+    }
 
     entity._components[Component.name] = component;
-
-    if (values) {
-      if (component.copy) {
-        component.copy(values);
-      } else {
-        for (var name in values) {
-          component[name] = values[name];
-        }
-      }
-    }
 
     this._queryManager.onEntityComponentAdded(entity, Component);
     this.world.componentsManager.componentAddedToEntity(Component);
@@ -147,11 +151,10 @@ export class EntityManager {
   _entityRemoveComponentSync(entity, Component, index) {
     // Remove T listing on entity and property ref, then free the component.
     entity._ComponentTypes.splice(index, 1);
-    var propName = componentPropertyName(Component);
     var componentName = getName(Component);
     var component = entity._components[componentName];
     delete entity._components[componentName];
-    this.componentsManager._componentPool[propName].release(component);
+    component.dispose();
     this.world.componentsManager.componentRemovedFromEntity(Component);
   }
 
@@ -200,10 +203,9 @@ export class EntityManager {
     if (this._entitiesByNames[entity.name]) {
       delete this._entitiesByNames[entity.name];
     }
-
-    // Prevent any access and free
-    entity._world = null;
-    this._entityPool.release(entity);
+    
+    entity._pool.release(entity);
+    entity.id = this._nextEntityId++;
   }
 
   /**
@@ -232,11 +234,10 @@ export class EntityManager {
       while (entity._ComponentTypesToRemove.length > 0) {
         let Component = entity._ComponentTypesToRemove.pop();
 
-        var propName = componentPropertyName(Component);
         var componentName = getName(Component);
         var component = entity._componentsToRemove[componentName];
         delete entity._componentsToRemove[componentName];
-        this.componentsManager._componentPool[propName].release(component);
+        component.dispose();
         this.world.componentsManager.componentRemovedFromEntity(Component);
 
         //this._entityRemoveComponentSync(entity, Component, index);

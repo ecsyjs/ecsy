@@ -4,14 +4,12 @@ import wrapImmutableComponent from "./WrapImmutableComponent.js";
 // @todo Take this out from there or use ENV
 const DEBUG = false;
 
-var nextId = 0;
-
-export class Entity {
-  constructor(world) {
-    this._world = world || null;
+export default class Entity {
+  constructor(entityManager) {
+    this._entityManager = entityManager || null;
 
     // Unique ID for this entity
-    this.id = nextId++;
+    this.id = entityManager._nextEntityId++;
 
     // List of components types the entity has
     this._ComponentTypes = [];
@@ -79,12 +77,12 @@ export class Entity {
   }
 
   addComponent(Component, values) {
-    this._world.entityAddComponent(this, Component, values);
+    this._entityManager.entityAddComponent(this, Component, values);
     return this;
   }
 
   removeComponent(Component, forceImmediate) {
-    this._world.entityRemoveComponent(this, Component, forceImmediate);
+    this._entityManager.entityRemoveComponent(this, Component, forceImmediate);
     return this;
   }
 
@@ -114,21 +112,26 @@ export class Entity {
   }
 
   removeAllComponents(forceImmediate) {
-    return this._world.entityRemoveAllComponents(this, forceImmediate);
+    return this._entityManager.entityRemoveAllComponents(this, forceImmediate);
   }
 
-  // EXTRAS
+  copy(src) {
+    // TODO: This can definitely be optimized
+    for (var componentName in src.components) {
+      var srcComponent = src.components[componentName];
+      this.addComponent(srcComponent.constructor);
+      var component = this.getComponent(srcComponent.constructor);
+      component.copy(srcComponent);
+    }
 
-  // Initialize the entity. To be used when returning an entity to the pool
-  reset() {
-    this.id = nextId++;
-    this._world = null;
-    this._ComponentTypes.length = 0;
-    this.queries.length = 0;
-    this._components = {};
+    return this;
+  }
+
+  clone() {
+    return new Entity(this._entityManager).copy(this);
   }
 
   remove(forceImmediate) {
-    return this._world.removeEntity(this, forceImmediate);
+    return this._entityManager.removeEntity(this, forceImmediate);
   }
 }

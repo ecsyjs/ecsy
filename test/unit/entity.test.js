@@ -1,5 +1,5 @@
 import test from "ava";
-import { World } from "../../src/index.js";
+import { World, Component, Types } from "../../src/index.js";
 import { FooComponent, BarComponent } from "../helpers/components";
 
 /**
@@ -7,18 +7,10 @@ import { FooComponent, BarComponent } from "../helpers/components";
  * - IDs
  */
 
-test("reset", t => {
-  var world = new World();
-
-  var entity = world.createEntity();
-  var prevId = entity.id;
-  entity.reset();
-
-  t.not(entity.id, prevId);
-});
-
 test("adding/removing components sync", async t => {
   var world = new World();
+
+  world.registerComponent(FooComponent).registerComponent(BarComponent);
 
   var entity = world.createEntity();
 
@@ -57,15 +49,19 @@ test("adding/removing components sync", async t => {
   t.deepEqual(Object.keys(entity.getComponents()), []);
 });
 
-test("clearing pooled components", async t => {
+test.only("clearing pooled components", async t => {
   var world, entity;
 
   // Component with no constructor
 
-  class BazComponent {}
+  class BazComponent extends Component {}
+
+  BazComponent.schema = {
+    spam: { type: Types.String }
+  };
 
   world = new World();
-
+  world.registerComponent(BazComponent);
   entity = world.createEntity();
   entity.addComponent(BazComponent, { spam: "eggs" });
   t.is(
@@ -82,19 +78,22 @@ test("clearing pooled components", async t => {
 
   t.is(
     entity.getComponent(BazComponent).spam,
-    undefined,
+    "",
     "property should be cleared since it is not specified in addComponent args"
   );
 
   // Component with constructor that sets property
 
-  class PimComponent {
-    constructor() {
-      this.spam = "bacon";
+  class PimComponent extends Component {
+    constructor(props) {
+      super(props);
+      this.spam = props && props.spam !== undefined ? props.spam : "bacon";
     }
   }
 
   world = new World();
+
+  world.registerComponent(PimComponent, false);
 
   entity = world.createEntity();
   entity.addComponent(PimComponent, { spam: "eggs" });
@@ -118,6 +117,8 @@ test("clearing pooled components", async t => {
 
   world = new World();
 
+  world.registerComponent(PimComponent, false);
+
   entity = world.createEntity();
   entity.addComponent(PimComponent, { spam: "eggs" });
 
@@ -136,6 +137,8 @@ test("clearing pooled components", async t => {
 
 test("removing components deferred", async t => {
   var world = new World();
+
+  world.registerComponent(FooComponent).registerComponent(BarComponent);
 
   var entity = world.createEntity();
 
@@ -173,6 +176,8 @@ test("remove entity", async t => {
 
 test("get component includeRemoved", async t => {
   var world = new World();
+
+  world.registerComponent(FooComponent);
 
   // Sync
   var entity = world.createEntity();

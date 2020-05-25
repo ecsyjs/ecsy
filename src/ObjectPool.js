@@ -1,24 +1,10 @@
-export default class ObjectPool {
+export class ObjectPool {
   // @todo Add initial size
-  constructor(T, initialSize) {
+  constructor(baseObject, initialSize) {
     this.freeList = [];
     this.count = 0;
-    this.T = T;
+    this.baseObject = baseObject;
     this.isObjectPool = true;
-
-    var extraArgs = null;
-    if (arguments.length > 1) {
-      extraArgs = Array.prototype.slice.call(arguments);
-      extraArgs.shift();
-    }
-
-    this.createElement = extraArgs
-      ? () => {
-          return new T(...extraArgs);
-        }
-      : () => {
-          return new T();
-        };
 
     if (typeof initialSize !== "undefined") {
       this.expand(initialSize);
@@ -37,13 +23,15 @@ export default class ObjectPool {
   }
 
   release(item) {
-    item.reset();
+    item.copy(this.baseObject);
     this.freeList.push(item);
   }
 
   expand(count) {
     for (var n = 0; n < count; n++) {
-      this.freeList.push(this.createElement());
+      var clone = this.baseObject.clone();
+      clone._pool = this;
+      this.freeList.push(clone);
     }
     this.count += count;
   }

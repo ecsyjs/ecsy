@@ -14,7 +14,7 @@
   </head>
   <body>
     <script type="module">
-      import { World, System, TagComponent } from '../../build/ecsy.module.js';
+      import { World, System, Component, TagComponent, Types } from '../../build/ecsy.module.js';
 
       const NUM_ELEMENTS = 600;
       const SPEED_MULTIPLIER = 0.1;
@@ -37,25 +37,28 @@
       //----------------------
 
       // Velocity component
-      class Velocity {
-        constructor() {
-          this.x = this.y = 0;
-        }
-      }
+      class Velocity extends Component {}
+
+      Velocity.schema = {
+        x: { type: Types.Number },
+        y: { type: Types.Number }
+      };
 
       // Position component
-      class Position {
-        constructor() {
-          this.x = this.y = 0;
-        }
-      }
+      class Position extends Component {}
+
+      Position.schema = {
+        x: { type: Types.Number },
+        y: { type: Types.Number }
+      };
 
       // Shape component
-      class Shape {
-        constructor() {
-          this.primitive = 'box';
-        }
-      }
+      class Shape extends Component {}
+
+      Shape.schema = {
+        primitive: { type: Types.String, default: 'box' }
+      };
+
 
       // Renderable component
       class Renderable extends TagComponent {}
@@ -142,7 +145,11 @@
       var world = new World();
       world
         .registerSystem(MovableSystem)
-        .registerSystem(RendererSystem);
+        .registerSystem(RendererSystem)
+        .registerComponent(Renderable)
+        .registerComponent(Shape)
+        .registerComponent(Velocity)
+        .registerComponent(Position);
 
       // Some helper functions when creating the components
       function getRandomVelocity() {
