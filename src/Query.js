@@ -1,5 +1,6 @@
 import EventDispatcher from "./EventDispatcher.js";
 import { queryKey } from "./Utils.js";
+import { Detached } from "./Detached";
 
 export default class Query {
   /**
@@ -9,13 +10,27 @@ export default class Query {
     this.Components = [];
     this.NotComponents = [];
 
+    var addNotDetached = true;
+
     Components.forEach(component => {
       if (typeof component === "object") {
         this.NotComponents.push(component.Component);
+
+        if (component.Component === Detached) {
+          addNotDetached = false;
+        }
       } else {
         this.Components.push(component);
+
+        if (component === Detached) {
+          addNotDetached = false;
+        }
       }
     });
+
+    if (addNotDetached) {
+      this.NotComponents.push(Detached);
+    }
 
     if (this.Components.length === 0) {
       throw new Error("Can't create a query without components");

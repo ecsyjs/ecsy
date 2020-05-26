@@ -3,6 +3,7 @@ export { System, Not } from "./System.js";
 export { Component } from "./Component.js";
 export { SystemStateComponent } from "./SystemStateComponent.js";
 export { TagComponent } from "./TagComponent.js";
+export { Detached } from "./Detached.js";
 export { createComponentClass } from "./CreateComponentClass.js";
 export { createType } from "./CreateType.js";
 export { Types } from "./StandardTypes.js";
