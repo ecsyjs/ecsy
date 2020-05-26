@@ -401,6 +401,7 @@ class Entity {
     for (var i = 0; i < this.queries.length; i++) {
       var query = this.queries[i];
       // @todo accelerate this check. Maybe having query._Components as an object
+      // @todo add Not components
       if (query.reactive && query.Components.indexOf(Component) !== -1) {
         query.eventDispatcher.dispatchEvent(
           Query.prototype.COMPONENT_CHANGED,
@@ -1244,6 +1245,16 @@ class System {
 
         if (queryConfig.listen) {
           validEvents.forEach(eventName => {
+            if (!this.execute) {
+              console.warn(
+                `System '${
+                  this.constructor.name
+                }' has defined listen events (${validEvents.join(
+                  ", "
+                )}) for query '${queryName}' but it does not implement the 'execute' method.`
+              );
+            }
+
             // Is the event enabled on this system's query?
             if (queryConfig.listen[eventName]) {
               let event = queryConfig.listen[eventName];
