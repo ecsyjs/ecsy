@@ -12,8 +12,19 @@ export class Entity {
   /**
    * Get an immutable reference to a component on this entity.
    * @param Component Type of component to get
+   * @param includeRemoved Whether a component that is staled to be removed should be also considered
    */
-  getComponent<T extends Component>(Component:ComponentConstructor<T>): T;
+  getComponent<T extends Component>(
+      Component: ComponentConstructor<T>,
+      includeRemoved?: boolean
+  ): T;
+
+  /**
+   * Get a component that is slated to be removed from this entity.
+   */
+  getRemovedComponent<T extends Component>(
+      Component: ComponentConstructor<T>
+  ): T;
 
   /**
    * Get an object containing all the components on this entity, where the object keys are the component types.
@@ -21,16 +32,14 @@ export class Entity {
   getComponents(): object;
 
   /**
+   * Get an object containing all the components that are slated to be removed from this entity, where the object keys are the component types.
+   */
+  getComponentsToRemove(): object;
+
+  /**
    * Get a list of component types that have been added to this entity.
    */
   getComponentTypes<T extends Component>(): Array<T>;
-
-  /**
-   * Get a component that is slated to be removed from this entity.
-   */
-  getRemovedComponent<T extends Component>(
-    Component: ComponentConstructor<T>
-  ): T;
 
   /**
    * Get a mutable reference to a component on this entity.
@@ -53,17 +62,21 @@ export class Entity {
   /**
    * Remove a component from the entity.
    * @param Component Type of component to remove from this entity
+   * @param forceImmediate Whether a component should be removed immediately
    */
   removeComponent<T extends Component>(
-    Component: ComponentConstructor<T>
+    Component: ComponentConstructor<T>,
+    forceImmediate?: boolean
   ): this;
 
   /**
    * Check if the entity has a component.
    * @param Component Type of component
+   * @param includeRemoved Whether a component that is staled to be removed should be also considered
    */
   hasComponent<T extends Component>(
-    Component: ComponentConstructor<T>
+    Component: ComponentConstructor<T>,
+    includeRemoved?: boolean
   ): boolean;
 
   /**
@@ -92,11 +105,17 @@ export class Entity {
 
   /**
    * Remove all components on this entity.
+   * @param forceImmediate Whether all components should be removed immediately
    */
-  removeAllComponents():void
+  removeAllComponents(
+      forceImmediate?: boolean
+  ):void
 
   /**
    * Remove this entity from the world.
+   * @param forceImmediate Whether this entity should be removed immediately
    */
-  remove():void;
+  remove(
+      forceImmediate?: boolean
+  ):void;
 }

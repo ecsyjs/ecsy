@@ -1,4 +1,3 @@
-import "../helpers/common.js";
 import test from "ava";
 import { World, System, Not } from "../../src/index.js";
 import {
@@ -881,4 +880,26 @@ test("Components with the the same name in uppercase and lowercase", t => {
     Object.values(components).map(c => c.constructor.name),
     ["B", "b"]
   );
+});
+
+test("Unregister systems", t => {
+  class SystemA extends System {}
+
+  class SystemB extends System {
+    execute() {}
+  }
+
+  const world = new World();
+  world.registerSystem(SystemA).registerSystem(SystemB);
+
+  t.is(world.systemManager._systems.length, 2);
+  t.is(world.systemManager._executeSystems.length, 1);
+
+  world.unregisterSystem(SystemA);
+  t.is(world.systemManager._systems.length, 1);
+  t.is(world.systemManager._executeSystems.length, 1);
+
+  world.unregisterSystem(SystemB);
+  t.is(world.systemManager._systems.length, 0);
+  t.is(world.systemManager._executeSystems.length, 0);
 });
