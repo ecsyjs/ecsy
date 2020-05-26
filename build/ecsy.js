@@ -9,6 +9,53 @@
 	}()));
 }(this, (function (exports) { 'use strict';
 
+	/**
+	 * Return the name of a component
+	 * @param {Component} Component
+	 * @private
+	 */
+	function getName(Component) {
+	  return Component.name;
+	}
+
+	/**
+	 * Return a valid property name for the Component
+	 * @param {Component} Component
+	 * @private
+	 */
+	function componentPropertyName(Component) {
+	  return getName(Component);
+	}
+
+	/**
+	 * Get a key from a list of components
+	 * @param {Array(Component)} Components Array of components to generate the key
+	 * @private
+	 */
+	function queryKey(Components) {
+	  var names = [];
+	  for (var n = 0; n < Components.length; n++) {
+	    var T = Components[n];
+	    if (typeof T === "object") {
+	      var operator = T.operator === "not" ? "!" : T.operator;
+	      names.push(operator + getName(T.Component));
+	    } else {
+	      names.push(getName(T));
+	    }
+	  }
+
+	  return names.sort().join("-");
+	}
+
+	// Detector for browser's "window"
+	const hasWindow = typeof window !== "undefined";
+
+	// performance.now() "polyfill"
+	const now =
+	  hasWindow && typeof window.performance !== "undefined"
+	    ? performance.now.bind(performance)
+	    : Date.now.bind(Date);
+
 	class SystemManager {
 	  constructor(world) {
 	    this._systems = [];
@@ -18,9 +65,7 @@
 	  }
 
 	  registerSystem(System, attributes) {
-	    if (
-	      this._systems.find(s => s.constructor.name === System.name) !== undefined
-	    ) {
+	    if (this.getSystem(System) !== undefined) {
 	      console.warn(`System '${System.name}' already registered.`);
 	      return this;
 	    }
@@ -33,6 +78,23 @@
 	      this._executeSystems.push(system);
 	      this.sortSystems();
 	    }
+	    return this;
+	  }
+
+	  unregisterSystem(System) {
+	    let system = this.getSystem(System);
+	    if (system === undefined) {
+	      console.warn(`Can unregister system '${System.name}'. It doesn't exist.`);
+	      return this;
+	    }
+
+	    this._systems.splice(this._systems.indexOf(system), 1);
+
+	    if (system.execute) {
+	      this._executeSystems.splice(this._executeSystems.indexOf(system), 1);
+	    }
+
+	    // @todo Add system.unregister() call to free resources
 	    return this;
 	  }
 
@@ -60,9 +122,9 @@
 	  executeSystem(system, delta, time) {
 	    if (system.initialized) {
 	      if (system.canExecute()) {
-	        let startTime = performance.now();
+	        let startTime = now();
 	        system.execute(delta, time);
-	        system.executeTime = performance.now() - startTime;
+	        system.executeTime = now() - startTime;
 	        this.lastExecutedSystem = system;
 	        system.clearEvents();
 	      }
@@ -89,7 +151,8 @@
 	    for (var i = 0; i < this._systems.length; i++) {
 	      var system = this._systems[i];
 	      var systemStats = (stats.systems[system.constructor.name] = {
-	        queries: {}
+	        queries: {},
+	        executeTime: system.executeTime
 	      });
 	      for (var name in system.ctx) {
 	        systemStats.queries[name] = system.ctx[name].stats();
@@ -181,44 +244,6 @@
 	  resetCounters() {
 	    this.stats.fired = this.stats.handled = 0;
 	  }
-	}
-
-	/**
-	 * Return the name of a component
-	 * @param {Component} Component
-	 * @private
-	 */
-	function getName(Component) {
-	  return Component.name;
-	}
-
-	/**
-	 * Return a valid property name for the Component
-	 * @param {Component} Component
-	 * @private
-	 */
-	function componentPropertyName(Component) {
-	  return getName(Component);
-	}
-
-	/**
-	 * Get a key from a list of components
-	 * @param {Array(Component)} Components Array of components to generate the key
-	 * @private
-	 */
-	function queryKey(Components) {
-	  var names = [];
-	  for (var n = 0; n < Components.length; n++) {
-	    var T = Components[n];
-	    if (typeof T === "object") {
-	      var operator = T.operator === "not" ? "!" : T.operator;
-	      names.push(operator + getName(T.Component));
-	    } else {
-	      names.push(getName(T));
-	    }
-	  }
-
-	  return names.sort().join("-");
 	}
 
 	class Query {
@@ -350,7 +375,7 @@
 
 	    this.alive = false;
 
-	    //if there are state components on a entity, it can't be removed
+	    //if there are state components on a entity, it can't be removed completely
 	    this.numStateComponents = 0;
 	  }
 
@@ -403,8 +428,8 @@
 	    return this;
 	  }
 
-	  removeComponent(Component, forceRemove) {
-	    this._world.entityRemoveComponent(this, Component, forceRemove);
+	  removeComponent(Component, forceImmediate) {
+	    this._world.entityRemoveComponent(this, Component, forceImmediate);
 	    return this;
 	  }
 
@@ -433,8 +458,8 @@
 	    return false;
 	  }
 
-	  removeAllComponents(forceRemove) {
-	    return this._world.entityRemoveAllComponents(this, forceRemove);
+	  removeAllComponents(forceImmediate) {
+	    return this._world.entityRemoveAllComponents(this, forceImmediate);
 	  }
 
 	  // EXTRAS
@@ -448,8 +473,8 @@
 	    this._components = {};
 	  }
 
-	  remove(forceRemove) {
-	    return this._world.removeEntity(this, forceRemove);
+	  remove(forceImmediate) {
+	    return this._world.removeEntity(this, forceImmediate);
 	  }
 	}
 
@@ -688,7 +713,15 @@
 	   * @param {Object} values Optional values to replace the default attributes
 	   */
 	  entityAddComponent(entity, Component, values) {
-	    if (~entity._ComponentTypes.indexOf(Component)) return;
+	    if (~entity._ComponentTypes.indexOf(Component)) {
+	      // @todo Just on debug mode
+	      console.warn(
+	        "Component type already exists on entity.",
+	        entity,
+	        Component.name
+	      );
+	      return;
+	    }
 
 	    entity._ComponentTypes.push(Component);
 
@@ -1092,14 +1125,14 @@
 
 	    this.eventQueues = {};
 
-	    if (typeof CustomEvent !== "undefined") {
+	    if (hasWindow && typeof CustomEvent !== "undefined") {
 	      var event = new CustomEvent("ecsy-world-created", {
 	        detail: { world: this, version: Version }
 	      });
 	      window.dispatchEvent(event);
 	    }
 
-	    this.lastTime = performance.now();
+	    this.lastTime = now();
 	  }
 
 	  registerComponent(Component) {
@@ -1109,6 +1142,11 @@
 
 	  registerSystem(System, attributes) {
 	    this.systemManager.registerSystem(System, attributes);
+	    return this;
+	  }
+
+	  unregisterSystem(System) {
+	    this.systemManager.unregisterSystem(System);
 	    return this;
 	  }
 
@@ -1122,7 +1160,7 @@
 
 	  execute(delta, time) {
 	    if (!delta) {
-	      let time = performance.now();
+	      time = now();
 	      delta = time - this.lastTime;
 	      this.lastTime = time;
 	    }
@@ -1665,6 +1703,11 @@
 	}
 
 	function enableRemoteDevtools(remoteId) {
+	  if (!hasWindow) {
+	    console.warn("Remote devtools not available outside the browser");
+	    return;
+	  }
+
 	  window.generateNewCode = () => {
 	    window.localStorage.clear();
 	    remoteId = generateId(6);
@@ -1750,11 +1793,13 @@
 	  );
 	}
 
-	const urlParams = new URLSearchParams(window.location.search);
+	if (hasWindow) {
+	  const urlParams = new URLSearchParams(window.location.search);
 
-	// @todo Provide a way to disable it if needed
-	if (urlParams.has("enable-remote-devtools")) {
-	  enableRemoteDevtools();
+	  // @todo Provide a way to disable it if needed
+	  if (urlParams.has("enable-remote-devtools")) {
+	    enableRemoteDevtools();
+	  }
 	}
 
 	exports.Component = Component;

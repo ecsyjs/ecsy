@@ -1,3 +1,5 @@
+import { now } from "./Utils.js";
+
 export class SystemManager {
   constructor(world) {
     this._systems = [];
@@ -7,9 +9,7 @@ export class SystemManager {
   }
 
   registerSystem(System, attributes) {
-    if (
-      this._systems.find(s => s.constructor.name === System.name) !== undefined
-    ) {
+    if (this.getSystem(System) !== undefined) {
       console.warn(`System '${System.name}' already registered.`);
       return this;
     }
@@ -22,6 +22,23 @@ export class SystemManager {
       this._executeSystems.push(system);
       this.sortSystems();
     }
+    return this;
+  }
+
+  unregisterSystem(System) {
+    let system = this.getSystem(System);
+    if (system === undefined) {
+      console.warn(`Can unregister system '${System.name}'. It doesn't exist.`);
+      return this;
+    }
+
+    this._systems.splice(this._systems.indexOf(system), 1);
+
+    if (system.execute) {
+      this._executeSystems.splice(this._executeSystems.indexOf(system), 1);
+    }
+
+    // @todo Add system.unregister() call to free resources
     return this;
   }
 
@@ -49,9 +66,9 @@ export class SystemManager {
   executeSystem(system, delta, time) {
     if (system.initialized) {
       if (system.canExecute()) {
-        let startTime = performance.now();
+        let startTime = now();
         system.execute(delta, time);
-        system.executeTime = performance.now() - startTime;
+        system.executeTime = now() - startTime;
         this.lastExecutedSystem = system;
         system.clearEvents();
       }
@@ -78,7 +95,8 @@ export class SystemManager {
     for (var i = 0; i < this._systems.length; i++) {
       var system = this._systems[i];
       var systemStats = (stats.systems[system.constructor.name] = {
-        queries: {}
+        queries: {},
+        executeTime: system.executeTime
       });
       for (var name in system.ctx) {
         systemStats.queries[name] = system.ctx[name].stats();
