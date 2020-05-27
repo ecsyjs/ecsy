@@ -903,3 +903,14 @@ test("Unregister systems", t => {
   t.is(world.systemManager._systems.length, 0);
   t.is(world.systemManager._executeSystems.length, 0);
 });
+
+test("Register a system that does not extend System", t => {
+  class SystemA {}
+
+  const world = new World();
+  const error = t.throws(() => {
+    world.registerSystem(SystemA);
+  }, Error);
+
+  t.is(error.message, "System 'SystemA' does not extends 'System' class");
+});
