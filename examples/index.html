@@ -61,6 +61,9 @@
         height: 100%;
         overflow: auto;
       }
+      .selected {
+        text-decoration: underline;
+      }
       span a {
         display: inline;
       }
@@ -99,7 +102,15 @@
         {name: "System State Components", url: "systemstatecomponents/index.html", source: "https://github.com/MozillaReality/ecsy/blob/dev/examples/systemstatecomponents/index.html"}
       ];
 
+      let hash = window.location.hash;
+      let selectedIndex = -1;
+      if(hash){
+        selectedIndex = examples.findIndex(example => "#"+encodeURI(example.name) == hash);
+      }
+
       let container = document.getElementsByClassName("content")[0];
+
+      let selectedLine = null;
 
       //make example list with this template
       //<span><a href="demo/index.html" target="viewer">Name</a> <a href="source link" target="_blank">(source)</a></span>
@@ -113,6 +124,12 @@
         demoLink.addEventListener( 'click', function ( event ) {
           if ( event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey ) return;
           window.location.hash = encodeURI(example.name);
+
+          if(selectedLine)
+            selectedLine.classList.remove("selected");
+          let line = event.currentTarget.parentNode;
+          line.classList.add("selected");
+          selectedLine = line;
         });
 
         let sourceLink = document.createElement("a");
@@ -125,16 +142,15 @@
         exampleLine.append(" ");
         exampleLine.appendChild(sourceLink);
 
-        container.appendChild(exampleLine);
-      }
-
-      let hash = window.location.hash
-      if(hash){
-        let example = examples.find(example => "#"+encodeURI(example.name) == hash);
-        if(example){
+        if(selectedIndex === i){
+          exampleLine.classList.add("selected");
           let viewer = document.getElementById("viewer");
           viewer.src = example.url;
+
+          selectedLine = exampleLine;
         }
+
+        container.appendChild(exampleLine);
       }
     </script>
   </body>
