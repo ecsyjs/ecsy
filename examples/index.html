@@ -61,6 +61,9 @@
         height: 100%;
         overflow: auto;
       }
+      .selected {
+        text-decoration: underline;
+      }
       span a {
         display: inline;
       }
@@ -85,15 +88,70 @@
           <div style="text-align: center">
               <h1>ECSY</h1>
           </div>
-          <span><a href="circles-boxes/index.html" target="viewer">Circles and boxes</a> <a href="https://github.com/MozillaReality/ecsy/blob/dev/examples/circles-boxes/index.html" target="_blank">(source)</a></span>
-          <span><a href="canvas/index.html" target="viewer">Intersecting circles</a> <a href="https://github.com/MozillaReality/ecsy/blob/dev/examples/canvas/index.html" target="_blank">(source)</a></span>
-          <span><a href="ball-example/three/index.html" target="viewer">Three.js ball</a> <a href="https://github.com/MozillaReality/ecsy/blob/dev/examples/ball-example/three/index.html" target="_blank">(source)</a></span>
-          <span><a href="ball-example/babylon/index.html" target="viewer">Babylon.js ball</a> <a href="https://github.com/MozillaReality/ecsy/blob/dev/examples/ball-example/babylon/index.html" target="_blank">(source)</a></span>
-          <span><a href="factory/index.html" target="viewer">Factory</a> <a href="https://github.com/MozillaReality/ecsy/blob/dev/examples/factory/index.html" target="_blank">(source)</a></span>
-          <span><a href="systemstatecomponents/index.html" target="viewer">System State Components</a> <a href="https://github.com/MozillaReality/ecsy/blob/dev/examples/systemstatecomponents/index.html" target="_blank">(source)</a></span>
         </div>
       </div>
       <iframe id="viewer" name="viewer" allowfullscreen="" allowvr="" onmousewheel=""></iframe>
     </div>
+    <script>
+      let examples = [
+        {name: "Circles and boxes", url: "circles-boxes/index.html", source: "https://github.com/MozillaReality/ecsy/blob/dev/examples/circles-boxes/index.html"},
+        {name: "Intersecting circles", url: "canvas/index.html", source: "https://github.com/MozillaReality/ecsy/blob/dev/examples/circles-boxes/index.html"},
+        {name: "Three.js ball", url: "ball-example/three/index.html", source: "https://github.com/MozillaReality/ecsy/blob/dev/examples/ball-example/three/index.html"},
+        {name: "Babylon.js ball", url: "ball-example/babylon/index.html", source: "https://github.com/MozillaReality/ecsy/blob/dev/examples/ball-example/babylon/index.html"},
+        {name: "Factory", url: "factory/index.html", source: "https://github.com/MozillaReality/ecsy/blob/dev/examples/factory/index.html"},
+        {name: "System State Components", url: "systemstatecomponents/index.html", source: "https://github.com/MozillaReality/ecsy/blob/dev/examples/systemstatecomponents/index.html"}
+      ];
+
+      let hash = window.location.hash;
+      let selectedIndex = -1;
+      if(hash){
+        selectedIndex = examples.findIndex(example => "#"+encodeURI(example.name) == hash);
+      }
+
+      let container = document.getElementsByClassName("content")[0];
+
+      let selectedLine = null;
+
+      //make example list with this template
+      //<span><a href="demo/index.html" target="viewer">Name</a> <a href="source link" target="_blank">(source)</a></span>
+      for(let i=0; i<examples.length; i++){
+        const example = examples[i];
+
+        let demoLink = document.createElement("a");
+        demoLink.href = example.url;
+        demoLink.target = "viewer";
+        demoLink.innerHTML = example.name;
+        demoLink.addEventListener( 'click', function ( event ) {
+          if ( event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey ) return;
+          window.location.hash = encodeURI(example.name);
+
+          if(selectedLine)
+            selectedLine.classList.remove("selected");
+          let line = event.currentTarget.parentNode;
+          line.classList.add("selected");
+          selectedLine = line;
+        });
+
+        let sourceLink = document.createElement("a");
+        sourceLink.href = example.source;
+        sourceLink.target = "_blank";
+        sourceLink.innerHTML = "(source)";
+
+        let exampleLine = document.createElement("span");
+        exampleLine.appendChild(demoLink);
+        exampleLine.append(" ");
+        exampleLine.appendChild(sourceLink);
+
+        if(selectedIndex === i){
+          exampleLine.classList.add("selected");
+          let viewer = document.getElementById("viewer");
+          viewer.src = example.url;
+
+          selectedLine = exampleLine;
+        }
+
+        container.appendChild(exampleLine);
+      }
+    </script>
   </body>
 </html>

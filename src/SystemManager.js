@@ -1,4 +1,5 @@
 import { now } from "./Utils.js";
+import { System } from "./System.js";
 
 export class SystemManager {
   constructor(world) {
@@ -8,13 +9,18 @@ export class SystemManager {
     this.lastExecutedSystem = null;
   }
 
-  registerSystem(System, attributes) {
-    if (this.getSystem(System) !== undefined) {
-      console.warn(`System '${System.name}' already registered.`);
+  registerSystem(SystemClass, attributes) {
+    if (!(SystemClass.prototype instanceof System)) {
+      throw new Error(
+        `System '${SystemClass.name}' does not extends 'System' class`
+      );
+    }
+    if (this.getSystem(SystemClass) !== undefined) {
+      console.warn(`System '${SystemClass.name}' already registered.`);
       return this;
     }
 
-    var system = new System(this.world, attributes);
+    var system = new SystemClass(this.world, attributes);
     if (system.init) system.init(attributes);
     system.order = this._systems.length;
     this._systems.push(system);
@@ -25,10 +31,12 @@ export class SystemManager {
     return this;
   }
 
-  unregisterSystem(System) {
-    let system = this.getSystem(System);
+  unregisterSystem(SystemClass) {
+    let system = this.getSystem(SystemClass);
     if (system === undefined) {
-      console.warn(`Can unregister system '${System.name}'. It doesn't exist.`);
+      console.warn(
+        `Can unregister system '${SystemClass.name}'. It doesn't exist.`
+      );
       return this;
     }
 
@@ -48,16 +56,16 @@ export class SystemManager {
     });
   }
 
-  getSystem(System) {
-    return this._systems.find(s => s instanceof System);
+  getSystem(SystemClass) {
+    return this._systems.find(s => s instanceof SystemClass);
   }
 
   getSystems() {
     return this._systems;
   }
 
-  removeSystem(System) {
-    var index = this._systems.indexOf(System);
+  removeSystem(SystemClass) {
+    var index = this._systems.indexOf(SystemClass);
     if (!~index) return;
 
     this._systems.splice(index, 1);
