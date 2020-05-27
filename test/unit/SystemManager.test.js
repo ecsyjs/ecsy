@@ -17,6 +17,22 @@ test("registerSystems", t => {
   t.is(world.systemManager._systems.length, 2);
 });
 
+test("passes attributes to system.init", t => {
+  var world = new World();
+
+  var mockAttributes = { test: 10 };
+  var initArg1;
+
+  class mockSystem {
+    init(attributes) {
+      initArg1 = attributes;
+    }
+  }
+
+  world.registerSystem(mockSystem, mockAttributes);
+  t.is(initArg1, mockAttributes);
+});  
+
 test("registerSystems with different systems matching names", t => {
   let world = new World();
 
