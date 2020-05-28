@@ -20,18 +20,18 @@ test("registerSystems", t => {
 test("passes attributes to system.init", t => {
   var world = new World();
 
-  var mockAttributes = { test: 10 };
-  var initArg1;
+  const attributes = { test: 10 };
 
-  class mockSystem {
+  class SystemTest extends System {
     init(attributes) {
-      initArg1 = attributes;
+      this.attributes = attributes;
     }
   }
 
-  world.registerSystem(mockSystem, mockAttributes);
-  t.is(initArg1, mockAttributes);
-});  
+  world.registerSystem(SystemTest, attributes);
+  const system = world.getSystem(SystemTest);
+  t.deepEqual(system.attributes, attributes);
+});
 
 test("registerSystems with different systems matching names", t => {
   let world = new World();
