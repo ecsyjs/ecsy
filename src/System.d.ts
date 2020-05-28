@@ -4,7 +4,8 @@ import { TagComponent } from './TagComponent';
 import { World } from "./World";
 
 interface Attributes {
-    priority?: number;
+  priority?: number;
+  [propName: string]: any;
 }
 
 /**

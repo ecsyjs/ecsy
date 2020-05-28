@@ -3,6 +3,21 @@
 
 A system that manipulates entities in the world.
 
+## Constructors
+
+###  constructor
+
+\+ **new System**(`world`: [World](world.md), `attributes?`: [Attributes](../interfaces/attributes.md)): *[System](system.md)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`world` | [World](world.md) |
+`attributes?` | [Attributes](../interfaces/attributes.md) |
+
+**Returns:** *[System](system.md)*
+
 ## Properties
 
 ###  enabled
@@ -31,6 +46,12 @@ Should be used inside of execute.
 * **removed**? : *[Entity](entity.md)[]*
 
 * **results**: *[Entity](entity.md)[]*
+
+___
+
+###  world
+
+• **world**: *[World](world.md)*
 
 ___
 

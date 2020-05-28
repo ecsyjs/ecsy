@@ -25,9 +25,15 @@ Whether the world tick should execute.
 
 ###  createEntity
 
-▸ **createEntity**(): *[Entity](entity.md)*
+▸ **createEntity**(`name?`: string): *[Entity](entity.md)*
 
 Create a new entity
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`name?` | string |
 
 **Returns:** *[Entity](entity.md)*
 
@@ -112,7 +118,7 @@ ___
 
 ###  registerSystem
 
-▸ **registerSystem**<**T**>(`System`: [SystemConstructor](../interfaces/systemconstructor.md)‹T›): *this*
+▸ **registerSystem**<**T**>(`System`: [SystemConstructor](../interfaces/systemconstructor.md)‹T›, `attributes?`: object): *this*
 
 Register a system.
 
@@ -125,6 +131,7 @@ Register a system.
 Name | Type | Description |
 ------ | ------ | ------ |
 `System` | [SystemConstructor](../interfaces/systemconstructor.md)‹T› | Type of system to register  |
+`attributes?` | object | - |
 
 **Returns:** *this*
 
