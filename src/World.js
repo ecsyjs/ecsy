@@ -4,8 +4,14 @@ import { ComponentManager } from "./ComponentManager.js";
 import { Version } from "./Version.js";
 import { hasWindow, now } from "./Utils.js";
 
+const DEFAULT_OPTIONS = {
+  entityPoolSize: 0
+};
+
 export class World {
-  constructor() {
+  constructor(options = {}) {
+    this.options = Object.assign(DEFAULT_OPTIONS, options);
+
     this.componentsManager = new ComponentManager(this);
     this.entityManager = new EntityManager(this);
     this.systemManager = new SystemManager(this);
