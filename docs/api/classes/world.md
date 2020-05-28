@@ -7,9 +7,15 @@ The World is the root of the ECS.
 
 ###  constructor
 
-\+ **new World**(): *[World](world.md)*
+\+ **new World**(`options?`: [Options](../interfaces/options.md)): *[World](world.md)*
 
 Create a new World.
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`options?` | [Options](../interfaces/options.md) |
 
 **Returns:** *[World](world.md)*
 

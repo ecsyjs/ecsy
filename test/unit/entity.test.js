@@ -214,5 +214,4 @@ test("Delete entity from entitiesByNames", async t => {
   world.execute(); // Deferred remove happens
 
   t.deepEqual({}, world.entityManager._entitiesByNames);
-
 });

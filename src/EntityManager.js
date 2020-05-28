@@ -21,7 +21,10 @@ export class EntityManager {
 
     this._queryManager = new QueryManager(this);
     this.eventDispatcher = new EventDispatcher();
-    this._entityPool = new ObjectPool(Entity);
+    this._entityPool = new ObjectPool(
+      Entity,
+      this.world.options.entityPoolSize
+    );
 
     // Deferred deletion
     this.entitiesWithComponentsToRemove = [];
