@@ -2,6 +2,11 @@ import { Component, ComponentConstructor } from "./Component";
 import { System, SystemConstructor } from "./System";
 import { Entity } from "./Entity";
 
+interface Options {
+  entityPoolSize?: number;
+  [propName: string]: any;
+}
+
 /**
  * The World is the root of the ECS.
  */
@@ -14,7 +19,7 @@ export class World {
   /**
    * Create a new World.
    */
-  constructor();
+  constructor(options?: Options);
 
   /**
    * Register a component.
