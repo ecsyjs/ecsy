@@ -189,3 +189,30 @@ test("get component includeRemoved", async t => {
   t.is(entity.hasComponent(FooComponent, true), true);
   t.deepEqual(entity.getComponent(FooComponent, true), component);
 });
+
+test("Delete entity from entitiesByNames", async t => {
+  var world = new World();
+
+  // Sync
+  let entityA = world.createEntity("entityA");
+  let entityB = world.createEntity("entityB");
+
+  t.deepEqual(
+    { entityA: entityA, entityB: entityB },
+    world.entityManager._entitiesByNames
+  );
+
+  // Immediate remove
+  entityA.remove(true);
+
+  t.deepEqual({ entityB: entityB }, world.entityManager._entitiesByNames);
+
+  // Deferred remove
+  entityB.remove();
+
+  t.deepEqual({ entityB: entityB }, world.entityManager._entitiesByNames);
+  world.execute(); // Deferred remove happens
+
+  t.deepEqual({}, world.entityManager._entitiesByNames);
+
+});

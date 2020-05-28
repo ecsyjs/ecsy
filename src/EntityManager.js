@@ -195,6 +195,10 @@ export class EntityManager {
   _releaseEntity(entity, index) {
     this._entities.splice(index, 1);
 
+    if (this._entitiesByNames[entity.name]) {
+      delete this._entitiesByNames[entity.name];
+    }
+
     // Prevent any access and free
     entity._world = null;
     this._entityPool.release(entity);
