@@ -12,10 +12,7 @@ export function init(benchmarks) {
       name: "Add 1 tagComponent",
       prepare: ctx => {
         ctx.world = new World({ entityPoolSize: 100 });
-<<<<<<< HEAD
         ctx.world.registerComponent(TagComponentA);
-=======
->>>>>>> More benchmarks
         for (let i = 0; i < 100000; i++) {
           ctx.world.createEntity();
         }
@@ -31,12 +28,9 @@ export function init(benchmarks) {
       name: "Add 2 tagComponent",
       prepare: ctx => {
         ctx.world = new World({ entityPoolSize: 100 });
-<<<<<<< HEAD
         ctx.world
           .registerComponent(TagComponentA)
           .registerComponent(TagComponentB);
-=======
->>>>>>> More benchmarks
         for (let i = 0; i < 100000; i++) {
           ctx.world.createEntity();
         }
@@ -54,13 +48,10 @@ export function init(benchmarks) {
       name: "Add 3 tagComponent",
       prepare: ctx => {
         ctx.world = new World({ entityPoolSize: 100 });
-<<<<<<< HEAD
         ctx.world
           .registerComponent(TagComponentA)
           .registerComponent(TagComponentB)
           .registerComponent(TagComponentC);
-=======
->>>>>>> More benchmarks
         for (let i = 0; i < 100000; i++) {
           ctx.world.createEntity();
         }
@@ -79,10 +70,7 @@ export function init(benchmarks) {
       name: "Remove 1 tagComponent (100k entities with 1 component)",
       prepare: ctx => {
         ctx.world = new World({ entityPoolSize: 100 });
-<<<<<<< HEAD
         ctx.world.registerComponent(TagComponentA);
-=======
->>>>>>> More benchmarks
         for (let i = 0; i < 100000; i++) {
           ctx.world.createEntity().addComponent(TagComponentA);
         }
@@ -98,13 +86,10 @@ export function init(benchmarks) {
       name: "Remove 1 tagComponent (100k entities with 3 component)",
       prepare: ctx => {
         ctx.world = new World({ entityPoolSize: 100 });
-<<<<<<< HEAD
         ctx.world
           .registerComponent(TagComponentA)
           .registerComponent(TagComponentB)
           .registerComponent(TagComponentC);
-=======
->>>>>>> More benchmarks
         for (let i = 0; i < 100000; i++) {
           ctx.world
             .createEntity()

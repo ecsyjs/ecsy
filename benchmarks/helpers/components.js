@@ -1,5 +1,4 @@
 import { TagComponent } from "../../src/index";
-<<<<<<< HEAD
 import { Component } from "../../src/Component";
 import {
   Types,
@@ -36,14 +35,23 @@ const Vector3Type = createType({
   copy: copyCopyable,
   clone: cloneClonable
 });
-=======
->>>>>>> More benchmarks
+
+class Vector3 {
+  constructor(x = 0, y = 0, z = 0) {
+    this.set(x, y, z);
+  }
+
+  set(x, y, z) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+  }
+}
 
 export class TagComponentA extends TagComponent {}
 export class TagComponentB extends TagComponent {}
 export class TagComponentC extends TagComponent {}
 
-<<<<<<< HEAD
 export class Component1 extends Component {
   constructor(props) {
     super(false);
@@ -134,45 +142,6 @@ export class Component3NoReset extends Component {
 }
 
 export class BarComponent extends Component {
-=======
-export class Component1 {
-  constructor() {
-    this.attr = 0;
-  }
-
-  copy(src) {
-    this.attr = src.attr;
-  }
-}
-
-export class Component2 {
-  constructor() {
-    this.attr = 0;
-    this.attr2 = 0;
-  }
-
-  copy(src) {
-    this.attr = src.attr;
-    this.attr2 = src.attr2;
-  }
-}
-
-export class Component3 {
-  constructor() {
-    this.attr = 0;
-    this.attr2 = 0;
-    this.attr2 = 0;
-  }
-
-  copy(src) {
-    this.attr = src.attr;
-    this.attr2 = src.attr2;
-  }
-}
-
-
-export class BarComponent {
->>>>>>> More benchmarks
   constructor() {
     this.variableBar = 0;
   }
@@ -182,19 +151,10 @@ export class BarComponent {
   }
 }
 
-<<<<<<< HEAD
 export class NoCopyComponent extends Component {
-=======
-export class NoCopyComponent {
->>>>>>> More benchmarks
   constructor() {
     this.variable = 0;
   }
 }
-<<<<<<< HEAD
 */
 export class EmptyComponent extends Component {}
-=======
-
-export class EmptyComponent {}
->>>>>>> More benchmarks
