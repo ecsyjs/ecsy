@@ -52,6 +52,14 @@ export class Component3 {
   }
 }
 
+export class Component3NoReset {
+  constructor() {
+    this.attr = 0;
+    this.attr2 = 0;
+    this.attr3 = new Vector3();
+  }
+}
+
 export class BarComponent {
   constructor() {
     this.variableBar = 0;
