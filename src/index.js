@@ -8,3 +8,4 @@ export { createType } from "./CreateType.js";
 export { Types } from "./StandardTypes.js";
 export { Version } from "./Version.js";
 export { enableRemoteDevtools } from "./RemoteDevTools/index.js";
+export { Entity as _Entity } from "./Entity.js";
