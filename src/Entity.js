@@ -6,7 +6,7 @@ const DEBUG = false;
 
 var nextId = 0;
 
-export default class Entity {
+export class Entity {
   constructor(world) {
     this._world = world || null;
 

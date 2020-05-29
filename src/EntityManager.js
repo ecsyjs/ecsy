@@ -1,4 +1,3 @@
-import Entity from "./Entity.js";
 import ObjectPool from "./ObjectPool.js";
 import QueryManager from "./QueryManager.js";
 import EventDispatcher from "./EventDispatcher.js";
@@ -22,7 +21,7 @@ export class EntityManager {
     this._queryManager = new QueryManager(this);
     this.eventDispatcher = new EventDispatcher();
     this._entityPool = new ObjectPool(
-      Entity,
+      this.world.options.entityClass,
       this.world.options.entityPoolSize
     );
 
