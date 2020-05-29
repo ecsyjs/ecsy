@@ -1,57 +1,93 @@
 import { World } from "../src";
+import {
+  TagComponentA,
+  TagComponentB,
+  TagComponentC
+} from "./helpers/components.js";
 
 export function init(benchmarks) {
   benchmarks
+    // TAG COMPONENTS
     .add({
-      name: "new World({ entityPoolSize: 100k })",
-      execute: () => {
-        new World({ entityPoolSize: 100000 });
-      },
-      iterations: 10
-    })
-    .add({
-      name: "World::createEntity (100k empty, recreating world)",
-      execute: () => {
-        let world = new World();
-        for (let i = 0; i < 100000; i++) {
-          world.createEntity();
-        }
-      },
-      iterations: 10
-    })
-    .add({
-      name:
-        "World::createEntity (100k empty, recreating world (poolSize: 100k))",
-      execute: () => {
-        let world = new World({ entityPoolSize: 100000 });
-        for (let i = 0; i < 100000; i++) {
-          world.createEntity();
-        }
-      },
-      iterations: 10
-    })
-    .add({
-      name:
-        "World::createEntity (100k empty, recreating world (not measured), entityPoolSize = 100k)",
+      name: "Add 1 tagComponent",
       prepare: ctx => {
-        ctx.world = new World({ entityPoolSize: 100000 });
+        ctx.world = new World({ entityPoolSize: 100 });
+        for (let i = 0; i < 100000; i++) {
+          ctx.world.createEntity();
+        }
       },
       execute: ctx => {
         for (let i = 0; i < 100000; i++) {
-          ctx.world.createEntity();
+          ctx.world.entityManager._entities[i].addComponent(TagComponentA);
         }
       },
       iterations: 10
     })
     .add({
-      name:
-        "World::createEntity (100k empty, reuse world, entityPoolSize = 100k * 10)",
-      prepareGlobal: ctx => {
-        ctx.world = new World({ entityPoolSize: 100000 * 10 });
+      name: "Add 2 tagComponent",
+      prepare: ctx => {
+        ctx.world = new World({ entityPoolSize: 100 });
+        for (let i = 0; i < 100000; i++) {
+          ctx.world.createEntity();
+        }
       },
       execute: ctx => {
         for (let i = 0; i < 100000; i++) {
+          ctx.world.entityManager._entities[i]
+            .addComponent(TagComponentA)
+            .addComponent(TagComponentB);
+        }
+      },
+      iterations: 10
+    })
+    .add({
+      name: "Add 3 tagComponent",
+      prepare: ctx => {
+        ctx.world = new World({ entityPoolSize: 100 });
+        for (let i = 0; i < 100000; i++) {
           ctx.world.createEntity();
+        }
+      },
+      execute: ctx => {
+        for (let i = 0; i < 100000; i++) {
+          ctx.world.entityManager._entities[i]
+            .addComponent(TagComponentA)
+            .addComponent(TagComponentB)
+            .addComponent(TagComponentC);
+        }
+      },
+      iterations: 10
+    })
+    .add({
+      name: "Remove 1 tagComponent (100k entities with 1 component)",
+      prepare: ctx => {
+        ctx.world = new World({ entityPoolSize: 100 });
+        for (let i = 0; i < 100000; i++) {
+          ctx.world.createEntity().addComponent(TagComponentA);
+        }
+      },
+      execute: ctx => {
+        for (let i = 0; i < 100000; i++) {
+          ctx.world.entityManager._entities[i].removeComponent(TagComponentA);
+        }
+      },
+      iterations: 10
+    })
+    .add({
+      name: "Remove 1 tagComponent (100k entities with 3 component)",
+      prepare: ctx => {
+        ctx.world = new World({ entityPoolSize: 100 });
+        for (let i = 0; i < 100000; i++) {
+          ctx.world
+            .createEntity()
+            .addComponent(TagComponentA)
+            .addComponent(TagComponentB)
+            .addComponent(TagComponentC);
+        }
+      },
+      execute: ctx => {
+        for (let i = 0; i < 100000; i++) {
+          ctx.world.entityManager._entities[i].removeComponent(TagComponentA);
         }
       },
       iterations: 10
