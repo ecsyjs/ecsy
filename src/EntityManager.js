@@ -1,4 +1,3 @@
-import Entity from "./Entity.js";
 import { ObjectPool } from "./ObjectPool.js";
 import QueryManager from "./QueryManager.js";
 import EventDispatcher from "./EventDispatcher.js";
