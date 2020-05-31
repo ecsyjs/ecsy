@@ -11,6 +11,9 @@ ECSY (pronounced as "eck-see") is an highly experimental Entity Component System
 
 For detailed information on the architecture and API please visit the [documentation page](https://ecsy.io/docs/#/)
 
+* discourse forum: https://discourse.mozilla.org/c/mixed-reality/ecsy
+* discord: https://discord.gg/cFnrQ2v
+
 ## Features
 - Framework agnostic
 - Focused on providing a simple but yet efficient API
