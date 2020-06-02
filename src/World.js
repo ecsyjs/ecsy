@@ -12,7 +12,7 @@ const DEFAULT_OPTIONS = {
 
 export class World {
   constructor(options = {}) {
-    this.options = Object.assign(DEFAULT_OPTIONS, options);
+    this.options = Object.assign({}, DEFAULT_OPTIONS, options);
 
     this.componentsManager = new ComponentManager(this);
     this.entityManager = new EntityManager(this);
