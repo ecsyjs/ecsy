@@ -3,14 +3,16 @@ import { EntityManager } from "./EntityManager.js";
 import { ComponentManager } from "./ComponentManager.js";
 import { Version } from "./Version.js";
 import { hasWindow, now } from "./Utils.js";
+import { Entity } from "./Entity.js";
 
 const DEFAULT_OPTIONS = {
-  entityPoolSize: 0
+  entityPoolSize: 0,
+  entityClass: Entity
 };
 
 export class World {
   constructor(options = {}) {
-    this.options = Object.assign(DEFAULT_OPTIONS, options);
+    this.options = Object.assign({}, DEFAULT_OPTIONS, options);
 
     this.componentsManager = new ComponentManager(this);
     this.entityManager = new EntityManager(this);
