@@ -6,7 +6,7 @@ export default class DummyObjectPool {
     this.T = T;
   }
 
-  aquire() {
+  acquire() {
     this.used++;
     this.count++;
     return new this.T();

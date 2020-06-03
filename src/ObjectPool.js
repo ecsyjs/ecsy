@@ -25,7 +25,7 @@ export default class ObjectPool {
     }
   }
 
-  aquire() {
+  acquire() {
     // Grow the list by 20%ish if we're out
     if (this.freeList.length <= 0) {
       this.expand(Math.round(this.count * 0.2) + 1);

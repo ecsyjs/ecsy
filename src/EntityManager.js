@@ -39,7 +39,7 @@ export class EntityManager {
    * Create a new entity
    */
   createEntity(name) {
-    var entity = this._entityPool.aquire();
+    var entity = this._entityPool.acquire();
     entity.alive = true;
     entity.name = name || "";
     if (name) {
@@ -84,7 +84,7 @@ export class EntityManager {
     var componentPool = this.world.componentsManager.getComponentsPool(
       Component
     );
-    var component = componentPool.aquire();
+    var component = componentPool.acquire();
 
     entity._components[Component.name] = component;
 
