@@ -219,8 +219,4 @@ test("Delete entity from entitiesByNames", async t => {
   world.execute(); // Deferred remove happens
 
   t.deepEqual({}, world.entityManager._entitiesByNames);
-<<<<<<< HEAD
-=======
-
->>>>>>> Fix #157 remove entity from _entitiesByNames when removing it
 });

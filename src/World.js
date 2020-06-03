@@ -4,14 +4,6 @@ import { ComponentManager } from "./ComponentManager.js";
 import { Version } from "./Version.js";
 import { hasWindow, now } from "./Utils.js";
 import { Entity } from "./Entity.js";
-<<<<<<< HEAD
-
-const DEFAULT_OPTIONS = {
-  entityPoolSize: 0,
-  entityClass: Entity
-};
-=======
->>>>>>> Export Entity as _Entity and allow parameter to be set in World constructor
 
 const DEFAULT_OPTIONS = {
   entityPoolSize: 0,
@@ -20,11 +12,7 @@ const DEFAULT_OPTIONS = {
 
 export class World {
   constructor(options = {}) {
-<<<<<<< HEAD
     this.options = Object.assign({}, DEFAULT_OPTIONS, options);
-=======
-    this.options = Object.assign(DEFAULT_OPTIONS, options);
->>>>>>> Added options to the world. entityPoolSize
 
     this.componentsManager = new ComponentManager(this);
     this.entityManager = new EntityManager(this);
