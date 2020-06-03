@@ -46,7 +46,7 @@ test("DummyPool", t => {
   // Create 10 components
 
   for (let i = 0; i < 10; i++) {
-    components.push(pool.aquire());
+    components.push(pool.acquire());
   }
 
   t.is(pool.totalSize(), 10);
@@ -69,7 +69,7 @@ test("DummyPool", t => {
 
   // Create new components
   for (let i = 0; i < 5; i++) {
-    var component = pool.aquire();
+    var component = pool.acquire();
     t.is(component.id, i + 10);
   }
 
@@ -97,7 +97,7 @@ test("ObjectPool", t => {
   // Create 10 components
 
   for (let i = 0; i < 10; i++) {
-    components.push(pool.aquire());
+    components.push(pool.acquire());
   }
 
   t.is(pool.totalSize(), 12);
@@ -128,7 +128,7 @@ test("ObjectPool", t => {
 
   // Create new components
   for (let i = 0; i < 3; i++) {
-    components.push(pool.aquire());
+    components.push(pool.acquire());
   }
 
   for (let i = 0; i < components.length; i++) {
