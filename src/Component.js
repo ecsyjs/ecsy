@@ -1,17 +1,20 @@
 export class Component {
   constructor(props) {
-    const schema = this.constructor.schema;
+    if (props !== false) {
+      const schema = this.constructor.schema;
 
-    for (const key in schema) {
-      const schemaProp = schema[key];
-
-      if (props && props.hasOwnProperty(key)) {
-        this[key] = props[key];
-      } else if (schemaProp.hasOwnProperty("default")) {
-        this[key] = schemaProp.type.clone(schemaProp.default);
-      } else {
-        const type = schemaProp.type;
-        this[key] = type.clone(type.default);
+      for (const key in schema) {
+        if (props && props.hasOwnProperty(key)) {
+          this[key] = props[key];
+        } else {
+          const schemaProp = schema[key];
+          if (schemaProp.hasOwnProperty("default")) {
+            this[key] = schemaProp.type.clone(schemaProp.default);
+          } else {
+            const type = schemaProp.type;
+            this[key] = type.clone(type.default);
+          }
+        }
       }
     }
 
@@ -21,9 +24,10 @@ export class Component {
   copy(source) {
     const schema = this.constructor.schema;
 
-    for (const key in source) {
-      if (schema.hasOwnProperty(key)) {
-        const prop = schema[key];
+    for (const key in schema) {
+      const prop = schema[key];
+
+      if (source.hasOwnProperty(key)) {
         prop.type.copy(source, this, key);
       }
     }

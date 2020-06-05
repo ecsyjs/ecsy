@@ -7,36 +7,36 @@
 					"name": "new World({ entityPoolSize: 100k })",
 					"stats": {
 						"n": 10,
-						"min": 23,
-						"max": 185,
-						"sum": 888,
-						"mean": 88.8,
-						"variance": 5445.5599999999995,
-						"standard_deviation": 73.79403769953234
+						"min": 22,
+						"max": 233,
+						"sum": 1081,
+						"mean": 108.1,
+						"variance": 9698.890000000001,
+						"standard_deviation": 98.48294268552297
 					}
 				},
 				{
 					"name": "World::createEntity (100k empty, recreating world)",
 					"stats": {
 						"n": 10,
-						"min": 33,
-						"max": 579,
-						"sum": 4612,
-						"mean": 461.2,
-						"variance": 45868.36,
-						"standard_deviation": 214.16899869028663
+						"min": 29,
+						"max": 765,
+						"sum": 5864,
+						"mean": 586.4,
+						"variance": 77451.64000000001,
+						"standard_deviation": 278.30134746350046
 					}
 				},
 				{
 					"name": "World::createEntity (100k empty, recreating world (poolSize: 100k))",
 					"stats": {
 						"n": 10,
-						"min": 34,
-						"max": 517,
-						"sum": 3664,
-						"mean": 366.4,
-						"variance": 23473.44,
-						"standard_deviation": 153.21044350826742
+						"min": 30,
+						"max": 724,
+						"sum": 4664,
+						"mean": 466.4,
+						"variance": 41455.64,
+						"standard_deviation": 203.6065814260433
 					}
 				},
 				{
@@ -44,23 +44,23 @@
 					"stats": {
 						"n": 10,
 						"min": 3,
-						"max": 12,
-						"sum": 53,
-						"mean": 5.300000000000001,
-						"variance": 11.810000000000004,
-						"standard_deviation": 3.436568055487917
+						"max": 11,
+						"sum": 50,
+						"mean": 5,
+						"variance": 8.999999999999998,
+						"standard_deviation": 2.9999999999999996
 					}
 				},
 				{
 					"name": "World::createEntity(name) (100k empty, recreating world (not measured), entityPoolSize = 100k)",
 					"stats": {
 						"n": 10,
-						"min": 64,
-						"max": 90,
-						"sum": 697,
-						"mean": 69.7,
-						"variance": 51.20999999999998,
-						"standard_deviation": 7.156116265125936
+						"min": 41,
+						"max": 85,
+						"sum": 600,
+						"mean": 60.00000000000001,
+						"variance": 108.00000000000003,
+						"standard_deviation": 10.392304845413266
 					}
 				},
 				{
@@ -69,75 +69,75 @@
 						"n": 10,
 						"min": 2,
 						"max": 10,
-						"sum": 60,
-						"mean": 6,
-						"variance": 6.399999999999999,
-						"standard_deviation": 2.529822128134703
+						"sum": 52,
+						"mean": 5.200000000000001,
+						"variance": 6.960000000000001,
+						"standard_deviation": 2.638181191654584
 					}
 				},
 				{
 					"name": "Add 1 tagComponent",
 					"stats": {
 						"n": 10,
-						"min": 43,
-						"max": 72,
-						"sum": 480,
-						"mean": 48,
-						"variance": 72.4,
-						"standard_deviation": 8.508818954473059
+						"min": 37,
+						"max": 66,
+						"sum": 417,
+						"mean": 41.7,
+						"variance": 74.21,
+						"standard_deviation": 8.614522621712709
 					}
 				},
 				{
 					"name": "Add 2 tagComponent",
 					"stats": {
 						"n": 10,
-						"min": 100,
-						"max": 117,
-						"sum": 1045,
-						"mean": 104.5,
-						"variance": 27.849999999999984,
-						"standard_deviation": 5.2773099207835035
+						"min": 82,
+						"max": 102,
+						"sum": 909,
+						"mean": 90.9,
+						"variance": 38.690000000000055,
+						"standard_deviation": 6.220128616033599
 					}
 				},
 				{
 					"name": "Add 3 tagComponent",
 					"stats": {
 						"n": 10,
-						"min": 126,
-						"max": 151,
-						"sum": 1307,
-						"mean": 130.7,
-						"variance": 55.60999999999997,
-						"standard_deviation": 7.457211275000861
+						"min": 100,
+						"max": 122,
+						"sum": 1065,
+						"mean": 106.5,
+						"variance": 38.64999999999998,
+						"standard_deviation": 6.216912416947819
 					}
 				},
 				{
 					"name": "Remove 1 tagComponent (100k entities with 1 component)",
 					"stats": {
 						"n": 10,
-						"min": 66,
-						"max": 79,
-						"sum": 726,
-						"mean": 72.6,
-						"variance": 19.039999999999996,
-						"standard_deviation": 4.363484845854285
+						"min": 61,
+						"max": 81,
+						"sum": 698,
+						"mean": 69.80000000000001,
+						"variance": 38.760000000000055,
+						"standard_deviation": 6.225752966509357
 					}
 				},
 				{
 					"name": "Remove 1 tagComponent (100k entities with 3 component)",
 					"stats": {
 						"n": 10,
-						"min": 73,
-						"max": 85,
-						"sum": 782,
-						"mean": 78.20000000000002,
-						"variance": 17.16000000000003,
-						"standard_deviation": 4.142463035441599
+						"min": 77,
+						"max": 83,
+						"sum": 801,
+						"mean": 80.10000000000001,
+						"variance": 3.2900000000000014,
+						"standard_deviation": 1.813835714721706
 					}
 				}
 			],
-			"meanAll": 1431.4,
-			"sumAll": 14314
+			"meanAll": 1620.1000000000001,
+			"sumAll": 16201
 		},
 		{
 			"groupName": "objectpool",
@@ -146,29 +146,29 @@
 					"name": "new ObjectPool(TagComponent, 100k)",
 					"stats": {
 						"n": 10,
-						"min": 12,
-						"max": 89,
-						"sum": 697,
-						"mean": 69.7,
-						"variance": 835.21,
-						"standard_deviation": 28.900000000000002
+						"min": 6,
+						"max": 107,
+						"sum": 815,
+						"mean": 81.5,
+						"variance": 1398.2500000000002,
+						"standard_deviation": 37.39318119657647
 					}
 				},
 				{
 					"name": "new ObjectPool(Component1, 100k)",
 					"stats": {
 						"n": 10,
-						"min": 117,
-						"max": 129,
-						"sum": 1199,
-						"mean": 119.9,
-						"variance": 11.49,
-						"standard_deviation": 3.3896902513356584
+						"min": 95,
+						"max": 101,
+						"sum": 985,
+						"mean": 98.5,
+						"variance": 4.250000000000001,
+						"standard_deviation": 2.0615528128088303
 					}
 				}
 			],
-			"meanAll": 189.60000000000002,
-			"sumAll": 1896
+			"meanAll": 180,
+			"sumAll": 1800
 		},
 		{
 			"groupName": "components",
@@ -177,79 +177,79 @@
 					"name": "Entity::addComponent(Component3)",
 					"stats": {
 						"n": 10,
-						"min": 89,
-						"max": 178,
-						"sum": 1020,
-						"mean": 102,
-						"variance": 662.6000000000001,
-						"standard_deviation": 25.741017850893158
+						"min": 50,
+						"max": 90,
+						"sum": 579,
+						"mean": 57.9,
+						"variance": 169.89,
+						"standard_deviation": 13.034185820372517
 					}
 				},
 				{
 					"name": "Entity::addComponent(Component3)",
 					"stats": {
 						"n": 10,
-						"min": 89,
-						"max": 115,
-						"sum": 954,
-						"mean": 95.39999999999999,
-						"variance": 68.83999999999989,
-						"standard_deviation": 8.29698740507661
+						"min": 52,
+						"max": 72,
+						"sum": 567,
+						"mean": 56.7,
+						"variance": 56.81000000000002,
+						"standard_deviation": 7.537240874484509
 					}
 				},
 				{
 					"name": "Entity::removeComponent(Component3)",
 					"stats": {
 						"n": 10,
-						"min": 55,
-						"max": 77,
-						"sum": 642,
-						"mean": 64.2,
-						"variance": 42.359999999999985,
-						"standard_deviation": 6.508456038109191
-					}
-				},
-				{
-					"name": "Entity::removeComponent(Component3)",
-					"stats": {
-						"n": 10,
-						"min": 59,
+						"min": 57,
 						"max": 74,
-						"sum": 645,
-						"mean": 64.5,
-						"variance": 21.649999999999995,
-						"standard_deviation": 4.652956049652736
+						"sum": 659,
+						"mean": 65.89999999999999,
+						"variance": 32.89,
+						"standard_deviation": 5.734980383575867
 					}
 				},
 				{
-					"name": "Entity::removeComponent(Component3) sync",
-					"stats": {
-						"n": 10,
-						"min": 59,
-						"max": 75,
-						"sum": 631,
-						"mean": 63.10000000000001,
-						"variance": 24.69000000000002,
-						"standard_deviation": 4.96890329952194
-					}
-				},
-				{
-					"name": "Entity::removeComponent(Component3) sync",
+					"name": "Entity::removeComponent(Component3)",
 					"stats": {
 						"n": 10,
 						"min": 56,
-						"max": 69,
-						"sum": 619,
-						"mean": 61.9,
-						"variance": 17.290000000000003,
-						"standard_deviation": 4.158124577258358
+						"max": 68,
+						"sum": 624,
+						"mean": 62.400000000000006,
+						"variance": 14.24,
+						"standard_deviation": 3.7735924528226414
+					}
+				},
+				{
+					"name": "Entity::removeComponent(Component3) sync",
+					"stats": {
+						"n": 10,
+						"min": 29,
+						"max": 56,
+						"sum": 386,
+						"mean": 38.6,
+						"variance": 111.24000000000001,
+						"standard_deviation": 10.547037498748168
+					}
+				},
+				{
+					"name": "Entity::removeComponent(Component3) sync",
+					"stats": {
+						"n": 10,
+						"min": 29,
+						"max": 60,
+						"sum": 377,
+						"mean": 37.699999999999996,
+						"variance": 101.41,
+						"standard_deviation": 10.070253224224304
 					}
 				}
 			],
-			"meanAll": 451.09999999999997,
-			"sumAll": 4511
+			"meanAll": 319.2,
+			"sumAll": 3192
 		}
 	],
-	"meanAll": 2072.1,
-	"sumAll": 20721
+	"meanAll": 2119.3,
+	"sumAll": 21193
 }
