@@ -3,6 +3,7 @@ import { Component3, Component3NoReset } from "./helpers/components.js";
 
 export function init(benchmarks) {
   benchmarks
+    .group("components")
     .add({
       name: "Entity::addComponent(Component3NoReset)",
       prepare: ctx => {
@@ -15,8 +16,7 @@ export function init(benchmarks) {
         for (let i = 0; i < 100000; i++) {
           ctx.world.entityManager._entities[i].addComponent(Component3NoReset);
         }
-      },
-      iterations: 10
+      }
     })
     .add({
       name: "Entity::addComponent(Component3NoReset)",
@@ -30,8 +30,7 @@ export function init(benchmarks) {
         for (let i = 0; i < 100000; i++) {
           ctx.world.entityManager._entities[i].addComponent(Component3NoReset);
         }
-      },
-      iterations: 10
+      }
     })
     .add({
       name: "Entity::removeComponent(Component3NoReset)",
@@ -47,8 +46,7 @@ export function init(benchmarks) {
             Component3NoReset
           );
         }
-      },
-      iterations: 10
+      }
     })
     .add({
       name: "Entity::removeComponent(Component3NoReset)",
@@ -64,8 +62,7 @@ export function init(benchmarks) {
             Component3NoReset
           );
         }
-      },
-      iterations: 10
+      }
     })
     .add({
       name: "Entity::removeComponent(Component3NoReset) sync",
@@ -82,8 +79,7 @@ export function init(benchmarks) {
             true
           );
         }
-      },
-      iterations: 10
+      }
     })
     .add({
       name: "Entity::removeComponent(Component3NoReset) sync",
@@ -100,8 +96,7 @@ export function init(benchmarks) {
             true
           );
         }
-      },
-      iterations: 10
+      }
     });
 
   /*
@@ -117,8 +112,7 @@ export function init(benchmarks) {
         for (let i = 0; i < 100000; i++) {
           ctx.world.entityManager._entities[i].addComponent(Component3);
         }
-      },
-      iterations: 10
+      }
     });
     */
 }
