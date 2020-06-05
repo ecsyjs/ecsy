@@ -4,7 +4,7 @@ import wrapImmutableComponent from "./WrapImmutableComponent.js";
 // @todo Take this out from there or use ENV
 const DEBUG = false;
 
-export default class Entity {
+export class Entity {
   constructor(entityManager) {
     this._entityManager = entityManager || null;
 

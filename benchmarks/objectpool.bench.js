@@ -1,4 +1,4 @@
-import ObjectPool from "../src/ObjectPool.js";
+import { ObjectPool } from "../src/ObjectPool.js";
 import { TagComponentA, Component3 } from "./helpers/components.js";
 
 export function init(benchmarks) {
@@ -7,13 +7,13 @@ export function init(benchmarks) {
     .add({
       name: "new ObjectPool(TagComponent, 100k)",
       execute: () => {
-        new ObjectPool(TagComponentA, 100000);
+        new ObjectPool(new TagComponentA(), 100000);
       }
     })
     .add({
       name: "new ObjectPool(Component1, 100k)",
       execute: () => {
-        new ObjectPool(Component3, 100000);
+        new ObjectPool(new Component3(), 100000);
       }
     });
 }
