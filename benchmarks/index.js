@@ -12,7 +12,7 @@ let benchmarks = new Benchmarks({
   iterations: 10
 });
 
-//initWorld(benchmarks);
+initWorld(benchmarks);
 initEntities(benchmarks);
 initPool(benchmarks);
 initComponents(benchmarks);
