@@ -23,13 +23,13 @@ export class ObjectPool {
   }
 
   release(item) {
-    item.copy(this.baseObject);
+    item.reset();
     this.freeList.push(item);
   }
 
   expand(count) {
     for (var n = 0; n < count; n++) {
-      var clone = this.baseObject.clone();
+      var clone = new this.baseObject();
       clone._pool = this;
       this.freeList.push(clone);
     }

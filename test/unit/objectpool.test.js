@@ -22,7 +22,7 @@ test("Detecting Pool", t => {
   world.registerComponent(PoolTagComponent);
   world.registerComponent(NoPoolComponent, false);
 
-  var customPool = new ObjectPool(new CustomPoolComponent(), 10);
+  var customPool = new ObjectPool(CustomPoolComponent, 10);
   world.registerComponent(CustomPoolComponent, customPool);
 
   t.true(
@@ -52,7 +52,7 @@ test("ObjectPool", t => {
     }
   }
 
-  var pool = new ObjectPool(new T());
+  var pool = new ObjectPool(T);
   var components = [];
 
   // Create 10 components
