@@ -7,13 +7,13 @@ export function init(benchmarks) {
     .add({
       name: "new ObjectPool(TagComponent, 100k)",
       execute: () => {
-        new ObjectPool(new TagComponentA(), 100000);
+        new ObjectPool(TagComponentA, 100000);
       }
     })
     .add({
       name: "new ObjectPool(Component1, 100k)",
       execute: () => {
-        new ObjectPool(new Component3(), 100000);
+        new ObjectPool(Component3, 100000);
       }
     })
     /*
