@@ -40,18 +40,66 @@ export class TagComponentA extends TagComponent {}
 export class TagComponentB extends TagComponent {}
 export class TagComponentC extends TagComponent {}
 
-export class Component1 extends Component {}
+export class Component1 extends Component {
+  constructor(props) {
+    super(false);
+    this.attr = (props && props.attr) || 0;
+  }
+
+  copy(source) {
+    this.attr = source.attr;
+    return this;
+  }
+
+  clone() {
+    return new Component1().copy(this);
+  }
+}
 Component1.schema = {
   attr: { type: Types.Number }
 };
 
-export class Component2 extends Component {}
+export class Component2 extends Component {
+  constructor(props) {
+    super(false);
+    this.attr = (props && props.attr) || 0;
+    this.attr2 = (props && props.attr2) || 0;
+  }
+
+  copy(source) {
+    this.attr = source.attr;
+    this.attr2 = source.attr2;
+    return this;
+  }
+
+  clone() {
+    return new Component2().copy(this);
+  }
+}
 Component2.schema = {
   attr: { type: Types.Number },
   attr2: { type: Types.Number }
 };
 
-export class Component3 extends Component {}
+export class Component3 extends Component {
+  constructor(props) {
+    super(false);
+    this.attr = (props && props.attr) || 0;
+    this.attr2 = (props && props.attr2) || 0;
+    this.attr3 = (props && props.attr3) || new Vector3();
+  }
+
+  copy(source) {
+    this.attr = source.attr;
+    this.attr2 = source.attr2;
+    this.attr3.copy(source.attr3);
+    return this;
+  }
+
+  clone() {
+    return new Component3().copy(this);
+  }
+}
 Component3.schema = {
   attr: { type: Types.Number },
   attr2: { type: Types.Number },
