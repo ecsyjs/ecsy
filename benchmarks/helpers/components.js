@@ -1,4 +1,6 @@
 import { TagComponent } from "../../src/index";
+import { Component } from "../../src/Component";
+import { Types } from "../../src/Types";
 
 class Vector3 {
   constructor(x = 0, y = 0, z = 0) {
@@ -16,43 +18,25 @@ export class TagComponentA extends TagComponent {}
 export class TagComponentB extends TagComponent {}
 export class TagComponentC extends TagComponent {}
 
-export class Component1 {
-  constructor() {
-    this.attr = 0;
-  }
+export class Component1 extends Component {}
+Component1.schema = {
+  attr: { type: Types.Number }
+};
 
-  reset() {
-    this.attr = 0;
-  }
-}
+export class Component2 extends Component {}
+Component2.schema = {
+  attr: { type: Types.Number },
+  attr2: { type: Types.Number }
+};
 
-export class Component2 {
-  constructor() {
-    this.attr = 0;
-    this.attr2 = "";
-  }
-
-  reset() {
-    this.attr = 0;
-    this.attr2 = "";
-  }
-}
-
-export class Component3 {
-  constructor() {
-    this.attr = 0;
-    this.attr2 = 0;
-    this.attr3 = new Vector3();
-  }
-
-  reset() {
-    this.attr = 0;
-    this.attr2 = "";
-    this.attr3.set(0, 0, 0);
-  }
-}
-
-export class Component3NoReset {
+export class Component3 extends Component {}
+Component3.schema = {
+  attr: { type: Types.Number },
+  attr2: { type: Types.Number },
+  attr3: { type: Types.Array }
+};
+/*
+export class Component3NoReset extends Component {
   constructor() {
     this.attr = 0;
     this.attr2 = 0;
@@ -60,7 +44,7 @@ export class Component3NoReset {
   }
 }
 
-export class BarComponent {
+export class BarComponent extends Component {
   constructor() {
     this.variableBar = 0;
   }
@@ -70,10 +54,10 @@ export class BarComponent {
   }
 }
 
-export class NoCopyComponent {
+export class NoCopyComponent extends Component {
   constructor() {
     this.variable = 0;
   }
 }
-
-export class EmptyComponent {}
+*/
+export class EmptyComponent extends Component {}
