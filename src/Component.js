@@ -39,6 +39,21 @@ export class Component {
     return new this.constructor().copy(this);
   }
 
+  reset() {
+    const schema = this.constructor.schema;
+
+    for (const key in schema) {
+      const schemaProp = schema[key];
+
+      if (schemaProp.hasOwnProperty("default")) {
+        this[key] = schemaProp.type.clone(schemaProp.default);
+      } else {
+        const type = schemaProp.type;
+        this[key] = type.clone(type.default);
+      }
+    }
+  }
+
   dispose() {
     if (this._pool) {
       this._pool.release(this);

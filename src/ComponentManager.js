@@ -34,7 +34,7 @@ export class ComponentManager {
     this.numComponents[Component.name] = 0;
 
     if (objectPool === undefined) {
-      objectPool = new ObjectPool(new Component());
+      objectPool = new ObjectPool(Component);
     } else if (objectPool === false) {
       objectPool = undefined;
     }

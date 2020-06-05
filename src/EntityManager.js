@@ -4,6 +4,26 @@ import EventDispatcher from "./EventDispatcher.js";
 import { getName } from "./Utils.js";
 import { SystemStateComponent } from "./SystemStateComponent.js";
 
+class EntityPool extends ObjectPool {
+  constructor(entityManager, entityClass, initialSize) {
+    super(entityClass, undefined);
+    this.entityManager = entityManager;
+
+    if (typeof initialSize !== "undefined") {
+      this.expand(initialSize);
+    }
+  }
+
+  expand(count) {
+    for (var n = 0; n < count; n++) {
+      var clone = new this.baseObject(this.entityManager);
+      clone._pool = this;
+      this.freeList.push(clone);
+    }
+    this.count += count;
+  }
+}
+
 /**
  * @private
  * @class EntityManager
@@ -21,8 +41,9 @@ export class EntityManager {
 
     this._queryManager = new QueryManager(this);
     this.eventDispatcher = new EventDispatcher();
-    this._entityPool = new ObjectPool(
-      new this.world.options.entityClass(this),
+    this._entityPool = new EntityPool(
+      this,
+      this.world.options.entityClass,
       this.world.options.entityPoolSize
     );
 
@@ -203,7 +224,6 @@ export class EntityManager {
       delete this._entitiesByNames[entity.name];
     }
     entity._pool.release(entity);
-    entity.id = this._nextEntityId++;
   }
 
   /**
