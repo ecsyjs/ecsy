@@ -117,8 +117,8 @@ export class Entity {
 
   copy(src) {
     // TODO: This can definitely be optimized
-    for (var componentName in src.components) {
-      var srcComponent = src.components[componentName];
+    for (var componentName in src._components) {
+      var srcComponent = src._components[componentName];
       this.addComponent(srcComponent.constructor);
       var component = this.getComponent(srcComponent.constructor);
       component.copy(srcComponent);
@@ -129,6 +129,16 @@ export class Entity {
 
   clone() {
     return new Entity(this._entityManager).copy(this);
+  }
+
+  reset() {
+    this.id = this._entityManager._nextEntityId++;
+    this._ComponentTypes.length = 0;
+    this.queries.length = 0;
+
+    for (var componentName in this.components) {
+      delete this._components[componentName];
+    }
   }
 
   remove(forceImmediate) {

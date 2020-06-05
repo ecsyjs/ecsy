@@ -46,13 +46,17 @@ export class Component1 extends Component {
     this.attr = (props && props.attr) || 0;
   }
 
-  copy(source) {
-    this.attr = source.attr;
-    return this;
-  }
+  // copy(source) {
+  //   this.attr = source.attr;
+  //   return this;
+  // }
 
-  clone() {
-    return new Component1().copy(this);
+  // clone() {
+  //   return new Component1().copy(this);
+  // }
+
+  reset() {
+    this.attr = 0;
   }
 }
 Component1.schema = {
@@ -66,14 +70,19 @@ export class Component2 extends Component {
     this.attr2 = (props && props.attr2) || 0;
   }
 
-  copy(source) {
-    this.attr = source.attr;
-    this.attr2 = source.attr2;
-    return this;
-  }
+  // copy(source) {
+  //   this.attr = source.attr;
+  //   this.attr2 = source.attr2;
+  //   return this;
+  // }
 
-  clone() {
-    return new Component2().copy(this);
+  // clone() {
+  //   return new Component2().copy(this);
+  // }
+
+  reset() {
+    this.attr = 0;
+    this.attr2 = 0;
   }
 }
 Component2.schema = {
@@ -89,15 +98,21 @@ export class Component3 extends Component {
     this.attr3 = (props && props.attr3) || new Vector3();
   }
 
-  copy(source) {
-    this.attr = source.attr;
-    this.attr2 = source.attr2;
-    this.attr3.copy(source.attr3);
-    return this;
-  }
+  // copy(source) {
+  //   this.attr = source.attr;
+  //   this.attr2 = source.attr2;
+  //   this.attr3.copy(source.attr3);
+  //   return this;
+  // }
 
-  clone() {
-    return new Component3().copy(this);
+  // clone() {
+  //   return new Component3().copy(this);
+  // }
+
+  reset() {
+    this.attr = 0;
+    this.attr2 = 0;
+    this.attr3.set(0, 0, 0);
   }
 }
 Component3.schema = {
