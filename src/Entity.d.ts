@@ -116,6 +116,12 @@ export class Entity {
       forceImmediate?: boolean
   ): void
 
+  copy(source: this): this
+
+  clone(): this
+
+  reset(): void
+
   /**
    * Remove this entity from the world.
    * @param forceImmediate Whether this entity should be removed immediately
