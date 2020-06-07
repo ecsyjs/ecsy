@@ -1,6 +1,5 @@
 import {Component, ComponentConstructor} from "./Component";
 import { Entity } from "./Entity";
-import { TagComponent } from './TagComponent';
 import { World } from "./World";
 
 interface Attributes {
@@ -18,7 +17,7 @@ export abstract class System {
    */
   static queries: {
     [queryName: string]: {
-      components: (Component<any> | NotComponent | TagComponent)[],
+      components: (ComponentConstructor<any, any> | NotComponent<any, any>)[],
       listen?: {
         added?: boolean,
         removed?: boolean,
@@ -70,12 +69,12 @@ export interface SystemConstructor<T extends System> {
   new (...args: any): T;
 }
 
-export interface NotComponent {
+export interface NotComponent<P, C extends Component<P>> {
   type: "not",
-  Component: Component<any>,
+  Component: ComponentConstructor<P, C>
 }
 
 /**
  * Use the Not class to negate a component query.
  */
-export function Not(Component: ComponentConstructor<any, any>): NotComponent;
+export function Not<P, C extends Component<P>>(Component: ComponentConstructor<P, C>): NotComponent<P, C>;
