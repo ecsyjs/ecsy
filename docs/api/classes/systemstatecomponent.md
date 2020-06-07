@@ -33,6 +33,12 @@ Name | Type |
 
 ___
 
+### `Static` isSystemStateComponent
+
+▪ **isSystemStateComponent**: *true*
+
+___
+
 ### `Static` schema
 
 ▪ **schema**: *[ComponentSchema](../README.md#componentschema)*
