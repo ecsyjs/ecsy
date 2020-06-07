@@ -44,6 +44,28 @@ Name | Type | Description |
 
 ___
 
+###  clone
+
+▸ **clone**(): *this*
+
+**Returns:** *this*
+
+___
+
+###  copy
+
+▸ **copy**(`source`: this): *this*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`source` | this |
+
+**Returns:** *this*
+
+___
+
 ###  getComponent
 
 ▸ **getComponent**<**P**, **C**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹P, C›, `includeRemoved?`: boolean): *C*
@@ -274,3 +296,11 @@ Name | Type | Description |
 `forceImmediate?` | boolean | Whether a component should be removed immediately  |
 
 **Returns:** *this*
+
+___
+
+###  reset
+
+▸ **reset**(): *void*
+
+**Returns:** *void*
