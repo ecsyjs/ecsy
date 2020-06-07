@@ -14,7 +14,7 @@ export interface PropType<T> extends PropTypeDefinition<T> {
   isType: true
 }
 
-export interface Types {
+export interface PropTypes {
   Number: PropType<number>;
   Boolean: PropType<boolean>;
   String: PropType<string>;
@@ -22,6 +22,8 @@ export interface Types {
   Object: PropType<any>;
   JSON: PropType<any>;
 }
+
+export const Types: PropTypes;
 
 export function copyValue<T>(src: Component<any>, dest: Component<any>, key: string): T;
 export function cloneValue<T>(value: T): T;
