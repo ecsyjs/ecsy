@@ -5,7 +5,7 @@
 
 ###  Component
 
-• **Component**: *[Component](../classes/component.md)*
+• **Component**: *[Component](../classes/component.md)‹any›*
 
 ___
 

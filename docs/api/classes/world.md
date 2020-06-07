@@ -7,7 +7,7 @@ The World is the root of the ECS.
 
 ###  constructor
 
-\+ **new World**(`options?`: [Options](../interfaces/options.md)): *[World](world.md)*
+\+ **new World**(`options?`: [WorldOptions](../interfaces/worldoptions.md)): *[World](world.md)*
 
 Create a new World.
 
@@ -15,7 +15,7 @@ Create a new World.
 
 Name | Type |
 ------ | ------ |
-`options?` | [Options](../interfaces/options.md) |
+`options?` | [WorldOptions](../interfaces/worldoptions.md) |
 
 **Returns:** *[World](world.md)*
 
@@ -64,19 +64,19 @@ ___
 
 ###  getSystem
 
-▸ **getSystem**<**T**>(`System`: [SystemConstructor](../interfaces/systemconstructor.md)‹T›): *[System](system.md)*
+▸ **getSystem**<**S**>(`System`: [SystemConstructor](../interfaces/systemconstructor.md)‹S›): *[System](system.md)*
 
 Get a system registered in this world.
 
 **Type parameters:**
 
-▪ **T**: *[System](system.md)*
+▪ **S**: *[System](system.md)*
 
 **Parameters:**
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`System` | [SystemConstructor](../interfaces/systemconstructor.md)‹T› | Type of system to get.  |
+`System` | [SystemConstructor](../interfaces/systemconstructor.md)‹S› | Type of system to get.  |
 
 **Returns:** *[System](system.md)*
 
@@ -104,19 +104,15 @@ ___
 
 ###  registerComponent
 
-▸ **registerComponent**<**T**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹T›): *this*
+▸ **registerComponent**(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹any, any›): *this*
 
 Register a component.
-
-**Type parameters:**
-
-▪ **T**: *[Component](component.md)*
 
 **Parameters:**
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹T› | Type of component to register  |
+`Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹any, any› | Type of component to register  |
 
 **Returns:** *this*
 
@@ -124,19 +120,15 @@ ___
 
 ###  registerSystem
 
-▸ **registerSystem**<**T**>(`System`: [SystemConstructor](../interfaces/systemconstructor.md)‹T›, `attributes?`: object): *this*
+▸ **registerSystem**(`System`: [SystemConstructor](../interfaces/systemconstructor.md)‹any›, `attributes?`: object): *this*
 
 Register a system.
-
-**Type parameters:**
-
-▪ **T**: *[System](system.md)*
 
 **Parameters:**
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`System` | [SystemConstructor](../interfaces/systemconstructor.md)‹T› | Type of system to register  |
+`System` | [SystemConstructor](../interfaces/systemconstructor.md)‹any› | Type of system to register  |
 `attributes?` | object | - |
 
 **Returns:** *this*
