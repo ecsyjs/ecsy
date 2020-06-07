@@ -1,6 +1,6 @@
 {
   "name": "ecsy",
-  "version": "0.2.4",
+  "version": "0.2.6",
   "description": "Entity Component System in JS",
   "main": "build/ecsy.js",
   "jsnext:main": "build/ecsy.module.js",
