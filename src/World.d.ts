@@ -1,6 +1,7 @@
 import { Component, ComponentConstructor } from "./Component";
 import { System, SystemConstructor } from "./System";
 import { Entity } from "./Entity";
+import { ObjectPool } from "./ObjectPool";
 
 export interface WorldOptions {
   entityPoolSize?: number;
@@ -25,7 +26,7 @@ export class World {
    * Register a component.
    * @param Component Type of component to register
    */
-  registerComponent(Component: ComponentConstructor<any, any>): this;
+  registerComponent(Component: ComponentConstructor<any, any>, objectPool?: ObjectPool | false): this;
 
   /**
    * Register a system.
