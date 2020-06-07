@@ -1,20 +1,34 @@
 
-# Interface: ComponentConstructor <**T**>
+# Interface: ComponentConstructor <**P, C**>
 
 ## Type parameters
 
-▪ **T**: *[Component](../classes/component.md)*
+▪ **P**
+
+▪ **C**: *[Component](../classes/component.md)‹P›*
 
 ## Constructors
 
 ###  constructor
 
-\+ **new ComponentConstructor**(...`args`: any): *T*
+\+ **new ComponentConstructor**(`props?`: [ComponentProps](../README.md#componentprops)‹P›): *C*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`...args` | any |
+`props?` | [ComponentProps](../README.md#componentprops)‹P› |
 
-**Returns:** *T*
+**Returns:** *C*
+
+## Properties
+
+###  isComponent
+
+• **isComponent**: *true*
+
+___
+
+###  schema
+
+• **schema**: *[ComponentSchema](../README.md#componentschema)*
