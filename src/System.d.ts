@@ -18,11 +18,11 @@ export abstract class System {
    */
   static queries: {
     [queryName: string]: {
-      components: (Component | NotComponent | TagComponent)[],
+      components: (Component<any> | NotComponent | TagComponent)[],
       listen?: {
         added?: boolean,
         removed?: boolean,
-        changed?: boolean | Component[],
+        changed?: boolean | Component<any>[],
       },
     }
   };
@@ -72,10 +72,10 @@ export interface SystemConstructor<T extends System> {
 
 export interface NotComponent {
   type: "not",
-  Component: Component,
+  Component: Component<any>,
 }
 
 /**
  * Use the Not class to negate a component query.
  */
-export function Not<T>(Component:ComponentConstructor<T>): NotComponent;
+export function Not(Component: ComponentConstructor<any, any>): NotComponent;
