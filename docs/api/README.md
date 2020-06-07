@@ -75,17 +75,23 @@ Name | Type |
 
 ###  Not
 
-▸ **Not**(`Component`: [ComponentConstructor](interfaces/componentconstructor.md)‹any, any›): *[NotComponent](interfaces/notcomponent.md)*
+▸ **Not**<**P**, **C**>(`Component`: [ComponentConstructor](interfaces/componentconstructor.md)‹P, C›): *[NotComponent](interfaces/notcomponent.md)‹P, C›*
 
 Use the Not class to negate a component query.
+
+**Type parameters:**
+
+▪ **P**
+
+▪ **C**: *[Component](classes/component.md)‹P›*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`Component` | [ComponentConstructor](interfaces/componentconstructor.md)‹any, any› |
+`Component` | [ComponentConstructor](interfaces/componentconstructor.md)‹P, C› |
 
-**Returns:** *[NotComponent](interfaces/notcomponent.md)*
+**Returns:** *[NotComponent](interfaces/notcomponent.md)‹P, C›*
 
 ___
 

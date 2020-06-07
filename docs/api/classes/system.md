@@ -66,7 +66,7 @@ This needs to be user defined.
 
 * \[ **queryName**: *string*\]: object
 
-* **components**: *[Component](component.md)‹any› | [TagComponent](tagcomponent.md)‹› | [NotComponent](../interfaces/notcomponent.md)[]*
+* **components**: *[ComponentConstructor](../interfaces/componentconstructor.md)‹any, any› | [NotComponent](../interfaces/notcomponent.md)‹any, any›[]*
 
 * **listen**(): *object*
 
