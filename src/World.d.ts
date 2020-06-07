@@ -26,7 +26,7 @@ export class World {
    * Register a component.
    * @param Component Type of component to register
    */
-  registerComponent(Component: ComponentConstructor<any, any>, objectPool?: ObjectPool | false): this;
+  registerComponent<C extends Component<any>>(Component: ComponentConstructor<any, C>, objectPool?: ObjectPool<C> | false): this;
 
   /**
    * Register a system.
