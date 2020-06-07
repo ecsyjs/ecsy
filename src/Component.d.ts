@@ -16,6 +16,8 @@ export type ComponentSchema = {
 };
 
 export class Component<P> {
+  static schema: ComponentSchema;
+  static isComponent: true;
   constructor(props?: ComponentProps<P>);
   copy(source: this): this;
   clone(): this;
