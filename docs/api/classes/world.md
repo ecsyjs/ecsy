@@ -104,15 +104,20 @@ ___
 
 ###  registerComponent
 
-▸ **registerComponent**(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹any, any›): *this*
+▸ **registerComponent**<**C**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹any, C›, `objectPool?`: [ObjectPool](objectpool.md)‹C› | false): *this*
 
 Register a component.
+
+**Type parameters:**
+
+▪ **C**: *[Component](component.md)‹any›*
 
 **Parameters:**
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹any, any› | Type of component to register  |
+`Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹any, C› | Type of component to register  |
+`objectPool?` | [ObjectPool](objectpool.md)‹C› &#124; false | - |
 
 **Returns:** *this*
 
