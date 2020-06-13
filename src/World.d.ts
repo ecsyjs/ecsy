@@ -32,6 +32,13 @@ export class World {
    * @param System Type of system to register
    */
   registerSystem<T extends System>(System:SystemConstructor<T>, attributes?: object): this;
+  
+
+  /**
+   * Unregister a system.
+   * @param System Type of system to unregister
+   */
+  unregisterSystem<T extends System>(System:SystemConstructor<T>): this;
 
   /**
    * Get a system registered in this world.
