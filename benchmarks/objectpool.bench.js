@@ -16,6 +16,7 @@ export function init(benchmarks) {
         new ObjectPool(Component3, 100000);
       }
     })
+    /*
     .add({
       name: "acquiring 100k. ObjectPool(Component1, 100k)",
       prepare: ctx => {
@@ -53,4 +54,5 @@ export function init(benchmarks) {
         }
       }
     });
+    */
 }
