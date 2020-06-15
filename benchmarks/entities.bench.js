@@ -1,4 +1,4 @@
-import { World } from "../src";
+import { World } from "../src/World.js";
 import {
   TagComponentA,
   TagComponentB,

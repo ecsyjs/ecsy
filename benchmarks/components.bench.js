@@ -1,4 +1,4 @@
-import { World } from "../src";
+import { World } from "../src/World.js";
 import { Component3, Component3NoReset } from "./helpers/components.js";
 
 export function init(benchmarks) {

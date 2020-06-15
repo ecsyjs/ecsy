@@ -1,7 +1,8 @@
-import { World } from "../src";
+import { World } from "../src/World.js";
 
 export function init(benchmarks) {
   benchmarks
+    .group("world")
     .add({
       name: "new World({ entityPoolSize: 100k })",
       execute: () => {
