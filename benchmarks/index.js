@@ -13,9 +13,9 @@ let benchmarks = new Benchmarks({
 });
 
 initWorld(benchmarks);
-//initEntities(benchmarks);
+initEntities(benchmarks);
 initPool(benchmarks);
-//initComponents(benchmarks);
+initComponents(benchmarks);
 benchmarks.run();
 
 console.log(JSON.stringify(benchmarks.getReport("json"), null, "\t"));
