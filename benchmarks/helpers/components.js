@@ -118,7 +118,7 @@ export class Component3 extends Component {
 Component3.schema = {
   attr: { type: Types.Number },
   attr2: { type: Types.Number },
-  attr3: { type: Types.Array }
+  attr3: { type: Vector3Type }
 };
 /*
 export class Component3NoReset extends Component {
