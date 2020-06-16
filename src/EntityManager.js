@@ -16,7 +16,7 @@ class EntityPool extends ObjectPool {
 
   expand(count) {
     for (var n = 0; n < count; n++) {
-      var clone = new this.baseObject(this.entityManager);
+      var clone = new this.T(this.entityManager);
       clone._pool = this;
       this.freeList.push(clone);
     }
