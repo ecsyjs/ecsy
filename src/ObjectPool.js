@@ -1,9 +1,9 @@
 export class ObjectPool {
   // @todo Add initial size
-  constructor(baseObject, initialSize) {
+  constructor(T, initialSize) {
     this.freeList = [];
     this.count = 0;
-    this.baseObject = baseObject;
+    this.T = T;
     this.isObjectPool = true;
 
     if (typeof initialSize !== "undefined") {
@@ -29,7 +29,7 @@ export class ObjectPool {
 
   expand(count) {
     for (var n = 0; n < count; n++) {
-      var clone = new this.baseObject();
+      var clone = new this.T();
       clone._pool = this;
       this.freeList.push(clone);
     }
