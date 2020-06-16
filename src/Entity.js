@@ -136,7 +136,7 @@ export class Entity {
     this._ComponentTypes.length = 0;
     this.queries.length = 0;
 
-    for (var componentName in this.components) {
+    for (var componentName in this._components) {
       delete this._components[componentName];
     }
   }
