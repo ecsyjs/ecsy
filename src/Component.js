@@ -46,10 +46,10 @@ export class Component {
       const schemaProp = schema[key];
 
       if (schemaProp.hasOwnProperty("default")) {
-        this[key] = schemaProp.type.clone(schemaProp.default);
+        schemaProp.type.copy(schemaProp.default, this, key);
       } else {
         const type = schemaProp.type;
-        this[key] = type.clone(type.default);
+        type.copy(type.default, this, key);
       }
     }
   }
