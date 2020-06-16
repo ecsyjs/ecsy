@@ -1,10 +1,10 @@
-export const copyValue = (src, dest, key) => (dest[key] = src[key]);
+export const copyValue = src => src;
 
 export const cloneValue = src => src;
 
-export const copyArray = (src, dest, key) => {
-  const srcArray = src[key];
-  const destArray = dest[key];
+export const copyArray = (src, dest) => {
+  const srcArray = src;
+  const destArray = dest;
 
   destArray.length = 0;
 
@@ -17,12 +17,11 @@ export const copyArray = (src, dest, key) => {
 
 export const cloneArray = src => src.slice();
 
-export const copyJSON = (src, dest, key) =>
-  (dest[key] = JSON.parse(JSON.stringify(src[key])));
+export const copyJSON = src => JSON.parse(JSON.stringify(src));
 
 export const cloneJSON = src => JSON.parse(JSON.stringify(src));
 
-export const copyCopyable = (src, dest, key) => dest[key].copy(src[key]);
+export const copyCopyable = (src, dest) => dest.copy(src);
 
 export const cloneClonable = src => src.clone();
 
