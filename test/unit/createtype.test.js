@@ -14,7 +14,7 @@ test("Create simple type", t => {
 
   // Just create
   const error2 = t.throws(() => {
-    createType({ name: "test" });
+    createType({ create: {} });
   });
   t.is(
     error2.message,
@@ -23,7 +23,7 @@ test("Create simple type", t => {
 
   // create and reset
   const error3 = t.throws(() => {
-    createType({ copy: {}, clone: {} });
+    createType({ create: {}, reset: {} });
   });
   t.is(
     error3.message,

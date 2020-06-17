@@ -37,7 +37,7 @@ test("Unknown types", t => {
   t.deepEqual(c1.vector3.toArray(), [4, 5, 6]);
   let error = t.throws(() => {
     c1.clear();
-  }, Error);
+  });
   t.is(error.message, "c1.clear is not a function");
 
   t.deepEqual(c1.vector3.toArray(), [4, 5, 6]);
@@ -45,7 +45,7 @@ test("Unknown types", t => {
   t.deepEqual(c1.vector3.toArray(), [4, 5, 6]);
   error = t.throws(() => {
     c1.reset();
-  }, Error);
+  });
   t.is(error.message, "c1.reset is not a function");
   t.deepEqual(c1.vector3.toArray(), [4, 5, 6]);
 
@@ -54,13 +54,13 @@ test("Unknown types", t => {
 
   error = t.throws(() => {
     c1.clear();
-  }, Error);
+  });
   t.is(error.message, "c1.clear is not a function");
 
   t.deepEqual(c1.vector3.toArray(), [1, 2, 3]);
   error = t.throws(() => {
     c1.reset();
-  }, Error);
+  });
   t.is(error.message, "c1.reset is not a function");
 
   t.deepEqual(c1.vector3.toArray(), [1, 2, 3]);
