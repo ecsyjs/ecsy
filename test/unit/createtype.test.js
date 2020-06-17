@@ -6,7 +6,7 @@ test("Create simple type", t => {
   // Empty
   const error1 = t.throws(() => {
     createType({});
-  });
+  }, Error);
   t.is(
     error1.message,
     "createType expects a type definition with the following properties: name, default, copy, clone"

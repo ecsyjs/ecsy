@@ -1,73 +1,255 @@
 {
 	"groups": [
 		{
+			"groupName": "world",
+			"benchmarks": [
+				{
+					"name": "new World({ entityPoolSize: 100k })",
+					"stats": {
+						"n": 10,
+						"min": 23,
+						"max": 150,
+						"sum": 1096,
+						"mean": 109.6,
+						"variance": 2610.8399999999997,
+						"standard_deviation": 51.09637951949237
+					}
+				},
+				{
+					"name": "World::createEntity (100k empty, recreating world)",
+					"stats": {
+						"n": 10,
+						"min": 40,
+						"max": 583,
+						"sum": 4632,
+						"mean": 463.2,
+						"variance": 43672.55999999999,
+						"standard_deviation": 208.9798076370059
+					}
+				},
+				{
+					"name": "World::createEntity (100k empty, recreating world (poolSize: 100k))",
+					"stats": {
+						"n": 10,
+						"min": 154,
+						"max": 608,
+						"sum": 4844,
+						"mean": 484.4,
+						"variance": 27302.440000000013,
+						"standard_deviation": 165.23450002950355
+					}
+				},
+				{
+					"name": "World::createEntity (100k empty, recreating world (not measured), entityPoolSize = 100k)",
+					"stats": {
+						"n": 10,
+						"min": 3,
+						"max": 12,
+						"sum": 55,
+						"mean": 5.5,
+						"variance": 8.65,
+						"standard_deviation": 2.9410882339705484
+					}
+				},
+				{
+					"name": "World::createEntity(name) (100k empty, recreating world (not measured), entityPoolSize = 100k)",
+					"stats": {
+						"n": 10,
+						"min": 35,
+						"max": 75,
+						"sum": 566,
+						"mean": 56.599999999999994,
+						"variance": 104.44000000000001,
+						"standard_deviation": 10.219589032832975
+					}
+				},
+				{
+					"name": "World::createEntity (100k empty, reuse world, entityPoolSize = 100k * 10)",
+					"stats": {
+						"n": 10,
+						"min": 3,
+						"max": 29,
+						"sum": 80,
+						"mean": 8,
+						"variance": 54.19999999999999,
+						"standard_deviation": 7.3620649277223835
+					}
+				},
+				{
+					"name": "Add 1 tagComponent",
+					"stats": {
+						"n": 10,
+						"min": 36,
+						"max": 65,
+						"sum": 410,
+						"mean": 41,
+						"variance": 67.99999999999997,
+						"standard_deviation": 8.24621125123532
+					}
+				},
+				{
+					"name": "Add 2 tagComponent",
+					"stats": {
+						"n": 10,
+						"min": 85,
+						"max": 105,
+						"sum": 904,
+						"mean": 90.39999999999999,
+						"variance": 31.43999999999996,
+						"standard_deviation": 5.607138307550471
+					}
+				},
+				{
+					"name": "Add 3 tagComponent",
+					"stats": {
+						"n": 10,
+						"min": 108,
+						"max": 132,
+						"sum": 1124,
+						"mean": 112.4,
+						"variance": 46.040000000000035,
+						"standard_deviation": 6.785278181474952
+					}
+				},
+				{
+					"name": "Remove 1 tagComponent (100k entities with 1 component)",
+					"stats": {
+						"n": 10,
+						"min": 34,
+						"max": 45,
+						"sum": 389,
+						"mean": 38.900000000000006,
+						"variance": 11.090000000000007,
+						"standard_deviation": 3.3301651610693437
+					}
+				},
+				{
+					"name": "Remove 1 tagComponent (100k entities with 3 component)",
+					"stats": {
+						"n": 10,
+						"min": 81,
+						"max": 83,
+						"sum": 819,
+						"mean": 81.89999999999999,
+						"variance": 0.49000000000000155,
+						"standard_deviation": 0.7000000000000011
+					}
+				}
+			],
+			"meanAll": 1491.9,
+			"sumAll": 14919
+		},
+		{
 			"groupName": "objectpool",
 			"benchmarks": [
 				{
 					"name": "new ObjectPool(TagComponent, 100k)",
 					"stats": {
 						"n": 10,
-						"min": 6,
-						"max": 67,
-						"sum": 461,
-						"mean": 46.1,
-						"variance": 660.8899999999999,
-						"standard_deviation": 25.707780923292464
+						"min": 10,
+						"max": 75,
+						"sum": 521,
+						"mean": 52.1,
+						"variance": 446.48999999999995,
+						"standard_deviation": 21.1303099835284
 					}
 				},
 				{
 					"name": "new ObjectPool(Component1, 100k)",
 					"stats": {
 						"n": 10,
-						"min": 61,
-						"max": 77,
-						"sum": 652,
-						"mean": 65.2,
-						"variance": 19.960000000000004,
-						"standard_deviation": 4.467661580737736
-					}
-				},
-				{
-					"name": "acquiring 100k. ObjectPool(Component1, 100k)",
-					"stats": {
-						"n": 10,
-						"min": 0,
-						"max": 1,
-						"sum": 5,
-						"mean": 0.5,
-						"variance": 0.25,
-						"standard_deviation": 0.5
-					}
-				},
-				{
-					"name": "acquiring 100k. ObjectPool(Component1)",
-					"stats": {
-						"n": 10,
-						"min": 2,
-						"max": 16,
-						"sum": 50,
-						"mean": 5,
-						"variance": 30.4,
-						"standard_deviation": 5.513619500836088
-					}
-				},
-				{
-					"name": "returning 100k. ObjectPool(Component1)",
-					"stats": {
-						"n": 10,
-						"min": 2,
-						"max": 4,
-						"sum": 25,
-						"mean": 2.5,
-						"variance": 0.65,
-						"standard_deviation": 0.806225774829855
+						"min": 58,
+						"max": 63,
+						"sum": 608,
+						"mean": 60.8,
+						"variance": 2.5600000000000014,
+						"standard_deviation": 1.6000000000000005
 					}
 				}
 			],
-			"meanAll": 119.30000000000001,
-			"sumAll": 1193
+			"meanAll": 112.9,
+			"sumAll": 1129
+		},
+		{
+			"groupName": "components",
+			"benchmarks": [
+				{
+					"name": "Entity::addComponent(Component3)",
+					"stats": {
+						"n": 10,
+						"min": 51,
+						"max": 100,
+						"sum": 587,
+						"mean": 58.699999999999996,
+						"variance": 201.00999999999993,
+						"standard_deviation": 14.177799547179383
+					}
+				},
+				{
+					"name": "Entity::addComponent(Component3)",
+					"stats": {
+						"n": 10,
+						"min": 52,
+						"max": 76,
+						"sum": 571,
+						"mean": 57.099999999999994,
+						"variance": 44.69,
+						"standard_deviation": 6.685057965343307
+					}
+				},
+				{
+					"name": "Entity::removeComponent(Component3)",
+					"stats": {
+						"n": 10,
+						"min": 35,
+						"max": 47,
+						"sum": 394,
+						"mean": 39.400000000000006,
+						"variance": 10.840000000000002,
+						"standard_deviation": 3.2924155266308657
+					}
+				},
+				{
+					"name": "Entity::removeComponent(Component3)",
+					"stats": {
+						"n": 10,
+						"min": 36,
+						"max": 44,
+						"sum": 396,
+						"mean": 39.599999999999994,
+						"variance": 6.639999999999999,
+						"standard_deviation": 2.576819745345025
+					}
+				},
+				{
+					"name": "Entity::removeComponent(Component3) sync",
+					"stats": {
+						"n": 10,
+						"min": 20,
+						"max": 31,
+						"sum": 239,
+						"mean": 23.9,
+						"variance": 9.489999999999998,
+						"standard_deviation": 3.080584360149872
+					}
+				},
+				{
+					"name": "Entity::removeComponent(Component3) sync",
+					"stats": {
+						"n": 10,
+						"min": 20,
+						"max": 28,
+						"sum": 231,
+						"mean": 23.099999999999998,
+						"variance": 5.489999999999999,
+						"standard_deviation": 2.3430749027719964
+					}
+				}
+			],
+			"meanAll": 241.79999999999998,
+			"sumAll": 2418
 		}
 	],
-	"meanAll": 119.30000000000001,
-	"sumAll": 1193
+	"meanAll": 1846.6000000000001,
+	"sumAll": 18466
 }
