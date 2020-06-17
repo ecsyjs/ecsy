@@ -1,4 +1,5 @@
 import json from "rollup-plugin-json";
+import resolve from '@rollup/plugin-node-resolve';
 import { terser } from "rollup-plugin-terser";
 
 export default [
@@ -29,6 +30,17 @@ export default [
         name: "ECSY",
         noConflict: true,
         file: "build/ecsy.min.js",
+        indent: "\t"
+      }
+    ]
+  },
+  {
+    input: "benchmarks/browser.js",
+    plugins: [json(), resolve()],
+    output: [
+      {
+        format: "es",
+        file: "build/benchmarks.module.js",
         indent: "\t"
       }
     ]

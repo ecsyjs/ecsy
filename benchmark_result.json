@@ -1,0 +1,73 @@
+{
+	"groups": [
+		{
+			"groupName": "objectpool",
+			"benchmarks": [
+				{
+					"name": "new ObjectPool(TagComponent, 100k)",
+					"stats": {
+						"n": 10,
+						"min": 6,
+						"max": 67,
+						"sum": 461,
+						"mean": 46.1,
+						"variance": 660.8899999999999,
+						"standard_deviation": 25.707780923292464
+					}
+				},
+				{
+					"name": "new ObjectPool(Component1, 100k)",
+					"stats": {
+						"n": 10,
+						"min": 61,
+						"max": 77,
+						"sum": 652,
+						"mean": 65.2,
+						"variance": 19.960000000000004,
+						"standard_deviation": 4.467661580737736
+					}
+				},
+				{
+					"name": "acquiring 100k. ObjectPool(Component1, 100k)",
+					"stats": {
+						"n": 10,
+						"min": 0,
+						"max": 1,
+						"sum": 5,
+						"mean": 0.5,
+						"variance": 0.25,
+						"standard_deviation": 0.5
+					}
+				},
+				{
+					"name": "acquiring 100k. ObjectPool(Component1)",
+					"stats": {
+						"n": 10,
+						"min": 2,
+						"max": 16,
+						"sum": 50,
+						"mean": 5,
+						"variance": 30.4,
+						"standard_deviation": 5.513619500836088
+					}
+				},
+				{
+					"name": "returning 100k. ObjectPool(Component1)",
+					"stats": {
+						"n": 10,
+						"min": 2,
+						"max": 4,
+						"sum": 25,
+						"mean": 2.5,
+						"variance": 0.65,
+						"standard_deviation": 0.806225774829855
+					}
+				}
+			],
+			"meanAll": 119.30000000000001,
+			"sumAll": 1193
+		}
+	],
+	"meanAll": 119.30000000000001,
+	"sumAll": 1193
+}

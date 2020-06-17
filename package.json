@@ -14,6 +14,7 @@
     "dev:server": "http-server -c-1 -p 8080 --cors",
     "lint": "eslint src test examples",
     "start": "npm run dev",
+    "benchmarks": "node -r esm --expose-gc benchmarks/index.js",
     "test": "ava",
     "travis": "npm run lint && npm run test && npm run build",
     "watch:test": "ava --watch"
@@ -56,11 +57,13 @@
   },
   "homepage": "https://github.com/fernandojsg/ecsy#readme",
   "devDependencies": {
+    "@rollup/plugin-node-resolve": "^8.0.1",
     "ava": "^1.4.1",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-eslint": "^10.0.3",
     "babel-loader": "^8.0.6",
+    "benchmarker-js": "0.0.1",
     "concurrently": "^4.1.2",
     "docsify-cli": "^4.4.0",
     "eslint": "^5.16.0",
