@@ -81,12 +81,12 @@ test("Empty queries", t => {
 
   const error = t.throws(() => {
     world.registerSystem(SystemEmpty3);
-  }, Error);
+  });
 
   t.is(error.message, "'components' attribute can't be empty in a query");
   const error2 = t.throws(() => {
     world.registerSystem(SystemEmpty4);
-  }, Error);
+  });
   t.is(error2.message, "'components' attribute can't be empty in a query");
 });
 
@@ -165,7 +165,7 @@ test("Queries with 'Not' operator", t => {
 
   const error = t.throws(() => {
     world.registerSystem(SystemNotNot);
-  }, Error);
+  });
 
   t.is(error.message, "Can't create a query without components");
 
@@ -268,7 +268,7 @@ test("Queries with sync removal", t => {
   t.is(entitiesB.length, 5);
   const error = t.throws(() => {
     systemB.execute();
-  }, Error);
+  });
 
   t.is(error.message, "Cannot read property 'remove' of undefined");
 
@@ -910,7 +910,7 @@ test("Register a system that does not extend System", t => {
   const world = new World();
   const error = t.throws(() => {
     world.registerSystem(SystemA);
-  }, Error);
+  });
 
   t.is(error.message, "System 'SystemA' does not extends 'System' class");
 });

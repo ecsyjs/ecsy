@@ -6,7 +6,7 @@ test("Create simple type", t => {
   // Empty
   const error1 = t.throws(() => {
     createType({});
-  }, Error);
+  });
   t.is(
     error1.message,
     "createType expect type definition to implements the following functions: create, reset, clear"
@@ -15,7 +15,7 @@ test("Create simple type", t => {
   // Just create
   const error2 = t.throws(() => {
     createType({ create: {} });
-  }, Error);
+  });
   t.is(
     error2.message,
     "createType expect type definition to implements the following functions: reset, clear"
@@ -24,7 +24,7 @@ test("Create simple type", t => {
   // create and reset
   const error3 = t.throws(() => {
     createType({ create: {}, reset: {} });
-  }, Error);
+  });
   t.is(
     error3.message,
     "createType expect type definition to implements the following functions: clear"

@@ -36,9 +36,6 @@
     "files": [
       "test/**/*.test.js"
     ],
-    "sources": [
-      "src/**/*.js"
-    ],
     "require": [
       "babel-register",
       "esm"
@@ -58,7 +55,7 @@
   "homepage": "https://github.com/fernandojsg/ecsy#readme",
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^8.0.1",
-    "ava": "^1.4.1",
+    "ava": "^3.9.0",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-eslint": "^10.0.3",
@@ -69,6 +66,7 @@
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^4.3.0",
     "eslint-plugin-prettier": "^3.1.2",
+    "esm": "^3.2.25",
     "http-server": "^0.11.1",
     "nodemon": "^1.19.4",
     "prettier": "^1.19.1",
