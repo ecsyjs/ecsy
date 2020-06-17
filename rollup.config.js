@@ -1,5 +1,5 @@
 import json from "rollup-plugin-json";
-import resolve from '@rollup/plugin-node-resolve';
+import resolve from "@rollup/plugin-node-resolve";
 import { terser } from "rollup-plugin-terser";
 
 export default [
@@ -30,7 +30,14 @@ export default [
         name: "ECSY",
         noConflict: true,
         file: "build/ecsy.min.js",
-        indent: "\t"
+        indent: "\t",
+        sourcemap: true
+      },
+      {
+        format: "es",
+        file: "build/ecsy.module.min.js",
+        indent: "\t",
+        sourcemap: true
       }
     ]
   },

@@ -1,5 +1,5 @@
 
-# ecsy - v0.2.5
+# ecsy - v0.2.6
 
 ## Functions
 

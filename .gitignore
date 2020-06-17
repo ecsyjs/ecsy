@@ -1,3 +1,7 @@
+# Generated files
+lib
+build
+ 
 # Logs
 .idea
 .vscode
