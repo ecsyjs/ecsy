@@ -6,7 +6,7 @@ test("Create simple type", t => {
   // Empty
   const error1 = t.throws(() => {
     createType({});
-  }, Error);
+  });
   t.is(
     error1.message,
     "createType expects a type definition with the following properties: name, default, copy, clone"
@@ -15,7 +15,7 @@ test("Create simple type", t => {
   // Just name
   const error2 = t.throws(() => {
     createType({ name: "test" });
-  }, Error);
+  });
   t.is(
     error2.message,
     "createType expects a type definition with the following properties: default, copy, clone"
@@ -24,7 +24,7 @@ test("Create simple type", t => {
   // copy and clone
   const error3 = t.throws(() => {
     createType({ copy: {}, clone: {} });
-  }, Error);
+  });
   t.is(
     error3.message,
     "createType expects a type definition with the following properties: name, default"
