@@ -1,27 +1,16 @@
-export class FooComponent {
-  constructor() {
-    this.variableFoo = 0;
-  }
+import { Component } from "../../src/Component";
+import { Types } from "../../src/Types";
 
-  copy(src) {
-    this.variableFoo = src.variableFoo;
-  }
-}
+export class FooComponent extends Component {}
 
-export class BarComponent {
-  constructor() {
-    this.variableBar = 0;
-  }
+FooComponent.schema = {
+  variableFoo: { type: Types.Number }
+};
 
-  copy(src) {
-    this.variableBar = src.variableBar;
-  }
-}
+export class BarComponent extends Component {}
 
-export class NoCopyComponent {
-  constructor() {
-    this.variable = 0;
-  }
-}
+BarComponent.schema = {
+  variableBar: { type: Types.Number }
+};
 
-export class EmptyComponent {}
+export class EmptyComponent extends Component {}

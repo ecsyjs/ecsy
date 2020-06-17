@@ -25,29 +25,20 @@
         textarea.innerHTML += msg + '\n';
       }
 
-      import {World, System, Component, SystemStateComponent, Not} from '../../build/ecsy.module.js';
+      import {World, System, Component, SystemStateComponent, Not, Types} from '../../build/ecsy.module.js';
 
-      class Sprite {
-        constructor() {
-          this.reset();
-        }
+      class Sprite extends Component {}
 
-        reset() {
-          this.name = 'empty';
-        }
-      }
+      Sprite.schema = {
+        name: { type: Types.String, default: "empty" }
+      };
 
-      class SpriteResources extends SystemStateComponent {
-        constructor() {
-          super();
-          this.reset();
-        }
+      class SpriteResources extends SystemStateComponent {}
 
-        reset() {
-          this.size = 0;
-          this.memPosition = 0;
-        }
-      }
+      SpriteResources.schema = {
+        size: { type: Types.Number },
+        memPosition: { type: Types.Number }
+      };
 
       // Systems
       class MainSystem extends System {

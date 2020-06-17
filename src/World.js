@@ -32,8 +32,8 @@ export class World {
     this.lastTime = now();
   }
 
-  registerComponent(Component) {
-    this.componentsManager.registerComponent(Component);
+  registerComponent(Component, objectPool) {
+    this.componentsManager.registerComponent(Component, objectPool);
     return this;
   }
 

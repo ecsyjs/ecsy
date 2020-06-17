@@ -1,5 +1,5 @@
 import test from "ava";
-import { World, System, Not } from "../../src/index.js";
+import { World, System, Not, Component } from "../../src/index.js";
 import {
   FooComponent,
   BarComponent,
@@ -93,7 +93,10 @@ test("Empty queries", t => {
 test("Queries", t => {
   var world = new World();
 
-  world.registerComponent(FooComponent).registerComponent(BarComponent);
+  world
+    .registerComponent(FooComponent)
+    .registerComponent(BarComponent)
+    .registerComponent(EmptyComponent);
 
   for (var i = 0; i < 15; i++) {
     var entity = world.createEntity();
@@ -145,7 +148,10 @@ test("Queries", t => {
 test("Queries with 'Not' operator", t => {
   var world = new World();
 
-  world.registerComponent(FooComponent).registerComponent(BarComponent);
+  world
+    .registerComponent(FooComponent)
+    .registerComponent(BarComponent)
+    .registerComponent(EmptyComponent);
 
   // 10 Foo
   // 10 Bar
@@ -280,7 +286,10 @@ test("Queries with sync removal", t => {
 test("Queries with deferred removal", t => {
   var world = new World();
 
-  world.registerComponent(FooComponent).registerComponent(BarComponent);
+  world
+    .registerComponent(FooComponent)
+    .registerComponent(BarComponent)
+    .registerComponent(EmptyComponent);
 
   for (var i = 0; i < 6; i++) {
     var entity = world.createEntity();
@@ -744,6 +753,9 @@ test("Queries with 'mandatory' parameter", t => {
 
   // -------
   var world = new World();
+
+  world.registerComponent(FooComponent).registerComponent(BarComponent);
+
   var entity = world.createEntity();
 
   world
@@ -811,8 +823,10 @@ test("Systems without queries", t => {
 test("Systems with component case sensitive", t => {
   var world = new World();
 
-  class A {}
-  class a {}
+  class A extends Component {}
+  class a extends Component {}
+
+  world.registerComponent(A).registerComponent(a);
 
   var counter = { a: 0, A: 0 };
 
@@ -852,9 +866,9 @@ test("Systems with component case sensitive", t => {
 });
 
 test("Components with the the same name in uppercase and lowercase", t => {
-  class B {}
+  class B extends Component {}
 
-  class b {}
+  class b extends Component {}
 
   class S extends System {
     execute() {
@@ -866,6 +880,9 @@ test("Components with the the same name in uppercase and lowercase", t => {
   S.queries = { S: { components: [B, b] } };
 
   const world = new World();
+
+  world.registerComponent(B).registerComponent(b);
+
   world.registerSystem(S);
   world
     .createEntity()
