@@ -1,5 +1,5 @@
 
-# Interface: Options
+# Interface: WorldOptions
 
 ## Indexable
 

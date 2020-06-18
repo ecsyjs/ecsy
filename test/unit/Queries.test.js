@@ -16,6 +16,8 @@ function queriesLength(queries) {
 test("Reactive queries with Not operator", t => {
   var world = new World();
 
+  world.registerComponent(FooComponent).registerComponent(BarComponent);
+
   // System 1
   class SystemTest extends System {
     execute() {}
@@ -123,6 +125,8 @@ test("Reactive queries with Not operator", t => {
 
 test("Entity living just within the frame", t => {
   var world = new World();
+
+  world.registerComponent(FooComponent);
 
   // System 1
   class SystemTest extends System {

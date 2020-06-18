@@ -55,7 +55,7 @@
     "@rollup/plugin-node-resolve": "^8.0.1",
     "ava": "^3.9.0",
     "babel-eslint": "^10.0.3",
-    "benchmarker-js": "0.0.1",
+    "benchmarker-js": "0.0.3",
     "branchsite": "^4.0.3",
     "concurrently": "^4.1.2",
     "docsify-cli": "^4.4.0",

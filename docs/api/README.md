@@ -1,13 +1,102 @@
 
-# ecsy - v0.2.6
+# @ecsy/core - v0.2.6
+
+## Type aliases
+
+###  ComponentProps
+
+Ƭ **ComponentProps**: *P | false*
+
+Base class for components.
+
+___
+
+###  ComponentSchema
+
+Ƭ **ComponentSchema**: *object*
+
+#### Type declaration:
+
+* \[ **propName**: *string*\]: [ComponentSchemaProp](README.md#componentschemaprop)‹any›
+
+___
+
+###  ComponentSchemaProp
+
+Ƭ **ComponentSchemaProp**: *object*
+
+#### Type declaration:
+
+* **default**? : *T*
+
+* **type**: *[PropType](interfaces/proptype.md)‹T›*
+
+___
+
+###  TypeCloneFunction
+
+Ƭ **TypeCloneFunction**: *function*
+
+#### Type declaration:
+
+▸ (`value`: T): *T*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`value` | T |
+
+___
+
+###  TypeCopyFunction
+
+Ƭ **TypeCopyFunction**: *function*
+
+#### Type declaration:
+
+▸ (`src`: T, `dest`: T): *T*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`src` | T |
+`dest` | T |
+
+## Variables
+
+### `Const` Types
+
+• **Types**: *[PropTypes](interfaces/proptypes.md)*
 
 ## Functions
 
 ###  Not
 
-▸ **Not**<**T**>(`Component`: [ComponentConstructor](interfaces/componentconstructor.md)‹T›): *[NotComponent](interfaces/notcomponent.md)*
+▸ **Not**<**P**, **C**>(`Component`: [ComponentConstructor](interfaces/componentconstructor.md)‹P, C›): *[NotComponent](interfaces/notcomponent.md)‹P, C›*
 
 Use the Not class to negate a component query.
+
+**Type parameters:**
+
+▪ **P**
+
+▪ **C**: *[Component](classes/component.md)‹P›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`Component` | [ComponentConstructor](interfaces/componentconstructor.md)‹P, C› |
+
+**Returns:** *[NotComponent](interfaces/notcomponent.md)‹P, C›*
+
+___
+
+###  cloneArray
+
+▸ **cloneArray**<**T**>(`value`: Array‹T›): *Array‹T›*
 
 **Type parameters:**
 
@@ -17,43 +106,148 @@ Use the Not class to negate a component query.
 
 Name | Type |
 ------ | ------ |
-`Component` | [ComponentConstructor](interfaces/componentconstructor.md)‹T› |
+`value` | Array‹T› |
 
-**Returns:** *[NotComponent](interfaces/notcomponent.md)*
+**Returns:** *Array‹T›*
 
 ___
 
-###  createComponentClass
+###  cloneClonable
 
-▸ **createComponentClass**<**T**>(`schema`: object, `name`: string): *[ComponentConstructor](interfaces/componentconstructor.md)‹T›*
-
-Create a component class from a schema.
+▸ **cloneClonable**<**T**>(`value`: T): *T*
 
 **Type parameters:**
 
-▪ **T**: *[Component](classes/component.md)*
+▪ **T**
 
 **Parameters:**
 
-Name | Type | Description |
------- | ------ | ------ |
-`schema` | object | An object that describes the schema of the component |
-`name` | string | The name of the component  |
+Name | Type |
+------ | ------ |
+`value` | T |
 
-**Returns:** *[ComponentConstructor](interfaces/componentconstructor.md)‹T›*
+**Returns:** *T*
+
+___
+
+###  cloneJSON
+
+▸ **cloneJSON**(`value`: any): *any*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`value` | any |
+
+**Returns:** *any*
+
+___
+
+###  cloneValue
+
+▸ **cloneValue**<**T**>(`value`: T): *T*
+
+**Type parameters:**
+
+▪ **T**
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`value` | T |
+
+**Returns:** *T*
+
+___
+
+###  copyArray
+
+▸ **copyArray**<**T**>(`src`: T, `dest`: T): *Array‹T›*
+
+**Type parameters:**
+
+▪ **T**
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`src` | T |
+`dest` | T |
+
+**Returns:** *Array‹T›*
+
+___
+
+###  copyCopyable
+
+▸ **copyCopyable**<**T**>(`src`: T, `dest`: T): *T*
+
+**Type parameters:**
+
+▪ **T**
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`src` | T |
+`dest` | T |
+
+**Returns:** *T*
+
+___
+
+###  copyJSON
+
+▸ **copyJSON**(`src`: any, `dest`: any): *any*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`src` | any |
+`dest` | any |
+
+**Returns:** *any*
+
+___
+
+###  copyValue
+
+▸ **copyValue**<**T**>(`src`: T, `dest`: T): *T*
+
+**Type parameters:**
+
+▪ **T**
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`src` | T |
+`dest` | T |
+
+**Returns:** *T*
 
 ___
 
 ###  createType
 
-▸ **createType**(`typeDefinition`: object): *object*
+▸ **createType**<**T**>(`typeDefinition`: [PropTypeDefinition](interfaces/proptypedefinition.md)‹T›): *[PropType](interfaces/proptype.md)‹T›*
 
 Use createType to create custom type definitions.
+
+**Type parameters:**
+
+▪ **T**
 
 **Parameters:**
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`typeDefinition` | object | An object with create, reset and clear functions for the custom type.  |
+`typeDefinition` | [PropTypeDefinition](interfaces/proptypedefinition.md)‹T› | An object with create, reset and clear functions for the custom type.  |
 
-**Returns:** *object*
+**Returns:** *[PropType](interfaces/proptype.md)‹T›*

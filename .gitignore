@@ -1,7 +1,8 @@
 # Generated files
 lib
 build
- 
+benchmark_result.json
+
 # Logs
 .idea
 .vscode

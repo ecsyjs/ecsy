@@ -1,5 +1,4 @@
-import ObjectPool from "./ObjectPool.js";
-import DummyObjectPool from "./DummyObjectPool.js";
+import { ObjectPool } from "./ObjectPool.js";
 import { componentPropertyName } from "./Utils.js";
 
 export class ComponentManager {
@@ -9,14 +8,38 @@ export class ComponentManager {
     this.numComponents = {};
   }
 
-  registerComponent(Component) {
+  registerComponent(Component, objectPool) {
     if (this.Components[Component.name]) {
       console.warn(`Component type: '${Component.name}' already registered.`);
       return;
     }
 
+    const schema = Component.schema;
+
+    if (!schema) {
+      throw new Error(`Component "${Component.name}" has no schema property.`);
+    }
+
+    for (const propName in schema) {
+      const prop = schema[propName];
+
+      if (!prop.type) {
+        throw new Error(
+          `Invalid schema for component "${Component.name}". Missing type for "${propName}" property.`
+        );
+      }
+    }
+
     this.Components[Component.name] = Component;
     this.numComponents[Component.name] = 0;
+
+    if (objectPool === undefined) {
+      objectPool = new ObjectPool(Component);
+    } else if (objectPool === false) {
+      objectPool = undefined;
+    }
+
+    this._componentPool[Component.name] = objectPool;
   }
 
   componentAddedToEntity(Component) {
@@ -33,18 +56,6 @@ export class ComponentManager {
 
   getComponentsPool(Component) {
     var componentName = componentPropertyName(Component);
-
-    if (!this._componentPool[componentName]) {
-      if (Component.prototype.reset) {
-        this._componentPool[componentName] = new ObjectPool(Component);
-      } else {
-        console.warn(
-          `Component '${Component.name}' won't benefit from pooling because 'reset' method was not implemented.`
-        );
-        this._componentPool[componentName] = new DummyObjectPool(Component);
-      }
-    }
-
     return this._componentPool[componentName];
   }
 }

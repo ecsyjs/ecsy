@@ -1,71 +1,46 @@
-import { TagComponent } from "../../../build/ecsy.module.js";
+import { TagComponent, Component, Types } from "../../../build/ecsy.module.js";
 
 export class Collidable extends TagComponent {}
 export class Collider extends TagComponent {}
 export class Recovering extends TagComponent {}
 export class Moving extends TagComponent {}
 
-export class PulsatingScale {
-  constructor() {
-    this.offset = 0;
-  }
-  reset() {
-    this.offset = 0;
-  }
-}
+export class PulsatingScale extends Component {}
 
-export class Object3D {
-  constructor() {
-    this.object = null;
-  }
-  reset() {
-    this.object = null;
-  }
-}
+PulsatingScale.schema = {
+  offset: { type: Types.Number, default: 0 }
+};
 
-export class Timeout {
-  constructor() {
-    this.timer = 0;
-    this.addComponents = [];
-    this.removeComponents = [];
-  }
+export class Object3D extends Component {}
 
-  reset() {
-    this.timer = 0;
-    this.addComponents.length = 0;
-    this.removeComponents.length = 0;
-  }
-}
+Object3D.schema = {
+  object: { type: Types.Object }
+};
 
-export class PulsatingColor {
-  constructor() {
-    this.offset = 0;
-  }
+export class Timeout extends Component {}
 
-  reset() {
-    this.offset = 0;
-  }
-}
+Timeout.schema = {
+  timer: { type: Types.Number },
+  addComponents: { type: Types.Array },
+  removeComponents: { type: Types.Array }
+};
 
-export class Colliding {
-  constructor() {
-    this.value = false;
-  }
-  reset() {
-    this.value = false;
-  }
-}
+export class PulsatingColor extends Component {}
 
-export class Rotating {
-  constructor() {
-    this.enabled = true;
-    this.rotatingSpeed = 0;
-    this.decreasingSpeed = 0.001;
-  }
+PulsatingColor.schema = {
+  offset: { type: Types.Number }
+};
 
-  reset() {
-    this.enabled = true;
-    this.rotatingSpeed = 0;
-    this.decreasingSpeed = 0.001;
-  }
-}
+export class Colliding extends Component {}
+
+Colliding.schema = {
+  value: { type: Types.Boolean }
+};
+
+export class Rotating extends Component {}
+
+Rotating.schema = {
+  enabled: { type: Types.Boolean },
+  rotatingSpeed: { type: Types.Number },
+  decreasingSpeed: { type: Types.Number, default: 0.001 }
+};
