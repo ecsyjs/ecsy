@@ -1,6 +1,6 @@
 import { Component } from "./Component";
 
-export type TypeCopyFunction<T> = (src: Component<any>, dest: Component<any>, key: string) => T;
+export type TypeCopyFunction<T> = (src: T, dest: T) => T;
 export type TypeCloneFunction<T> = (value: T) => T;
 
 export interface PropTypeDefinition<T> {
@@ -25,16 +25,16 @@ export interface PropTypes {
 
 export const Types: PropTypes;
 
-export function copyValue<T>(src: Component<any>, dest: Component<any>, key: string): T;
+export function copyValue<T>(src: T, dest: T): T;
 export function cloneValue<T>(value: T): T;
 
-export function copyArray<T>(src: Component<any>, dest: Component<any>, key: string): Array<T>;
+export function copyArray<T>(src: T, dest: T): Array<T>;
 export function cloneArray<T>(value: Array<T>): Array<T>;
 
-export function copyJSON(src: Component<any>, dest: Component<any>, key: string): any;
+export function copyJSON(src: any, dest: any): any;
 export function cloneJSON(value: any): any;
 
-export function copyCopyable<T>(src: Component<any>, dest: Component<any>, key: string): T;
+export function copyCopyable<T>(src: T, dest: T): T;
 export function cloneClonable<T>(value: T): T;
 
 /**

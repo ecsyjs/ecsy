@@ -55,15 +55,14 @@ ___
 
 #### Type declaration:
 
-▸ (`src`: [Component](classes/component.md)‹any›, `dest`: [Component](classes/component.md)‹any›, `key`: string): *T*
+▸ (`src`: T, `dest`: T): *T*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`src` | [Component](classes/component.md)‹any› |
-`dest` | [Component](classes/component.md)‹any› |
-`key` | string |
+`src` | T |
+`dest` | T |
 
 ## Variables
 
@@ -165,7 +164,7 @@ ___
 
 ###  copyArray
 
-▸ **copyArray**<**T**>(`src`: [Component](classes/component.md)‹any›, `dest`: [Component](classes/component.md)‹any›, `key`: string): *Array‹T›*
+▸ **copyArray**<**T**>(`src`: T, `dest`: T): *Array‹T›*
 
 **Type parameters:**
 
@@ -175,9 +174,8 @@ ___
 
 Name | Type |
 ------ | ------ |
-`src` | [Component](classes/component.md)‹any› |
-`dest` | [Component](classes/component.md)‹any› |
-`key` | string |
+`src` | T |
+`dest` | T |
 
 **Returns:** *Array‹T›*
 
@@ -185,7 +183,7 @@ ___
 
 ###  copyCopyable
 
-▸ **copyCopyable**<**T**>(`src`: [Component](classes/component.md)‹any›, `dest`: [Component](classes/component.md)‹any›, `key`: string): *T*
+▸ **copyCopyable**<**T**>(`src`: T, `dest`: T): *T*
 
 **Type parameters:**
 
@@ -195,9 +193,8 @@ ___
 
 Name | Type |
 ------ | ------ |
-`src` | [Component](classes/component.md)‹any› |
-`dest` | [Component](classes/component.md)‹any› |
-`key` | string |
+`src` | T |
+`dest` | T |
 
 **Returns:** *T*
 
@@ -205,15 +202,14 @@ ___
 
 ###  copyJSON
 
-▸ **copyJSON**(`src`: [Component](classes/component.md)‹any›, `dest`: [Component](classes/component.md)‹any›, `key`: string): *any*
+▸ **copyJSON**(`src`: any, `dest`: any): *any*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`src` | [Component](classes/component.md)‹any› |
-`dest` | [Component](classes/component.md)‹any› |
-`key` | string |
+`src` | any |
+`dest` | any |
 
 **Returns:** *any*
 
@@ -221,7 +217,7 @@ ___
 
 ###  copyValue
 
-▸ **copyValue**<**T**>(`src`: [Component](classes/component.md)‹any›, `dest`: [Component](classes/component.md)‹any›, `key`: string): *T*
+▸ **copyValue**<**T**>(`src`: T, `dest`: T): *T*
 
 **Type parameters:**
 
@@ -231,9 +227,8 @@ ___
 
 Name | Type |
 ------ | ------ |
-`src` | [Component](classes/component.md)‹any› |
-`dest` | [Component](classes/component.md)‹any› |
-`key` | string |
+`src` | T |
+`dest` | T |
 
 **Returns:** *T*
 
