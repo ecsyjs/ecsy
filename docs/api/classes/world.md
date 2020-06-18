@@ -147,3 +147,19 @@ ___
 Stop execution of this world.
 
 **Returns:** *void*
+
+___
+
+###  unregisterSystem
+
+▸ **unregisterSystem**(`System`: [SystemConstructor](../interfaces/systemconstructor.md)‹any›): *this*
+
+Unregister a system.
+
+**Parameters:**
+
+Name | Type | Description |
+------ | ------ | ------ |
+`System` | [SystemConstructor](../interfaces/systemconstructor.md)‹any› | Type of system to unregister  |
+
+**Returns:** *this*
