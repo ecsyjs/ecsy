@@ -18,6 +18,18 @@ export default [
         format: "es",
         file: "build/ecsy.module.js",
         indent: "\t"
+      },
+      {
+        format: "umd",
+        name: "ECSY",
+        noConflict: true,
+        file: "site/build/ecsy.js",
+        indent: "\t"
+      },
+      {
+        format: "es",
+        file: "site/build/ecsy.module.js",
+        indent: "\t"
       }
     ]
   },
@@ -38,6 +50,20 @@ export default [
         file: "build/ecsy.module.min.js",
         indent: "\t",
         sourcemap: true
+      },
+      {
+        format: "umd",
+        name: "ECSY",
+        noConflict: true,
+        file: "site/build/ecsy.min.js",
+        indent: "\t",
+        sourcemap: true
+      },
+      {
+        format: "es",
+        file: "site/build/ecsy.module.min.js",
+        indent: "\t",
+        sourcemap: true
       }
     ]
   },
@@ -47,7 +73,7 @@ export default [
     output: [
       {
         format: "es",
-        file: "build/benchmarks.module.js",
+        file: "site/benchmarks/benchmarks.module.js",
         indent: "\t"
       }
     ]
