@@ -66,13 +66,13 @@ This needs to be user defined.
 
 * \[ **queryName**: *string*\]: object
 
-* **components**: *[Component](component.md)‹› | [NotComponent](../interfaces/notcomponent.md) | [TagComponent](tagcomponent.md)‹›[]*
+* **components**: *[ComponentConstructor](../interfaces/componentconstructor.md)‹any, any› | [NotComponent](../interfaces/notcomponent.md)‹any, any›[]*
 
 * **listen**(): *object*
 
   * **added**? : *boolean*
 
-  * **changed**? : *boolean | [Component](component.md)[]*
+  * **changed**? : *boolean | [Component](component.md)‹any›[]*
 
   * **removed**? : *boolean*
 

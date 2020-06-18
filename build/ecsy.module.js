@@ -555,25 +555,11 @@ class SystemManager {
 
 class ObjectPool {
   // @todo Add initial size
-  constructor(T, initialSize) {
+  constructor(baseObject, initialSize) {
     this.freeList = [];
     this.count = 0;
-    this.T = T;
+    this.baseObject = baseObject;
     this.isObjectPool = true;
-
-    var extraArgs = null;
-    if (arguments.length > 1) {
-      extraArgs = Array.prototype.slice.call(arguments);
-      extraArgs.shift();
-    }
-
-    this.createElement = extraArgs
-      ? () => {
-          return new T(...extraArgs);
-        }
-      : () => {
-          return new T();
-        };
 
     if (typeof initialSize !== "undefined") {
       this.expand(initialSize);
@@ -598,7 +584,9 @@ class ObjectPool {
 
   expand(count) {
     for (var n = 0; n < count; n++) {
-      this.freeList.push(this.createElement());
+      var clone = new this.baseObject();
+      clone._pool = this;
+      this.freeList.push(clone);
     }
     this.count += count;
   }
@@ -726,9 +714,95 @@ class QueryManager {
   }
 }
 
-class SystemStateComponent {}
+class Component {
+  constructor(props) {
+    if (props !== false) {
+      const schema = this.constructor.schema;
+
+      for (const key in schema) {
+        if (props && props.hasOwnProperty(key)) {
+          this[key] = props[key];
+        } else {
+          const schemaProp = schema[key];
+          if (schemaProp.hasOwnProperty("default")) {
+            this[key] = schemaProp.type.clone(schemaProp.default);
+          } else {
+            const type = schemaProp.type;
+            this[key] = type.clone(type.default);
+          }
+        }
+      }
+    }
+
+    this._pool = null;
+  }
+
+  copy(source) {
+    const schema = this.constructor.schema;
+
+    for (const key in schema) {
+      const prop = schema[key];
+
+      if (source.hasOwnProperty(key)) {
+        prop.type.copy(source, this, key);
+      }
+    }
+
+    return this;
+  }
+
+  clone() {
+    return new this.constructor().copy(this);
+  }
+
+  reset() {
+    const schema = this.constructor.schema;
+
+    for (const key in schema) {
+      const schemaProp = schema[key];
+
+      if (schemaProp.hasOwnProperty("default")) {
+        this[key] = schemaProp.type.clone(schemaProp.default);
+      } else {
+        const type = schemaProp.type;
+        this[key] = type.clone(type.default);
+      }
+    }
+  }
+
+  dispose() {
+    if (this._pool) {
+      this._pool.release(this);
+    }
+  }
+}
+
+Component.schema = {};
+Component.isComponent = true;
+
+class SystemStateComponent extends Component {}
 
 SystemStateComponent.isSystemStateComponent = true;
+
+class EntityPool extends ObjectPool {
+  constructor(entityManager, entityClass, initialSize) {
+    super(entityClass, undefined);
+    this.entityManager = entityManager;
+
+    if (typeof initialSize !== "undefined") {
+      this.expand(initialSize);
+    }
+  }
+
+  expand(count) {
+    for (var n = 0; n < count; n++) {
+      var clone = new this.baseObject(this.entityManager);
+      clone._pool = this;
+      this.freeList.push(clone);
+    }
+    this.count += count;
+  }
+}
 
 /**
  * @private
@@ -741,12 +815,14 @@ class EntityManager {
 
     // All the entities in this instance
     this._entities = [];
+    this._nextEntityId = 0;
 
     this._entitiesByNames = {};
 
     this._queryManager = new QueryManager(this);
     this.eventDispatcher = new EventDispatcher();
-    this._entityPool = new ObjectPool(
+    this._entityPool = new EntityPool(
+      this,
       this.world.options.entityClass,
       this.world.options.entityPoolSize
     );
@@ -776,7 +852,6 @@ class EntityManager {
       }
     }
 
-    entity._world = this;
     this._entities.push(entity);
     this.eventDispatcher.dispatchEvent(ENTITY_CREATED, entity);
     return entity;
@@ -791,6 +866,12 @@ class EntityManager {
    * @param {Object} values Optional values to replace the default attributes
    */
   entityAddComponent(entity, Component, values) {
+    if (!this.world.componentsManager.Components[Component.name]) {
+      throw new Error(
+        `Attempted to add unregistered component "${Component.name}"`
+      );
+    }
+
     if (~entity._ComponentTypes.indexOf(Component)) {
       // @todo Just on debug mode
       console.warn(
@@ -810,19 +891,16 @@ class EntityManager {
     var componentPool = this.world.componentsManager.getComponentsPool(
       Component
     );
-    var component = componentPool.acquire();
+
+    var component = componentPool
+      ? componentPool.acquire()
+      : new Component(values);
+
+    if (componentPool && values) {
+      component.copy(values);
+    }
 
     entity._components[Component.name] = component;
-
-    if (values) {
-      if (component.copy) {
-        component.copy(values);
-      } else {
-        for (var name in values) {
-          component[name] = values[name];
-        }
-      }
-    }
 
     this._queryManager.onEntityComponentAdded(entity, Component);
     this.world.componentsManager.componentAddedToEntity(Component);
@@ -873,11 +951,10 @@ class EntityManager {
   _entityRemoveComponentSync(entity, Component, index) {
     // Remove T listing on entity and property ref, then free the component.
     entity._ComponentTypes.splice(index, 1);
-    var propName = componentPropertyName(Component);
     var componentName = getName(Component);
     var component = entity._components[componentName];
     delete entity._components[componentName];
-    this.componentsManager._componentPool[propName].release(component);
+    component.dispose();
     this.world.componentsManager.componentRemovedFromEntity(Component);
   }
 
@@ -926,10 +1003,7 @@ class EntityManager {
     if (this._entitiesByNames[entity.name]) {
       delete this._entitiesByNames[entity.name];
     }
-
-    // Prevent any access and free
-    entity._world = null;
-    this._entityPool.release(entity);
+    entity._pool.release(entity);
   }
 
   /**
@@ -958,11 +1032,10 @@ class EntityManager {
       while (entity._ComponentTypesToRemove.length > 0) {
         let Component = entity._ComponentTypesToRemove.pop();
 
-        var propName = componentPropertyName(Component);
         var componentName = getName(Component);
         var component = entity._componentsToRemove[componentName];
         delete entity._componentsToRemove[componentName];
-        this.componentsManager._componentPool[propName].release(component);
+        component.dispose();
         this.world.componentsManager.componentRemovedFromEntity(Component);
 
         //this._entityRemoveComponentSync(entity, Component, index);
@@ -1020,37 +1093,6 @@ const ENTITY_REMOVED = "EntityManager#ENTITY_REMOVED";
 const COMPONENT_ADDED = "EntityManager#COMPONENT_ADDED";
 const COMPONENT_REMOVE = "EntityManager#COMPONENT_REMOVE";
 
-class DummyObjectPool {
-  constructor(T) {
-    this.isDummyObjectPool = true;
-    this.count = 0;
-    this.used = 0;
-    this.T = T;
-  }
-
-  acquire() {
-    this.used++;
-    this.count++;
-    return new this.T();
-  }
-
-  release() {
-    this.used--;
-  }
-
-  totalSize() {
-    return this.count;
-  }
-
-  totalFree() {
-    return Infinity;
-  }
-
-  totalUsed() {
-    return this.used;
-  }
-}
-
 class ComponentManager {
   constructor() {
     this.Components = {};
@@ -1058,14 +1100,38 @@ class ComponentManager {
     this.numComponents = {};
   }
 
-  registerComponent(Component) {
+  registerComponent(Component, objectPool) {
     if (this.Components[Component.name]) {
       console.warn(`Component type: '${Component.name}' already registered.`);
       return;
     }
 
+    const schema = Component.schema;
+
+    if (!schema) {
+      throw new Error(`Component "${Component.name}" has no schema property.`);
+    }
+
+    for (const propName in schema) {
+      const prop = schema[propName];
+
+      if (!prop.type) {
+        throw new Error(
+          `Invalid schema for component "${Component.name}". Missing type for "${propName}" property.`
+        );
+      }
+    }
+
     this.Components[Component.name] = Component;
     this.numComponents[Component.name] = 0;
+
+    if (objectPool === undefined) {
+      objectPool = new ObjectPool(Component);
+    } else if (objectPool === false) {
+      objectPool = undefined;
+    }
+
+    this._componentPool[Component.name] = objectPool;
   }
 
   componentAddedToEntity(Component) {
@@ -1082,24 +1148,12 @@ class ComponentManager {
 
   getComponentsPool(Component) {
     var componentName = componentPropertyName(Component);
-
-    if (!this._componentPool[componentName]) {
-      if (Component.prototype.reset) {
-        this._componentPool[componentName] = new ObjectPool(Component);
-      } else {
-        console.warn(
-          `Component '${Component.name}' won't benefit from pooling because 'reset' method was not implemented.`
-        );
-        this._componentPool[componentName] = new DummyObjectPool(Component);
-      }
-    }
-
     return this._componentPool[componentName];
   }
 }
 
 var name = "ecsy";
-var version = "0.2.5";
+var version = "0.2.6";
 var description = "Entity Component System in JS";
 var main = "build/ecsy.js";
 var module = "build/ecsy.module.js";
@@ -1112,6 +1166,7 @@ var scripts = {
 	"dev:server": "http-server -c-1 -p 8080 --cors",
 	lint: "eslint src test examples",
 	start: "npm run dev",
+	benchmarks: "node -r esm --expose-gc benchmarks/index.js",
 	test: "ava",
 	travis: "npm run lint && npm run test && npm run build",
 	"watch:test": "ava --watch"
@@ -1160,6 +1215,7 @@ var devDependencies = {
 	"babel-core": "^6.26.3",
 	"babel-eslint": "^10.0.3",
 	"babel-loader": "^8.0.6",
+	"benchmarker-js": "0.0.3",
 	concurrently: "^4.1.2",
 	"docsify-cli": "^4.4.0",
 	eslint: "^5.16.0",
@@ -1197,14 +1253,12 @@ var pjson = {
 
 const Version = pjson.version;
 
-var nextId = 0;
-
 class Entity {
-  constructor(world) {
-    this._world = world || null;
+  constructor(entityManager) {
+    this._entityManager = entityManager || null;
 
     // Unique ID for this entity
-    this.id = nextId++;
+    this.id = entityManager._nextEntityId++;
 
     // List of components types the entity has
     this._ComponentTypes = [];
@@ -1272,12 +1326,12 @@ class Entity {
   }
 
   addComponent(Component, values) {
-    this._world.entityAddComponent(this, Component, values);
+    this._entityManager.entityAddComponent(this, Component, values);
     return this;
   }
 
   removeComponent(Component, forceImmediate) {
-    this._world.entityRemoveComponent(this, Component, forceImmediate);
+    this._entityManager.entityRemoveComponent(this, Component, forceImmediate);
     return this;
   }
 
@@ -1307,22 +1361,37 @@ class Entity {
   }
 
   removeAllComponents(forceImmediate) {
-    return this._world.entityRemoveAllComponents(this, forceImmediate);
+    return this._entityManager.entityRemoveAllComponents(this, forceImmediate);
   }
 
-  // EXTRAS
+  copy(src) {
+    // TODO: This can definitely be optimized
+    for (var componentName in src._components) {
+      var srcComponent = src._components[componentName];
+      this.addComponent(srcComponent.constructor);
+      var component = this.getComponent(srcComponent.constructor);
+      component.copy(srcComponent);
+    }
 
-  // Initialize the entity. To be used when returning an entity to the pool
+    return this;
+  }
+
+  clone() {
+    return new Entity(this._entityManager).copy(this);
+  }
+
   reset() {
-    this.id = nextId++;
-    this._world = null;
+    this.id = this._entityManager._nextEntityId++;
     this._ComponentTypes.length = 0;
     this.queries.length = 0;
-    this._components = {};
+
+    for (var componentName in this.components) {
+      delete this._components[componentName];
+    }
   }
 
   remove(forceImmediate) {
-    return this._world.removeEntity(this, forceImmediate);
+    return this._entityManager.removeEntity(this, forceImmediate);
   }
 }
 
@@ -1353,8 +1422,8 @@ class World {
     this.lastTime = now();
   }
 
-  registerComponent(Component) {
-    this.componentsManager.registerComponent(Component);
+  registerComponent(Component, objectPool) {
+    this.componentsManager.registerComponent(Component, objectPool);
     return this;
   }
 
@@ -1411,245 +1480,108 @@ class World {
   }
 }
 
-class Component {}
-
-Component.isComponent = true;
-
-class TagComponent {
-  reset() {}
+class TagComponent extends Component {
+  constructor() {
+    super(false);
+  }
 }
 
 TagComponent.isTagComponent = true;
 
-function createType(typeDefinition) {
-  var mandatoryFunctions = [
-    "create",
-    "reset",
-    "clear"
-    /*"copy"*/
-  ];
+const copyValue = (src, dest, key) => (dest[key] = src[key]);
 
-  var undefinedFunctions = mandatoryFunctions.filter(f => {
-    return !typeDefinition[f];
+const cloneValue = src => src;
+
+const copyArray = (src, dest, key) => {
+  const srcArray = src[key];
+  const destArray = dest[key];
+
+  destArray.length = 0;
+
+  for (let i = 0; i < srcArray.length; i++) {
+    destArray.push(srcArray[i]);
+  }
+
+  return destArray;
+};
+
+const cloneArray = src => src.slice();
+
+const copyJSON = (src, dest, key) =>
+  (dest[key] = JSON.parse(JSON.stringify(src[key])));
+
+const cloneJSON = src => JSON.parse(JSON.stringify(src));
+
+const copyCopyable = (src, dest, key) => dest[key].copy(src[key]);
+
+const cloneClonable = src => src.clone();
+
+function createType(typeDefinition) {
+  var mandatoryProperties = ["name", "default", "copy", "clone"];
+
+  var undefinedProperties = mandatoryProperties.filter(p => {
+    return !typeDefinition.hasOwnProperty(p);
   });
 
-  if (undefinedFunctions.length > 0) {
+  if (undefinedProperties.length > 0) {
     throw new Error(
-      `createType expect type definition to implements the following functions: ${undefinedFunctions.join(
+      `createType expects a type definition with the following properties: ${undefinedProperties.join(
         ", "
       )}`
     );
   }
 
   typeDefinition.isType = true;
+
   return typeDefinition;
 }
 
 /**
  * Standard types
  */
-var Types = {};
+const Types = {
+  Number: createType({
+    name: "Number",
+    default: 0,
+    copy: copyValue,
+    clone: cloneValue
+  }),
 
-Types.Number = createType({
-  baseType: Number,
-  isSimpleType: true,
-  create: defaultValue => {
-    return typeof defaultValue !== "undefined" ? defaultValue : 0;
-  },
-  reset: (src, key, defaultValue) => {
-    if (typeof defaultValue !== "undefined") {
-      src[key] = defaultValue;
-    } else {
-      src[key] = 0;
-    }
-  },
-  clear: (src, key) => {
-    src[key] = 0;
-  }
-});
+  Boolean: createType({
+    name: "Boolean",
+    default: false,
+    copy: copyValue,
+    clone: cloneValue
+  }),
 
-Types.Boolean = createType({
-  baseType: Boolean,
-  isSimpleType: true,
-  create: defaultValue => {
-    return typeof defaultValue !== "undefined" ? defaultValue : false;
-  },
-  reset: (src, key, defaultValue) => {
-    if (typeof defaultValue !== "undefined") {
-      src[key] = defaultValue;
-    } else {
-      src[key] = false;
-    }
-  },
-  clear: (src, key) => {
-    src[key] = false;
-  }
-});
+  String: createType({
+    name: "String",
+    default: "",
+    copy: copyValue,
+    clone: cloneValue
+  }),
 
-Types.String = createType({
-  baseType: String,
-  isSimpleType: true,
-  create: defaultValue => {
-    return typeof defaultValue !== "undefined" ? defaultValue : "";
-  },
-  reset: (src, key, defaultValue) => {
-    if (typeof defaultValue !== "undefined") {
-      src[key] = defaultValue;
-    } else {
-      src[key] = "";
-    }
-  },
-  clear: (src, key) => {
-    src[key] = "";
-  }
-});
+  Array: createType({
+    name: "Array",
+    default: [],
+    copy: copyArray,
+    clone: cloneArray
+  }),
 
-Types.Array = createType({
-  baseType: Array,
-  create: defaultValue => {
-    if (typeof defaultValue !== "undefined") {
-      return defaultValue.slice();
-    }
+  Object: createType({
+    name: "Object",
+    default: undefined,
+    copy: copyValue,
+    clone: cloneValue
+  }),
 
-    return [];
-  },
-  reset: (src, key, defaultValue) => {
-    if (typeof defaultValue !== "undefined") {
-      src[key] = defaultValue.slice();
-    } else {
-      src[key].length = 0;
-    }
-  },
-  clear: (src, key) => {
-    src[key].length = 0;
-  },
-  copy: (src, dst, key) => {
-    src[key] = dst[key].slice();
-  }
-});
-
-var standardTypes = {
-  number: Types.Number,
-  boolean: Types.Boolean,
-  string: Types.String
+  JSON: createType({
+    name: "JSON",
+    default: null,
+    copy: copyJSON,
+    clone: cloneJSON
+  })
 };
-
-/**
- * Try to infer the type of the value
- * @param {*} value
- * @return {String} Type of the attribute
- * @private
- */
-function inferType(value) {
-  if (Array.isArray(value)) {
-    return Types.Array;
-  }
-
-  if (standardTypes[typeof value]) {
-    return standardTypes[typeof value];
-  } else {
-    return null;
-  }
-}
-
-function createComponentClass(schema, name) {
-  //var Component = new Function(`return function ${name}() {}`)();
-  for (let key in schema) {
-    let type = schema[key].type;
-    if (!type) {
-      schema[key].type = inferType(schema[key].default);
-    }
-  }
-
-  var Component = function() {
-    for (let key in schema) {
-      var attr = schema[key];
-      let type = attr.type;
-      if (type && type.isType) {
-        this[key] = type.create(attr.default);
-      } else {
-        this[key] = attr.default;
-      }
-    }
-  };
-
-  if (typeof name !== "undefined") {
-    Object.defineProperty(Component, "name", { value: name });
-  }
-
-  Component.prototype.schema = schema;
-
-  var knownTypes = true;
-  for (let key in schema) {
-    var attr = schema[key];
-    if (!attr.type) {
-      attr.type = inferType(attr.default);
-    }
-
-    var type = attr.type;
-    if (!type) {
-      console.warn(`Unknown type definition for attribute '${key}'`);
-      knownTypes = false;
-    }
-  }
-
-  if (!knownTypes) {
-    console.warn(
-      `This component can't use pooling because some data types are not registered. Please provide a type created with 'createType'`
-    );
-
-    for (var key in schema) {
-      let attr = schema[key];
-      Component.prototype[key] = attr.default;
-    }
-  } else {
-    Component.prototype.copy = function(src) {
-      for (let key in schema) {
-        if (src[key]) {
-          let type = schema[key].type;
-          if (type.isSimpleType) {
-            this[key] = src[key];
-          } else if (type.copy) {
-            type.copy(this, src, key);
-          } else {
-            // @todo Detect that it's not possible to copy all the attributes
-            // and just avoid creating the copy function
-            console.warn(
-              `Unknown copy function for attribute '${key}' data type`
-            );
-          }
-        }
-      }
-    };
-
-    Component.prototype.reset = function() {
-      for (let key in schema) {
-        let attr = schema[key];
-        let type = attr.type;
-        if (type.reset) type.reset(this, key, attr.default);
-      }
-    };
-
-    Component.prototype.clear = function() {
-      for (let key in schema) {
-        let type = schema[key].type;
-        if (type.clear) type.clear(this, key);
-      }
-    };
-
-    for (let key in schema) {
-      let attr = schema[key];
-      let type = attr.type;
-      Component.prototype[key] = attr.default;
-
-      if (type.reset) {
-        type.reset(Component.prototype, key, attr.default);
-      }
-    }
-  }
-
-  return Component;
-}
 
 function generateId(length) {
   var result = "";
@@ -1823,4 +1755,4 @@ if (hasWindow) {
   }
 }
 
-export { Component, Not, System, SystemStateComponent, TagComponent, Types, Version, World, Entity as _Entity, createComponentClass, createType, enableRemoteDevtools };
+export { Component, Not, ObjectPool, System, SystemStateComponent, TagComponent, Types, Version, World, Entity as _Entity, cloneArray, cloneClonable, cloneJSON, cloneValue, copyArray, copyCopyable, copyJSON, copyValue, createType, enableRemoteDevtools };
