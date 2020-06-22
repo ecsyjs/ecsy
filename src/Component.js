@@ -32,6 +32,16 @@ export class Component {
       }
     }
 
+    // @todo DEBUG
+    // Check that the attributes defined in source are also defined in the schema
+    Object.keys(source).forEach(srcKey => {
+      if (!schema.hasOwnProperty(srcKey)) {
+        console.warn(
+          `Trying to set attribute '${srcKey}' not defined in the '${this.constructor.name}' schema.`
+        );
+      }
+    });
+
     return this;
   }
 
