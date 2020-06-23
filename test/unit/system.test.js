@@ -929,5 +929,5 @@ test("Register a system that does not extend System", t => {
     world.registerSystem(SystemA);
   });
 
-  t.is(error.message, "System 'SystemA' does not extends 'System' class");
+  t.is(error.message, "System 'SystemA' does not extend 'System' class");
 });

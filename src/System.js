@@ -221,6 +221,8 @@ export class System {
   }
 }
 
+System.isSystem = true;
+
 export function Not(Component) {
   return {
     operator: "not",

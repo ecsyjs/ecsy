@@ -9,14 +9,12 @@ export class SystemManager {
   }
 
   registerSystem(SystemClass, attributes) {
-    // @fixme Break by bundlers
-    /*
-    if (!(SystemClass.prototype instanceof System)) {
+    if (!SystemClass.isSystem) {
       throw new Error(
-        `System '${SystemClass.name}' does not extends 'System' class`
+        `System '${SystemClass.name}' does not extend 'System' class`
       );
     }
-    */
+
     if (this.getSystem(SystemClass) !== undefined) {
       console.warn(`System '${SystemClass.name}' already registered.`);
       return this;
