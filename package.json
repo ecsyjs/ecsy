@@ -1,5 +1,5 @@
 {
-  "name": "@ecsy/core",
+  "name": "ecsy",
   "version": "0.2.6",
   "description": "Entity Component System in JS",
   "main": "lib/index.js",
