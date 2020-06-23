@@ -2,6 +2,7 @@
 lib
 build
 site/build/
+site/docs/README.md
 site/docs/api/
 site/benchmarks/benchmarks.module.js
 benchmark_result.json
