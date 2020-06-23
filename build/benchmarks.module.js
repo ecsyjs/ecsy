@@ -1,3 +1,199 @@
+class PerfStats {
+  constructor() {
+    this.n = 0;
+    this.min = Number.MAX_VALUE;
+    this.max = -Number.MAX_VALUE;
+    this.sum = 0;
+    this.mean = 0;
+    this.q = 0;
+  }
+
+  get variance() {
+    return this.q / this.n;
+  }
+
+  get standard_deviation() {
+    return Math.sqrt(this.q / this.n);
+  }
+
+  update(value) {
+    var num = parseFloat(value);
+    if (isNaN(num)) {
+      // Sorry, no NaNs
+      return;
+    }
+    this.n++;
+    this.min = Math.min(this.min, num);
+    this.max = Math.max(this.max, num);
+    this.sum += num;
+    const prevMean = this.mean;
+    this.mean = this.mean + (num - this.mean) / this.n;
+    this.q = this.q + (num - prevMean) * (num - this.mean);
+  }
+
+  getAll() {
+    return {
+      n: this.n,
+      min: this.min,
+      max: this.max,
+      sum: this.sum,
+      mean: this.mean,
+      variance: this.variance,
+      standard_deviation: this.standard_deviation
+    };
+  }  
+}
+
+var chalk = require('chalk');
+const { printTable } = require('console-table-printer');
+
+const Table = require("tty-table");
+
+const DEFAULT_GLOBAL_OPTIONS = {
+  verbose: false,
+  summary: true,
+  iterations: 10
+};
+
+const log = console.log;
+
+const DEFAULT_OPTIONS = {
+  gc: true
+};
+
+class Benchmarks {
+  constructor(globalOptions, benchDefaultOptions) {
+    this.benchs = [];
+    this.benchsByGroup = {
+      nogroup: []
+    };
+    this.currentGroup = this.benchsByGroup.nogroup;
+
+    this.options = Object.assign(DEFAULT_GLOBAL_OPTIONS, globalOptions);
+    this.benchDefaultOptions = Object.assign(DEFAULT_OPTIONS, benchDefaultOptions);
+  }
+
+  add(bench) {
+    if (!bench.options) {
+      bench.options = this.benchDefaultOptions;
+    } else {
+      bench.options = Object.assign(this.benchDefaultOptions, bench.options);
+    }
+
+    if (!bench.iterations) {
+      bench.iterations = this.options.iterations;
+    }
+
+    this.benchs.push(bench);
+    this.currentGroup.push(bench);
+
+    return this;
+  }
+
+  getReport(format = "json") {
+    let groups = [];
+    let json = {
+      groups: groups,
+      meanAll: 0,
+      sumAll: 0
+    };
+
+    Object.entries(this.benchsByGroup).forEach(([groupName, benchmarks]) => {
+      if (benchmarks.length === 0) {
+        return;
+      }
+
+      let group = {
+        groupName: groupName,
+        benchmarks: [],
+        meanAll: 0,
+        sumAll: 0
+      };
+
+      groups.push(group);
+
+      benchmarks.forEach(bench => {
+        const stats = bench.stats.getAll();
+        let current = {
+          name: bench.name,
+          stats: {}
+        };
+        group.benchmarks.push(current);
+        Object.entries(stats).forEach(([key, value]) => {
+          current.stats[key] = value;
+        });
+
+        group.meanAll += stats.mean;
+        group.sumAll += stats.sum;
+      });
+
+      json.meanAll += group.meanAll;
+      json.sumAll += group.sumAll;
+    });
+    return json;
+  }
+
+  group(name) {
+    if (!this.benchsByGroup[name]) {
+      this.benchsByGroup[name] = [];
+    }
+
+    this.currentGroup = this.benchsByGroup[name];
+
+    return this;
+  }
+
+  run() {
+    this.benchs.forEach(bench => {
+      bench.stats = new PerfStats();
+      let context = {};
+      if (bench.prepareGlobal) {
+        bench.prepareGlobal(context);
+      }
+
+      for (let i = 0; i < bench.iterations; i++) {
+        if (bench.prepare) {
+          bench.prepare(context);
+        }
+
+        let t0 = Date.now();
+        bench.execute(context);
+        let total = Date.now() - t0;
+        bench.stats.update(total);
+
+        // @todo Logging options
+        if (this.options.verbose) {
+          log(
+            `${bench.name} ${(i + 1).toString().padStart(2)}/${
+              bench.iterations
+            }: ${total}ms`
+          );
+          //  heapUsed: ${process.memoryUsage().heapUsed}
+        }
+
+        if (bench.options.gc) {
+          global.gc();
+        }
+      }
+
+      if (this.options.summary || this.options.verbose) {
+        let title = `${bench.name} - ${bench.iterations} iterations`;
+        const len = title.length;
+        log(
+          `${"-".repeat(len)}\n${title}\n${"-".repeat(len)}`
+        );
+        const values = bench.stats.getAll();
+        Object.entries(values).forEach(([key, value]) => {
+          if (key !== "n") {
+            console.log(`- ${key}: ${value.toFixed(2)}`);
+          }
+        });
+        console.log('\n');
+      }
+    });
+  }
+}
+
 /**
  * Return the name of a component
  * @param {Component} Component
@@ -1188,14 +1384,14 @@ class Entity {
   }
 }
 
-const DEFAULT_OPTIONS = {
+const DEFAULT_OPTIONS$1 = {
   entityPoolSize: 0,
   entityClass: Entity
 };
 
 class World {
   constructor(options = {}) {
-    this.options = Object.assign({}, DEFAULT_OPTIONS, options);
+    this.options = Object.assign({}, DEFAULT_OPTIONS$1, options);
 
     this.componentsManager = new ComponentManager(this);
     this.entityManager = new EntityManager(this);
@@ -1271,215 +1467,6 @@ class World {
 
     console.log(JSON.stringify(stats, null, 2));
   }
-}
-
-class System {
-  canExecute() {
-    if (this._mandatoryQueries.length === 0) return true;
-
-    for (let i = 0; i < this._mandatoryQueries.length; i++) {
-      var query = this._mandatoryQueries[i];
-      if (query.entities.length === 0) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  constructor(world, attributes) {
-    this.world = world;
-    this.enabled = true;
-
-    // @todo Better naming :)
-    this._queries = {};
-    this.queries = {};
-
-    this.priority = 0;
-
-    // Used for stats
-    this.executeTime = 0;
-
-    if (attributes && attributes.priority) {
-      this.priority = attributes.priority;
-    }
-
-    this._mandatoryQueries = [];
-
-    this.initialized = true;
-
-    if (this.constructor.queries) {
-      for (var queryName in this.constructor.queries) {
-        var queryConfig = this.constructor.queries[queryName];
-        var Components = queryConfig.components;
-        if (!Components || Components.length === 0) {
-          throw new Error("'components' attribute can't be empty in a query");
-        }
-        var query = this.world.entityManager.queryComponents(Components);
-        this._queries[queryName] = query;
-        if (queryConfig.mandatory === true) {
-          this._mandatoryQueries.push(query);
-        }
-        this.queries[queryName] = {
-          results: query.entities
-        };
-
-        // Reactive configuration added/removed/changed
-        var validEvents = ["added", "removed", "changed"];
-
-        const eventMapping = {
-          added: Query.prototype.ENTITY_ADDED,
-          removed: Query.prototype.ENTITY_REMOVED,
-          changed: Query.prototype.COMPONENT_CHANGED // Query.prototype.ENTITY_CHANGED
-        };
-
-        if (queryConfig.listen) {
-          validEvents.forEach(eventName => {
-            if (!this.execute) {
-              console.warn(
-                `System '${
-                  this.constructor.name
-                }' has defined listen events (${validEvents.join(
-                  ", "
-                )}) for query '${queryName}' but it does not implement the 'execute' method.`
-              );
-            }
-
-            // Is the event enabled on this system's query?
-            if (queryConfig.listen[eventName]) {
-              let event = queryConfig.listen[eventName];
-
-              if (eventName === "changed") {
-                query.reactive = true;
-                if (event === true) {
-                  // Any change on the entity from the components in the query
-                  let eventList = (this.queries[queryName][eventName] = []);
-                  query.eventDispatcher.addEventListener(
-                    Query.prototype.COMPONENT_CHANGED,
-                    entity => {
-                      // Avoid duplicates
-                      if (eventList.indexOf(entity) === -1) {
-                        eventList.push(entity);
-                      }
-                    }
-                  );
-                } else if (Array.isArray(event)) {
-                  let eventList = (this.queries[queryName][eventName] = []);
-                  query.eventDispatcher.addEventListener(
-                    Query.prototype.COMPONENT_CHANGED,
-                    (entity, changedComponent) => {
-                      // Avoid duplicates
-                      if (
-                        event.indexOf(changedComponent.constructor) !== -1 &&
-                        eventList.indexOf(entity) === -1
-                      ) {
-                        eventList.push(entity);
-                      }
-                    }
-                  );
-                }
-              } else {
-                let eventList = (this.queries[queryName][eventName] = []);
-
-                query.eventDispatcher.addEventListener(
-                  eventMapping[eventName],
-                  entity => {
-                    // @fixme overhead?
-                    if (eventList.indexOf(entity) === -1)
-                      eventList.push(entity);
-                  }
-                );
-              }
-            }
-          });
-        }
-      }
-    }
-  }
-
-  stop() {
-    this.executeTime = 0;
-    this.enabled = false;
-  }
-
-  play() {
-    this.enabled = true;
-  }
-
-  // @question rename to clear queues?
-  clearEvents() {
-    for (let queryName in this.queries) {
-      var query = this.queries[queryName];
-      if (query.added) {
-        query.added.length = 0;
-      }
-      if (query.removed) {
-        query.removed.length = 0;
-      }
-      if (query.changed) {
-        if (Array.isArray(query.changed)) {
-          query.changed.length = 0;
-        } else {
-          for (let name in query.changed) {
-            query.changed[name].length = 0;
-          }
-        }
-      }
-    }
-  }
-
-  toJSON() {
-    var json = {
-      name: this.constructor.name,
-      enabled: this.enabled,
-      executeTime: this.executeTime,
-      priority: this.priority,
-      queries: {}
-    };
-
-    if (this.constructor.queries) {
-      var queries = this.constructor.queries;
-      for (let queryName in queries) {
-        let query = this.queries[queryName];
-        let queryDefinition = queries[queryName];
-        let jsonQuery = (json.queries[queryName] = {
-          key: this._queries[queryName].key
-        });
-
-        jsonQuery.mandatory = queryDefinition.mandatory === true;
-        jsonQuery.reactive =
-          queryDefinition.listen &&
-          (queryDefinition.listen.added === true ||
-            queryDefinition.listen.removed === true ||
-            queryDefinition.listen.changed === true ||
-            Array.isArray(queryDefinition.listen.changed));
-
-        if (jsonQuery.reactive) {
-          jsonQuery.listen = {};
-
-          const methods = ["added", "removed", "changed"];
-          methods.forEach(method => {
-            if (query[method]) {
-              jsonQuery.listen[method] = {
-                entities: query[method].length
-              };
-            }
-          });
-        }
-      }
-    }
-
-    return json;
-  }
-}
-
-System.isSystem = true;
-
-function Not(Component) {
-  return {
-    operator: "not",
-    Component: Component
-  };
 }
 
 class TagComponent extends Component {
@@ -1756,4 +1743,270 @@ if (hasWindow) {
   }
 }
 
-export { Component, Not, ObjectPool, System, SystemStateComponent, TagComponent, Types, Version, World, Entity as _Entity, cloneArray, cloneClonable, cloneJSON, cloneValue, copyArray, copyCopyable, copyJSON, copyValue, createType, enableRemoteDevtools };
+class Vector3 {
+  constructor(x = 0, y = 0, z = 0) {
+    this.set(x, y, z);
+  }
+
+  set(x, y, z) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+  }
+
+  copy(source) {
+    this.x = source.x;
+    this.y = source.y;
+    return this;
+  }
+
+  clone() {
+    return new Vector3(this.x, this.y, this.z);
+  }
+}
+
+const Vector3Type = createType({
+  name: "Vector3",
+  default: new Vector3(),
+  copy: copyCopyable,
+  clone: cloneClonable
+});
+
+class TagComponentA extends TagComponent {}
+
+class Component3 extends Component {
+  constructor(props) {
+    super(false);
+    this.attr = (props && props.attr) || 0;
+    this.attr2 = (props && props.attr2) || 0;
+    this.attr3 = (props && props.attr3) || new Vector3();
+  }
+
+  // copy(source) {
+  //   this.attr = source.attr;
+  //   this.attr2 = source.attr2;
+  //   this.attr3.copy(source.attr3);
+  //   return this;
+  // }
+
+  // clone() {
+  //   return new Component3().copy(this);
+  // }
+
+  reset() {
+    this.attr = 0;
+    this.attr2 = 0;
+    this.attr3.set(0, 0, 0);
+  }
+}
+Component3.schema = {
+  attr: { type: Types.Number },
+  attr2: { type: Types.Number },
+  attr3: { type: Vector3Type }
+};
+
+function init(benchmarks) {
+  benchmarks
+    .group("world")
+    .add({
+      name: "new World({ entityPoolSize: 100k })",
+      execute: () => {
+        new World({ entityPoolSize: 100000 });
+      },
+      iterations: 10
+    })
+    .add({
+      name: "World::createEntity (100k empty, recreating world)",
+      execute: () => {
+        let world = new World();
+        for (let i = 0; i < 100000; i++) {
+          world.createEntity();
+        }
+      },
+      iterations: 10
+    })
+    .add({
+      name:
+        "World::createEntity (100k empty, recreating world (poolSize: 100k))",
+      execute: () => {
+        let world = new World({ entityPoolSize: 100000 });
+        for (let i = 0; i < 100000; i++) {
+          world.createEntity();
+        }
+      },
+      iterations: 10
+    })
+    .add({
+      name:
+        "World::createEntity (100k empty, recreating world (not measured), entityPoolSize = 100k)",
+      prepare: ctx => {
+        ctx.world = new World({ entityPoolSize: 100000 });
+      },
+      execute: ctx => {
+        for (let i = 0; i < 100000; i++) {
+          ctx.world.createEntity();
+        }
+      },
+      iterations: 10
+    })
+    .add({
+      name:
+        "World::createEntity(name) (100k empty, recreating world (not measured), entityPoolSize = 100k)",
+      prepare: ctx => {
+        ctx.world = new World({ entityPoolSize: 100000 });
+      },
+      execute: ctx => {
+        for (let i = 0; i < 100000; i++) {
+          ctx.world.createEntity("name" + i);
+        }
+      },
+      iterations: 10
+    })
+    .add({
+      name:
+        "World::createEntity (100k empty, reuse world, entityPoolSize = 100k * 10)",
+      prepareGlobal: ctx => {
+        ctx.world = new World({ entityPoolSize: 100000 * 10 });
+      },
+      execute: ctx => {
+        for (let i = 0; i < 100000; i++) {
+          ctx.world.createEntity();
+        }
+      },
+      iterations: 10
+    });
+}
+
+function init$1(benchmarks) {
+  benchmarks
+    .group("objectpool")
+    .add({
+      name: "new ObjectPool(TagComponent, 100k)",
+      execute: () => {
+        new ObjectPool(TagComponentA, 100000);
+      }
+    })
+    .add({
+      name: "new ObjectPool(Component1, 100k)",
+      execute: () => {
+        new ObjectPool(Component3, 100000);
+      }
+    });
+    /*
+    .add({
+      name: "acquiring 100k. ObjectPool(Component1, 100k)",
+      prepare: ctx => {
+        ctx.pool = new ObjectPool(Component3, 100000);
+      },
+      execute: ctx => {
+        for (let i = 0; i < 100000; i++) {
+          ctx.pool.acquire();
+        }
+      }
+    })
+    .add({
+      name: "acquiring 100k. ObjectPool(Component1)",
+      prepare: ctx => {
+        ctx.pool = new ObjectPool(Component3);
+      },
+      execute: ctx => {
+        for (let i = 0; i < 100000; i++) {
+          ctx.pool.acquire();
+        }
+      }
+    })
+    .add({
+      name: "returning 100k. ObjectPool(Component1)",
+      prepare: ctx => {
+        ctx.pool = new ObjectPool(Component3);
+        ctx.components = [];
+        for (let i = 0; i < 100000; i++) {
+          ctx.components.push(ctx.pool.acquire());
+        }
+      },
+      execute: ctx => {
+        for (let i = 0; i < 100000; i++) {
+          ctx.pool.release(ctx.components[i]);
+        }
+      }
+    });
+    */
+}
+
+const div = document.getElementById("results");
+
+let currentTable = null;
+let currentGroup = null;
+
+function onGroupStart(groupName) {
+  var title = document.createElement("div");
+  title.setAttribute("class", "table-title");
+  title.innerHTML = `<h3>${groupName}</h3>`;
+  div.appendChild(title);
+
+  currentTable = document.createElement("table");
+  currentTable.setAttribute("class", "table-fill");
+
+  let headCells = [
+    "benchmark",
+    "iterations",
+    "min",
+    "max",
+    "sum",
+    "mean",
+    "variance",
+    "std_deviation"
+  ]
+    .map(name => `<th>${name}</th>`)
+    .join("");
+
+  currentTable.innerHTML = `<thead>
+  <tr>
+    ${headCells}
+  </tr>
+  </thead><tbody></tbody>`;
+  div.appendChild(currentTable);
+
+  currentGroup = groupName;
+}
+
+function onBenchmarkFinished(bench) {
+  if (currentGroup !== bench.groupName) {
+    onGroupStart(bench.groupName);
+  }
+
+  const values = bench.stats.getAll();
+
+  const tbody = currentTable.querySelector("tbody");
+
+  let rowHtml = `<td>${bench.name}</td><td>${bench.iterations}</td>`;
+
+  const toFixed = ["mean", "variance", "standard_deviation"];
+  Object.entries(values).forEach(([key, value]) => {
+    if (key !== "n") {
+      if (toFixed.indexOf(key) !== -1) {
+        value = value.toFixed(2);
+      }
+      rowHtml += `<td>${value}</td>`;
+    }
+  });
+
+  let row = document.createElement("tr");
+  row.innerHTML = rowHtml;
+  tbody.appendChild(row);
+}
+
+let benchmarks = new Benchmarks({
+  //  verbose: true,
+  summary: true,
+  iterations: 10,
+  onBenchmarkFinished: onBenchmarkFinished
+});
+
+init(benchmarks);
+//initEntities(benchmarks);
+init$1(benchmarks);
+//initComponents(benchmarks);
+benchmarks.run();
+
+console.log(benchmarks.getReport("json"));

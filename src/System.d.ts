@@ -26,6 +26,8 @@ export abstract class System {
     }
   };
 
+  static isSystem: true;
+
   constructor(world: World, attributes?: Attributes);
 
   /**
@@ -66,6 +68,7 @@ export abstract class System {
 }
 
 export interface SystemConstructor<T extends System> {
+  isSystem: true;
   new (...args: any): T;
 }
 
