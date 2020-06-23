@@ -56,6 +56,172 @@
 	    ? performance.now.bind(performance)
 	    : Date.now.bind(Date);
 
+	class SystemManager {
+	  constructor(world) {
+	    this._systems = [];
+	    this._executeSystems = []; // Systems that have `execute` method
+	    this.world = world;
+	    this.lastExecutedSystem = null;
+	  }
+
+	  registerSystem(SystemClass, attributes) {
+	    if (!SystemClass.isSystem) {
+	      throw new Error(
+	        `System '${SystemClass.name}' does not extend 'System' class`
+	      );
+	    }
+
+	    if (this.getSystem(SystemClass) !== undefined) {
+	      console.warn(`System '${SystemClass.name}' already registered.`);
+	      return this;
+	    }
+
+	    var system = new SystemClass(this.world, attributes);
+	    if (system.init) system.init(attributes);
+	    system.order = this._systems.length;
+	    this._systems.push(system);
+	    if (system.execute) {
+	      this._executeSystems.push(system);
+	      this.sortSystems();
+	    }
+	    return this;
+	  }
+
+	  unregisterSystem(SystemClass) {
+	    let system = this.getSystem(SystemClass);
+	    if (system === undefined) {
+	      console.warn(
+	        `Can unregister system '${SystemClass.name}'. It doesn't exist.`
+	      );
+	      return this;
+	    }
+
+	    this._systems.splice(this._systems.indexOf(system), 1);
+
+	    if (system.execute) {
+	      this._executeSystems.splice(this._executeSystems.indexOf(system), 1);
+	    }
+
+	    // @todo Add system.unregister() call to free resources
+	    return this;
+	  }
+
+	  sortSystems() {
+	    this._executeSystems.sort((a, b) => {
+	      return a.priority - b.priority || a.order - b.order;
+	    });
+	  }
+
+	  getSystem(SystemClass) {
+	    return this._systems.find(s => s instanceof SystemClass);
+	  }
+
+	  getSystems() {
+	    return this._systems;
+	  }
+
+	  removeSystem(SystemClass) {
+	    var index = this._systems.indexOf(SystemClass);
+	    if (!~index) return;
+
+	    this._systems.splice(index, 1);
+	  }
+
+	  executeSystem(system, delta, time) {
+	    if (system.initialized) {
+	      if (system.canExecute()) {
+	        let startTime = now();
+	        system.execute(delta, time);
+	        system.executeTime = now() - startTime;
+	        this.lastExecutedSystem = system;
+	        system.clearEvents();
+	      }
+	    }
+	  }
+
+	  stop() {
+	    this._executeSystems.forEach(system => system.stop());
+	  }
+
+	  execute(delta, time, forcePlay) {
+	    this._executeSystems.forEach(
+	      system =>
+	        (forcePlay || system.enabled) && this.executeSystem(system, delta, time)
+	    );
+	  }
+
+	  stats() {
+	    var stats = {
+	      numSystems: this._systems.length,
+	      systems: {}
+	    };
+
+	    for (var i = 0; i < this._systems.length; i++) {
+	      var system = this._systems[i];
+	      var systemStats = (stats.systems[system.constructor.name] = {
+	        queries: {},
+	        executeTime: system.executeTime
+	      });
+	      for (var name in system.ctx) {
+	        systemStats.queries[name] = system.ctx[name].stats();
+	      }
+	    }
+
+	    return stats;
+	  }
+	}
+
+	class ObjectPool {
+	  // @todo Add initial size
+	  constructor(T, initialSize) {
+	    this.freeList = [];
+	    this.count = 0;
+	    this.T = T;
+	    this.isObjectPool = true;
+
+	    if (typeof initialSize !== "undefined") {
+	      this.expand(initialSize);
+	    }
+	  }
+
+	  acquire() {
+	    // Grow the list by 20%ish if we're out
+	    if (this.freeList.length <= 0) {
+	      this.expand(Math.round(this.count * 0.2) + 1);
+	    }
+
+	    var item = this.freeList.pop();
+
+	    return item;
+	  }
+
+	  release(item) {
+	    item.reset();
+	    this.freeList.push(item);
+	  }
+
+	  expand(count) {
+	    for (var n = 0; n < count; n++) {
+	      var clone = new this.T();
+	      clone._pool = this;
+	      this.freeList.push(clone);
+	    }
+	    this.count += count;
+	  }
+
+	  totalSize() {
+	    return this.count;
+	  }
+
+	  totalFree() {
+	    return this.freeList.length;
+	  }
+
+	  totalUsed() {
+	    return this.count - this.freeList.length;
+	  }
+	}
+
 	/**
 	 * @private
 	 * @class EventDispatcher
@@ -243,378 +409,6 @@
 	Query.prototype.ENTITY_REMOVED = "Query#ENTITY_REMOVED";
 	Query.prototype.COMPONENT_CHANGED = "Query#COMPONENT_CHANGED";
 
-	class System {
-	  canExecute() {
-	    if (this._mandatoryQueries.length === 0) return true;
-
-	    for (let i = 0; i < this._mandatoryQueries.length; i++) {
-	      var query = this._mandatoryQueries[i];
-	      if (query.entities.length === 0) {
-	        return false;
-	      }
-	    }
-
-	    return true;
-	  }
-
-	  constructor(world, attributes) {
-	    this.world = world;
-	    this.enabled = true;
-
-	    // @todo Better naming :)
-	    this._queries = {};
-	    this.queries = {};
-
-	    this.priority = 0;
-
-	    // Used for stats
-	    this.executeTime = 0;
-
-	    if (attributes && attributes.priority) {
-	      this.priority = attributes.priority;
-	    }
-
-	    this._mandatoryQueries = [];
-
-	    this.initialized = true;
-
-	    if (this.constructor.queries) {
-	      for (var queryName in this.constructor.queries) {
-	        var queryConfig = this.constructor.queries[queryName];
-	        var Components = queryConfig.components;
-	        if (!Components || Components.length === 0) {
-	          throw new Error("'components' attribute can't be empty in a query");
-	        }
-	        var query = this.world.entityManager.queryComponents(Components);
-	        this._queries[queryName] = query;
-	        if (queryConfig.mandatory === true) {
-	          this._mandatoryQueries.push(query);
-	        }
-	        this.queries[queryName] = {
-	          results: query.entities
-	        };
-
-	        // Reactive configuration added/removed/changed
-	        var validEvents = ["added", "removed", "changed"];
-
-	        const eventMapping = {
-	          added: Query.prototype.ENTITY_ADDED,
-	          removed: Query.prototype.ENTITY_REMOVED,
-	          changed: Query.prototype.COMPONENT_CHANGED // Query.prototype.ENTITY_CHANGED
-	        };
-
-	        if (queryConfig.listen) {
-	          validEvents.forEach(eventName => {
-	            if (!this.execute) {
-	              console.warn(
-	                `System '${
-                  this.constructor.name
-                }' has defined listen events (${validEvents.join(
-                  ", "
-                )}) for query '${queryName}' but it does not implement the 'execute' method.`
-	              );
-	            }
-
-	            // Is the event enabled on this system's query?
-	            if (queryConfig.listen[eventName]) {
-	              let event = queryConfig.listen[eventName];
-
-	              if (eventName === "changed") {
-	                query.reactive = true;
-	                if (event === true) {
-	                  // Any change on the entity from the components in the query
-	                  let eventList = (this.queries[queryName][eventName] = []);
-	                  query.eventDispatcher.addEventListener(
-	                    Query.prototype.COMPONENT_CHANGED,
-	                    entity => {
-	                      // Avoid duplicates
-	                      if (eventList.indexOf(entity) === -1) {
-	                        eventList.push(entity);
-	                      }
-	                    }
-	                  );
-	                } else if (Array.isArray(event)) {
-	                  let eventList = (this.queries[queryName][eventName] = []);
-	                  query.eventDispatcher.addEventListener(
-	                    Query.prototype.COMPONENT_CHANGED,
-	                    (entity, changedComponent) => {
-	                      // Avoid duplicates
-	                      if (
-	                        event.indexOf(changedComponent.constructor) !== -1 &&
-	                        eventList.indexOf(entity) === -1
-	                      ) {
-	                        eventList.push(entity);
-	                      }
-	                    }
-	                  );
-	                }
-	              } else {
-	                let eventList = (this.queries[queryName][eventName] = []);
-
-	                query.eventDispatcher.addEventListener(
-	                  eventMapping[eventName],
-	                  entity => {
-	                    // @fixme overhead?
-	                    if (eventList.indexOf(entity) === -1)
-	                      eventList.push(entity);
-	                  }
-	                );
-	              }
-	            }
-	          });
-	        }
-	      }
-	    }
-	  }
-
-	  stop() {
-	    this.executeTime = 0;
-	    this.enabled = false;
-	  }
-
-	  play() {
-	    this.enabled = true;
-	  }
-
-	  // @question rename to clear queues?
-	  clearEvents() {
-	    for (let queryName in this.queries) {
-	      var query = this.queries[queryName];
-	      if (query.added) {
-	        query.added.length = 0;
-	      }
-	      if (query.removed) {
-	        query.removed.length = 0;
-	      }
-	      if (query.changed) {
-	        if (Array.isArray(query.changed)) {
-	          query.changed.length = 0;
-	        } else {
-	          for (let name in query.changed) {
-	            query.changed[name].length = 0;
-	          }
-	        }
-	      }
-	    }
-	  }
-
-	  toJSON() {
-	    var json = {
-	      name: this.constructor.name,
-	      enabled: this.enabled,
-	      executeTime: this.executeTime,
-	      priority: this.priority,
-	      queries: {}
-	    };
-
-	    if (this.constructor.queries) {
-	      var queries = this.constructor.queries;
-	      for (let queryName in queries) {
-	        let query = this.queries[queryName];
-	        let queryDefinition = queries[queryName];
-	        let jsonQuery = (json.queries[queryName] = {
-	          key: this._queries[queryName].key
-	        });
-
-	        jsonQuery.mandatory = queryDefinition.mandatory === true;
-	        jsonQuery.reactive =
-	          queryDefinition.listen &&
-	          (queryDefinition.listen.added === true ||
-	            queryDefinition.listen.removed === true ||
-	            queryDefinition.listen.changed === true ||
-	            Array.isArray(queryDefinition.listen.changed));
-
-	        if (jsonQuery.reactive) {
-	          jsonQuery.listen = {};
-
-	          const methods = ["added", "removed", "changed"];
-	          methods.forEach(method => {
-	            if (query[method]) {
-	              jsonQuery.listen[method] = {
-	                entities: query[method].length
-	              };
-	            }
-	          });
-	        }
-	      }
-	    }
-
-	    return json;
-	  }
-	}
-
-	function Not(Component) {
-	  return {
-	    operator: "not",
-	    Component: Component
-	  };
-	}
-
-	class SystemManager {
-	  constructor(world) {
-	    this._systems = [];
-	    this._executeSystems = []; // Systems that have `execute` method
-	    this.world = world;
-	    this.lastExecutedSystem = null;
-	  }
-
-	  registerSystem(SystemClass, attributes) {
-	    if (!(SystemClass.prototype instanceof System)) {
-	      throw new Error(
-	        `System '${SystemClass.name}' does not extends 'System' class`
-	      );
-	    }
-	    if (this.getSystem(SystemClass) !== undefined) {
-	      console.warn(`System '${SystemClass.name}' already registered.`);
-	      return this;
-	    }
-
-	    var system = new SystemClass(this.world, attributes);
-	    if (system.init) system.init(attributes);
-	    system.order = this._systems.length;
-	    this._systems.push(system);
-	    if (system.execute) {
-	      this._executeSystems.push(system);
-	      this.sortSystems();
-	    }
-	    return this;
-	  }
-
-	  unregisterSystem(SystemClass) {
-	    let system = this.getSystem(SystemClass);
-	    if (system === undefined) {
-	      console.warn(
-	        `Can unregister system '${SystemClass.name}'. It doesn't exist.`
-	      );
-	      return this;
-	    }
-
-	    this._systems.splice(this._systems.indexOf(system), 1);
-
-	    if (system.execute) {
-	      this._executeSystems.splice(this._executeSystems.indexOf(system), 1);
-	    }
-
-	    // @todo Add system.unregister() call to free resources
-	    return this;
-	  }
-
-	  sortSystems() {
-	    this._executeSystems.sort((a, b) => {
-	      return a.priority - b.priority || a.order - b.order;
-	    });
-	  }
-
-	  getSystem(SystemClass) {
-	    return this._systems.find(s => s instanceof SystemClass);
-	  }
-
-	  getSystems() {
-	    return this._systems;
-	  }
-
-	  removeSystem(SystemClass) {
-	    var index = this._systems.indexOf(SystemClass);
-	    if (!~index) return;
-
-	    this._systems.splice(index, 1);
-	  }
-
-	  executeSystem(system, delta, time) {
-	    if (system.initialized) {
-	      if (system.canExecute()) {
-	        let startTime = now();
-	        system.execute(delta, time);
-	        system.executeTime = now() - startTime;
-	        this.lastExecutedSystem = system;
-	        system.clearEvents();
-	      }
-	    }
-	  }
-
-	  stop() {
-	    this._executeSystems.forEach(system => system.stop());
-	  }
-
-	  execute(delta, time, forcePlay) {
-	    this._executeSystems.forEach(
-	      system =>
-	        (forcePlay || system.enabled) && this.executeSystem(system, delta, time)
-	    );
-	  }
-
-	  stats() {
-	    var stats = {
-	      numSystems: this._systems.length,
-	      systems: {}
-	    };
-
-	    for (var i = 0; i < this._systems.length; i++) {
-	      var system = this._systems[i];
-	      var systemStats = (stats.systems[system.constructor.name] = {
-	        queries: {},
-	        executeTime: system.executeTime
-	      });
-	      for (var name in system.ctx) {
-	        systemStats.queries[name] = system.ctx[name].stats();
-	      }
-	    }
-
-	    return stats;
-	  }
-	}
-
-	class ObjectPool {
-	  // @todo Add initial size
-	  constructor(baseObject, initialSize) {
-	    this.freeList = [];
-	    this.count = 0;
-	    this.baseObject = baseObject;
-	    this.isObjectPool = true;
-
-	    if (typeof initialSize !== "undefined") {
-	      this.expand(initialSize);
-	    }
-	  }
-
-	  acquire() {
-	    // Grow the list by 20%ish if we're out
-	    if (this.freeList.length <= 0) {
-	      this.expand(Math.round(this.count * 0.2) + 1);
-	    }
-
-	    var item = this.freeList.pop();
-
-	    return item;
-	  }
-
-	  release(item) {
-	    item.reset();
-	    this.freeList.push(item);
-	  }
-
-	  expand(count) {
-	    for (var n = 0; n < count; n++) {
-	      var clone = new this.baseObject();
-	      clone._pool = this;
-	      this.freeList.push(clone);
-	    }
-	    this.count += count;
-	  }
-
-	  totalSize() {
-	    return this.count;
-	  }
-
-	  totalFree() {
-	    return this.freeList.length;
-	  }
-
-	  totalUsed() {
-	    return this.count - this.freeList.length;
-	  }
-	}
-
 	/**
 	 * @private
 	 * @class QueryManager
@@ -755,7 +549,7 @@
 	      const prop = schema[key];
 
 	      if (source.hasOwnProperty(key)) {
-	        prop.type.copy(source, this, key);
+	        this[key] = prop.type.copy(source[key], this[key]);
 	      }
 	    }
 
@@ -773,10 +567,10 @@
 	      const schemaProp = schema[key];
 
 	      if (schemaProp.hasOwnProperty("default")) {
-	        this[key] = schemaProp.type.clone(schemaProp.default);
+	        this[key] = schemaProp.type.copy(schemaProp.default, this[key]);
 	      } else {
 	        const type = schemaProp.type;
-	        this[key] = type.clone(type.default);
+	        this[key] = type.copy(type.default, this[key]);
 	      }
 	    }
 	  }
@@ -807,7 +601,7 @@
 
 	  expand(count) {
 	    for (var n = 0; n < count; n++) {
-	      var clone = new this.baseObject(this.entityManager);
+	      var clone = new this.T(this.entityManager);
 	      clone._pool = this;
 	      this.freeList.push(clone);
 	    }
@@ -1199,9 +993,6 @@
 		files: [
 			"test/**/*.test.js"
 		],
-		sources: [
-			"src/**/*.js"
-		],
 		require: [
 			"babel-register",
 			"esm"
@@ -1221,7 +1012,8 @@
 	};
 	var homepage = "https://github.com/fernandojsg/ecsy#readme";
 	var devDependencies = {
-		ava: "^1.4.1",
+		"@rollup/plugin-node-resolve": "^8.0.1",
+		ava: "^3.9.0",
 		"babel-cli": "^6.26.0",
 		"babel-core": "^6.26.3",
 		"babel-eslint": "^10.0.3",
@@ -1232,6 +1024,7 @@
 		eslint: "^5.16.0",
 		"eslint-config-prettier": "^4.3.0",
 		"eslint-plugin-prettier": "^3.1.2",
+		esm: "^3.2.25",
 		"http-server": "^0.11.1",
 		nodemon: "^1.19.4",
 		prettier: "^1.19.1",
@@ -1396,7 +1189,7 @@
 	    this._ComponentTypes.length = 0;
 	    this.queries.length = 0;
 
-	    for (var componentName in this.components) {
+	    for (var componentName in this._components) {
 	      delete this._components[componentName];
 	    }
 	  }
@@ -1491,6 +1284,215 @@
 	  }
 	}
 
+	class System {
+	  canExecute() {
+	    if (this._mandatoryQueries.length === 0) return true;
+
+	    for (let i = 0; i < this._mandatoryQueries.length; i++) {
+	      var query = this._mandatoryQueries[i];
+	      if (query.entities.length === 0) {
+	        return false;
+	      }
+	    }
+
+	    return true;
+	  }
+
+	  constructor(world, attributes) {
+	    this.world = world;
+	    this.enabled = true;
+
+	    // @todo Better naming :)
+	    this._queries = {};
+	    this.queries = {};
+
+	    this.priority = 0;
+
+	    // Used for stats
+	    this.executeTime = 0;
+
+	    if (attributes && attributes.priority) {
+	      this.priority = attributes.priority;
+	    }
+
+	    this._mandatoryQueries = [];
+
+	    this.initialized = true;
+
+	    if (this.constructor.queries) {
+	      for (var queryName in this.constructor.queries) {
+	        var queryConfig = this.constructor.queries[queryName];
+	        var Components = queryConfig.components;
+	        if (!Components || Components.length === 0) {
+	          throw new Error("'components' attribute can't be empty in a query");
+	        }
+	        var query = this.world.entityManager.queryComponents(Components);
+	        this._queries[queryName] = query;
+	        if (queryConfig.mandatory === true) {
+	          this._mandatoryQueries.push(query);
+	        }
+	        this.queries[queryName] = {
+	          results: query.entities
+	        };
+
+	        // Reactive configuration added/removed/changed
+	        var validEvents = ["added", "removed", "changed"];
+
+	        const eventMapping = {
+	          added: Query.prototype.ENTITY_ADDED,
+	          removed: Query.prototype.ENTITY_REMOVED,
+	          changed: Query.prototype.COMPONENT_CHANGED // Query.prototype.ENTITY_CHANGED
+	        };
+
+	        if (queryConfig.listen) {
+	          validEvents.forEach(eventName => {
+	            if (!this.execute) {
+	              console.warn(
+	                `System '${
+                  this.constructor.name
+                }' has defined listen events (${validEvents.join(
+                  ", "
+                )}) for query '${queryName}' but it does not implement the 'execute' method.`
+	              );
+	            }
+
+	            // Is the event enabled on this system's query?
+	            if (queryConfig.listen[eventName]) {
+	              let event = queryConfig.listen[eventName];
+
+	              if (eventName === "changed") {
+	                query.reactive = true;
+	                if (event === true) {
+	                  // Any change on the entity from the components in the query
+	                  let eventList = (this.queries[queryName][eventName] = []);
+	                  query.eventDispatcher.addEventListener(
+	                    Query.prototype.COMPONENT_CHANGED,
+	                    entity => {
+	                      // Avoid duplicates
+	                      if (eventList.indexOf(entity) === -1) {
+	                        eventList.push(entity);
+	                      }
+	                    }
+	                  );
+	                } else if (Array.isArray(event)) {
+	                  let eventList = (this.queries[queryName][eventName] = []);
+	                  query.eventDispatcher.addEventListener(
+	                    Query.prototype.COMPONENT_CHANGED,
+	                    (entity, changedComponent) => {
+	                      // Avoid duplicates
+	                      if (
+	                        event.indexOf(changedComponent.constructor) !== -1 &&
+	                        eventList.indexOf(entity) === -1
+	                      ) {
+	                        eventList.push(entity);
+	                      }
+	                    }
+	                  );
+	                }
+	              } else {
+	                let eventList = (this.queries[queryName][eventName] = []);
+
+	                query.eventDispatcher.addEventListener(
+	                  eventMapping[eventName],
+	                  entity => {
+	                    // @fixme overhead?
+	                    if (eventList.indexOf(entity) === -1)
+	                      eventList.push(entity);
+	                  }
+	                );
+	              }
+	            }
+	          });
+	        }
+	      }
+	    }
+	  }
+
+	  stop() {
+	    this.executeTime = 0;
+	    this.enabled = false;
+	  }
+
+	  play() {
+	    this.enabled = true;
+	  }
+
+	  // @question rename to clear queues?
+	  clearEvents() {
+	    for (let queryName in this.queries) {
+	      var query = this.queries[queryName];
+	      if (query.added) {
+	        query.added.length = 0;
+	      }
+	      if (query.removed) {
+	        query.removed.length = 0;
+	      }
+	      if (query.changed) {
+	        if (Array.isArray(query.changed)) {
+	          query.changed.length = 0;
+	        } else {
+	          for (let name in query.changed) {
+	            query.changed[name].length = 0;
+	          }
+	        }
+	      }
+	    }
+	  }
+
+	  toJSON() {
+	    var json = {
+	      name: this.constructor.name,
+	      enabled: this.enabled,
+	      executeTime: this.executeTime,
+	      priority: this.priority,
+	      queries: {}
+	    };
+
+	    if (this.constructor.queries) {
+	      var queries = this.constructor.queries;
+	      for (let queryName in queries) {
+	        let query = this.queries[queryName];
+	        let queryDefinition = queries[queryName];
+	        let jsonQuery = (json.queries[queryName] = {
+	          key: this._queries[queryName].key
+	        });
+
+	        jsonQuery.mandatory = queryDefinition.mandatory === true;
+	        jsonQuery.reactive =
+	          queryDefinition.listen &&
+	          (queryDefinition.listen.added === true ||
+	            queryDefinition.listen.removed === true ||
+	            queryDefinition.listen.changed === true ||
+	            Array.isArray(queryDefinition.listen.changed));
+
+	        if (jsonQuery.reactive) {
+	          jsonQuery.listen = {};
+
+	          const methods = ["added", "removed", "changed"];
+	          methods.forEach(method => {
+	            if (query[method]) {
+	              jsonQuery.listen[method] = {
+	                entities: query[method].length
+	              };
+	            }
+	          });
+	        }
+	      }
+	    }
+
+	    return json;
+	  }
+	}
+
+	System.isSystem = true;
+
+	function Not(Component) {
+	  return {
+	    operator: "not",
+	    Component: Component
+	  };
+	}
+
 	class TagComponent extends Component {
 	  constructor() {
 	    super(false);
@@ -1499,13 +1501,13 @@
 
 	TagComponent.isTagComponent = true;
 
-	const copyValue = (src, dest, key) => (dest[key] = src[key]);
+	const copyValue = src => src;
 
 	const cloneValue = src => src;
 
-	const copyArray = (src, dest, key) => {
-	  const srcArray = src[key];
-	  const destArray = dest[key];
+	const copyArray = (src, dest) => {
+	  const srcArray = src;
+	  const destArray = dest;
 
 	  destArray.length = 0;
 
@@ -1518,12 +1520,11 @@
 
 	const cloneArray = src => src.slice();
 
-	const copyJSON = (src, dest, key) =>
-	  (dest[key] = JSON.parse(JSON.stringify(src[key])));
+	const copyJSON = src => JSON.parse(JSON.stringify(src));
 
 	const cloneJSON = src => JSON.parse(JSON.stringify(src));
 
-	const copyCopyable = (src, dest, key) => dest[key].copy(src[key]);
+	const copyCopyable = (src, dest) => dest.copy(src);
 
 	const cloneClonable = src => src.clone();
 

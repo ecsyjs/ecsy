@@ -18,3 +18,9 @@ Name | Type |
 `...args` | any |
 
 **Returns:** *T*
+
+## Properties
+
+###  isSystem
+
+• **isSystem**: *true*

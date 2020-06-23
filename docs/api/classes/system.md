@@ -55,6 +55,12 @@ ___
 
 ___
 
+### `Static` isSystem
+
+▪ **isSystem**: *true*
+
+___
+
 ### `Static` queries
 
 ▪ **queries**: *object*
