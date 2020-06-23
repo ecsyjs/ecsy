@@ -93,13 +93,15 @@
       <iframe id="viewer" name="viewer" allowfullscreen="" allowvr="" onmousewheel=""></iframe>
     </div>
     <script>
+      const repoUrl = "https://github.com/MozillaReality/ecsy/blob/master/site/examples/";
+
       let examples = [
-        {name: "Circles and boxes", url: "circles-boxes/index.html", source: "https://github.com/MozillaReality/ecsy/blob/dev/examples/circles-boxes/index.html"},
-        {name: "Intersecting circles", url: "canvas/index.html", source: "https://github.com/MozillaReality/ecsy/blob/dev/examples/circles-boxes/index.html"},
-        {name: "Three.js ball", url: "ball-example/three/index.html", source: "https://github.com/MozillaReality/ecsy/blob/dev/examples/ball-example/three/index.html"},
-        {name: "Babylon.js ball", url: "ball-example/babylon/index.html", source: "https://github.com/MozillaReality/ecsy/blob/dev/examples/ball-example/babylon/index.html"},
-        {name: "Factory", url: "factory/index.html", source: "https://github.com/MozillaReality/ecsy/blob/dev/examples/factory/index.html"},
-        {name: "System State Components", url: "systemstatecomponents/index.html", source: "https://github.com/MozillaReality/ecsy/blob/dev/examples/systemstatecomponents/index.html"}
+        {name: "Circles and boxes", url: "circles-boxes/index.html"},
+        {name: "Intersecting circles", url: "canvas/index.html"},
+        {name: "Three.js ball", url: "ball-example/three/index.html"},
+        {name: "Babylon.js ball", url: "ball-example/babylon/index.html"},
+        {name: "Factory", url: "factory/index.html"},
+        {name: "System State Components", url: "systemstatecomponents/index.html"}
       ];
 
       let hash = window.location.hash;
@@ -133,7 +135,7 @@
         });
 
         let sourceLink = document.createElement("a");
-        sourceLink.href = example.source;
+        sourceLink.href = repoUrl + example.url;
         sourceLink.target = "_blank";
         sourceLink.innerHTML = "(source)";
 
