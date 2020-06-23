@@ -2,18 +2,23 @@
   "name": "ecsy",
   "version": "0.2.6",
   "description": "Entity Component System in JS",
-  "main": "build/ecsy.js",
-  "jsnext:main": "build/ecsy.module.js",
-  "module": "build/ecsy.module.js",
+  "main": "lib/index.js",
+  "module": "src/index.js",
   "types": "src/index.d.ts",
   "scripts": {
-    "build": "rollup -c && npm run docs",
-    "docs": "rm docs/api/_sidebar.md; typedoc --readme none --mode file --excludeExternals --plugin typedoc-plugin-markdown  --theme docs/theme --hideSources --hideBreadcrumbs --out docs/api/ --includeDeclarations --includes 'src/**/*.d.ts' src; touch docs/api/_sidebar.md",
+    "build": "npm run clean && rollup -c && npm run docs && npm run build:cjs",
+    "build:cjs": "rimraf lib && babel src -d lib",
+    "docs": "cp README.md site/docs/README.md && rimraf site/docs/api/_sidebar.md; typedoc --readme none --mode file --excludeExternals --plugin typedoc-plugin-markdown  --theme site/docs/theme --hideSources --hideBreadcrumbs --out site/docs/api/ --includeDeclarations --includes 'src/**/*.d.ts' src; touch site/docs/api/_sidebar.md",
     "dev:docs": "nodemon -e ts -x 'npm run docs' -w src",
     "dev": "concurrently --names 'ROLLUP,DOCS,HTTP' -c 'bgBlue.bold,bgYellow.bold,bgGreen.bold' 'rollup -c -w -m inline' 'npm run dev:docs' 'npm run dev:server'",
-    "dev:server": "http-server -c-1 -p 8080 --cors",
-    "lint": "eslint src test examples",
+    "dev:server": "http-server -c-1 -p 8080 --cors ./site",
+    "lint": "eslint src test site/examples",
     "start": "npm run dev",
+    "deploy": "np",
+    "clean": "rimraf lib build site/build site/docs/README.md site/docs/api site/benchmarks.module.js",
+    "prepublishOnly": "npm run build",
+    "postdeploy": "npm run gh-pages",
+    "gh-pages": "gh-pages --dist=./site --dotfiles=true",
     "benchmarks": "node -r esm --expose-gc benchmarks/index.js",
     "test": "ava",
     "travis": "npm run lint && npm run test && npm run build",
@@ -21,45 +26,38 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/fernandojsg/ecsy.git"
+    "url": "git+https://github.com/MozillaReality/ecsy.git"
   },
   "keywords": [
     "ecs",
     "entity component system"
   ],
-  "author": "Fernando Serrano <fernandojsg@gmail.com> (http://fernandojsg.com)",
+  "author": "Mozilla Reality <mr-internal@mozilla.com> (https://mixedreality.mozilla.org)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/fernandojsg/ecsy/issues"
+    "url": "https://github.com/MozillaReality/ecsy/issues"
   },
   "ava": {
     "files": [
       "test/**/*.test.js"
     ],
     "require": [
-      "babel-register",
       "esm"
     ]
   },
-  "jspm": {
-    "files": [
-      "package.json",
-      "LICENSE",
-      "README.md",
-      "build/ecsy.js",
-      "build/ecsy.min.js",
-      "build/ecsy.module.js"
-    ],
-    "directories": {}
-  },
-  "homepage": "https://github.com/fernandojsg/ecsy#readme",
+  "files": [
+    "build",
+    "lib",
+    "src"
+  ],
+  "homepage": "https://github.com/MozillaReality/ecsy#readme",
   "devDependencies": {
+    "@babel/cli": "^7.10.1",
+    "@babel/core": "^7.10.2",
+    "@babel/plugin-transform-modules-commonjs": "^7.10.1",
     "@rollup/plugin-node-resolve": "^8.0.1",
     "ava": "^3.9.0",
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.3",
     "babel-eslint": "^10.0.3",
-    "babel-loader": "^8.0.6",
     "benchmarker-js": "0.0.3",
     "concurrently": "^4.1.2",
     "docsify-cli": "^4.4.0",
@@ -67,11 +65,15 @@
     "eslint-config-prettier": "^4.3.0",
     "eslint-plugin-prettier": "^3.1.2",
     "esm": "^3.2.25",
+    "gh-pages": "^3.0.0",
     "http-server": "^0.11.1",
     "nodemon": "^1.19.4",
+    "np": "^6.2.4",
     "prettier": "^1.19.1",
+    "rimraf": "^3.0.2",
     "rollup": "^1.29.0",
     "rollup-plugin-json": "^4.0.0",
+    "rollup-plugin-sourcemaps": "^0.6.2",
     "rollup-plugin-terser": "^5.2.0",
     "typedoc": "^0.15.8",
     "typedoc-plugin-markdown": "^2.2.16",

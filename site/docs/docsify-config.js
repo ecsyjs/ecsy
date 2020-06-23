@@ -2,7 +2,7 @@ window.$docsify = {
   name: "ecsy",
   loadSidebar: true,
   auto2top: true,
-  homepage: "../README.md",
+  homepage: "./README.md",
   relativePath: true,
   search: {
     paths: "auto",
