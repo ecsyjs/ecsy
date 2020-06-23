@@ -1,5 +1,4 @@
 import { now } from "./Utils.js";
-import { System } from "./System.js";
 
 export class SystemManager {
   constructor(world) {
