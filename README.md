@@ -61,7 +61,7 @@ npm install --save ecsy
     </style>
     
     <script type="module">
-      import { World, System, TagComponent } from "https://ecsy.io/build/ecsy.module.js";
+      import { World, System, Component, TagComponent, Types } from "https://ecsy.io/build/ecsy.module.js";
 
       const NUM_ELEMENTS = 50;
       const SPEED_MULTIPLIER = 0.3;
@@ -79,25 +79,27 @@ npm install --save ecsy
       //----------------------
       
       // Velocity component
-      class Velocity {
-        constructor() {
-          this.x = this.y = 0;
-        }
-      }
+      class Velocity extends Component {}
+
+      Velocity.schema = {
+        x: { type: Types.Number },
+        y: { type: Types.Number }
+      };
 
       // Position component
-      class Position {
-        constructor() {
-          this.x = this.y = 0;
-        }
-      }
+      class Position extends Component {}
+
+      Position.schema = {
+        x: { type: Types.Number },
+        y: { type: Types.Number }
+      };
       
       // Shape component
-      class Shape {
-        constructor() {
-          this.primitive = 'box';
-        }
-      }
+      class Shape extends Component {}
+
+      Shape.schema = {
+        primitive: { type: Types.String, default: 'box' }
+      };
       
       // Renderable component
       class Renderable extends TagComponent {}
@@ -178,9 +180,13 @@ npm install --save ecsy
         renderables: { components: [Renderable, Shape] }
       }
       
-      // Create world and register the systems on it
+      // Create world and register the components and systems on it
       var world = new World();
       world
+        .registerComponent(Velocity)
+        .registerComponent(Position)
+        .registerComponent(Shape)
+        .registerComponent(Renderable)
         .registerSystem(MovableSystem)
         .registerSystem(RendererSystem);
 
@@ -236,7 +242,7 @@ npm install --save ecsy
   </body>
 </html>
 ```
-[Try it on glitch](https://glitch.com/~ecsy-boxes-and-circles)
+[Try it on glitch](https://glitch.com/~ecsy-0-3-0-boxes-and-circles)
 
 
 You can also include the hosted javascript directly on your HTML:
