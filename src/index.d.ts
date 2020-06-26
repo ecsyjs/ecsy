@@ -1,8 +1,10 @@
+import { Entity } from "./Entity";
 export * from "./World";
 export * from "./System";
-export { Entity as _Entity } from "./Entity";
+export *from "./Entity";
 export * from "./Component";
 export * from "./TagComponent";
 export * from "./SystemStateComponent";
 export * from "./Types";
+export const _Entity: Entity;
 export as namespace ecsy;
