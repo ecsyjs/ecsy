@@ -63,7 +63,7 @@ ComponentA.schema = {
 }
 ```
 
-The schema is used to set the default values of a component. ECSY also uses it to implement the default `.copy()`, `.clone()`, and `.reset()` methods. Schemas can also be used for tooling and serialization, something we plan on covering in the future.
+The schema is used to set the default values of a component. ECSY also uses it to implement the default `.copy()`, `.clone()`, and `.reset()` methods. Setting the initial values of a component, and resetting them via `.reset()` are necessary for pooling. When you define a schema, you get this for free! Schemas can also be used for tooling and serialization, something we plan on covering in the future.
 
 Each property in a schema represents a property on the component:
 
@@ -177,10 +177,14 @@ ECSY should know how to reset a component to its original state, if your compone
 
 #### Custom Components
 
-Sometimes it's not possible to define a component with a schema. If you still want to get the benefits of object pooling you can override some of the methods on the `Component` class.
+Sometimes it's not possible to define a component with a schema. If you still want to get the benefits of object pooling or redefine how `.copy()` or `.clone()` work, you can override any or all of the methods on the `Component` class.
 
 ```javascript
 class ColorArray extends Component {
+  /**
+   * The constructor should set the initial values for a component.
+   * Override this method to set your own initial values.
+   **/
   constructor(props) {
     // Pass false to disable using the schema for default values.
     super(false);
@@ -189,6 +193,11 @@ class ColorArray extends Component {
     this.value = [];
   }
 
+  /**
+   * The copy method is used when copying properties from one component to another.
+   * Copy is used when copying/cloning entities/components, it is not used in component pooling.
+   * You can re-implement this method to increase performance or deal with complex data structures.
+   **/
   copy(src) {
     this.value.length = src.value.length;
 
@@ -200,15 +209,26 @@ class ColorArray extends Component {
       destColor.g = srcColor.g;
       destColor.b = srcColor.b;
     }
+
+    return this;
   }
 
   /**
-   * We don't need to override clone in this case.
+   * Clone returns a new, identical instance of a component.
+   * We don't need to override clone in this case. However, if you needed to pass an argument
+   * to the constructor, you could override clone to do so.
+   * 
    * clone() {
    *  return new this.constructor().copy(this);
    * }
    **/
 
+  /**
+   * The reset method is used to reset the component back to it's initial state.
+   * It's used in component pools when a component is disposed. It can be called fairly often so it is a common method
+   * to optimize when you are adding/removing a lot of this type of component. You'll want to avoid memory allocation
+   * as much as possible in the reset method. Try to reuse existing data structures whenever possible.
+   **/
   reset() {
     this.value.forEach(color => {
       color.r = 0;
