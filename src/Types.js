@@ -77,8 +77,8 @@ export const Types = {
     clone: cloneArray
   }),
 
-  Object: createType({
-    name: "Object",
+  Ref: createType({
+    name: "Ref",
     default: undefined,
     copy: copyValue,
     clone: cloneValue

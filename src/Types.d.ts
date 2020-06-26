@@ -19,7 +19,7 @@ export interface PropTypes {
   Boolean: PropType<boolean>;
   String: PropType<string>;
   Array: PropType<Array<any>>;
-  Object: PropType<any>;
+  Ref: PropType<any>;
   JSON: PropType<any>;
 }
 

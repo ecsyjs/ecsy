@@ -28,19 +28,28 @@ world = new World();
 ## Creating components
 Components are just objects that hold data. We can use any way to define them, for example using ES6 class syntax (recommended):
 ```javascript
-class Acceleration {
-  constructor() {
-    this.value = 0.1;
-  }
-}
+class Acceleration extends Component {}
 
-class Position {
-  constructor() {
-    this.x = 0;
-    this.y = 0;
-    this.z = 0;
-  }
-}
+Acceleration.schema = {
+  value: { type: Types.Number, default: 0.1 }
+};
+
+class Position extends Component {}
+
+Position.schema = {
+  x: { type: Types.Number },
+  y: { type: Types.Number },
+  z: { type: Types.Number }
+};
+
+```
+
+Then we need to register components with the world to use them.
+
+```javascript
+  world
+    .registerComponent(Acceleration)
+    .registerComponent(Position);
 ```
 
 [More info on how to create components](/manual/Architecture?id=components).
@@ -188,19 +197,23 @@ import { World, System } from 'ecsy';
 
 let world = new World();
 
-class Acceleration {
-  constructor() {
-    this.value = 0.1;
-  }
-}
+class Acceleration extends Component {}
 
-class Position {
-  constructor() {
-    this.x = 0;
-    this.y = 0;
-    this.z = 0;
-  }
-}
+Acceleration.schema = {
+  value: { type: Types.Number, default: 0.1 }
+};
+
+class Position extends Component {}
+
+Position.schema = {
+  x: { type: Types.Number },
+  y: { type: Types.Number },
+  z: { type: Types.Number }
+};
+
+world
+  .registerComponent(Acceleration)
+  .registerComponent(Position);
 
 class PositionLogSystem extends System {
   init() {}

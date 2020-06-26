@@ -50,34 +50,77 @@ world = new World();
 
 ## Components
 A `Component` ([API Reference](/api/classes/component)) is an object that can store data but should have not behaviour (As that should be handled by systems). There is not a mandatory way to define a component.
-It could just be a function:
+
+To create a component you must extend the `Component` class and define a schema:
 ```javascript
-function ComponentA() {
-  this.number = 10;
-  this.string = "Hello";
+import { Component, Types } from 'ecsy';
+
+class ComponentA extends Component {}
+
+ComponentA.schema = {
+  number: { type: Types.Number, default: 10 },
+  string: { type: Types.String, default: "Hello" }
 }
 ```
 
-The recommended way is using ES6 classes and extending the `Component` class:
-```javascript
-import { Component } from 'ecsy';
+The schema is used to set the default values of a component. ECSY also uses it to implement the default `.copy()`, `.clone()`, and `.reset()` methods. Setting the initial values of a component, and resetting them via `.reset()` are necessary for pooling. When you define a schema, you get this for free! Schemas can also be used for tooling and serialization, something we plan on covering in the future.
 
-class ComponentA extends Component {
+Each property in a schema represents a property on the component:
+
+```javascript
+const component = new ComponentA();
+console.log(component.number === 10); // true
+```
+
+The `type` field must be set for each property. Each type has a default value as well as `.copy()` and `.clone()` functions.
+
+ECSY comes with a few primitive types:
+- `Types.Number`: Defaults to `0`.
+- `Types.Boolean`: Defaults to `false`.
+- `Types.String`: Defaults to `""`.
+- `Types.Ref`: Defaults to `undefined`. Copies by reference, not a deep clone.
+- `Types.JSON`: Defaults to `null`. Copies/clones via `JSON.parse(JSON.stringify(src))`, this is somewhat expensive but sometimes useful.
+- `Types.Array`: Defaults to `[]`. Copies/clones each item by value.
+
+You can also define your own types with `createType()`[API Reference](/api#createType).
+
+```javascript
+import { createType, copyCopyable, cloneClonable } from "ecsy";
+
+class Vector2 {
   constructor() {
-    super();
-    this.number = 10;
-    this.string = "Hello";
+    this.x = 0;
+    this.y = 0;
+  }
+
+  set(x, y) {
+    this.x = x;
+    this.y = y;
+    return this;
+  }
+
+  copy(source) {
+    this.x = source.x;
+    this.y = source.y;
+    return this;
+  }
+
+  clone() {
+    return new Vector2().set(this.x, this.y);
   }
 }
-```
 
-It is also recommended to implement the following functions on every component class:
-- `copy(src)`: Copy the values from the `src` component.
-- `reset()`: Reset the component's attributes to their default values.
+export const Vector2Type = createType({
+  name: "Vector2",
+  default: new Vector2(),
+  copy: copyCopyable,
+  clone: cloneClonable
+});
+```
 
 ### Tag Components
 
-Some components don't store data and are used just as tags. In these cases it is recommended to extends `TagComponent` ([API Reference](/api/classes/tagcomponent) so the engine could, eventually, optimize the usage of this component.
+Some components don't store data and are used just as tags. In these cases it is recommended to extend `TagComponent` ([API Reference](/api/classes/tagcomponent) so the engine could, eventually, optimize the usage of this component.
 
 ```javascript
 class Enemy extends TagComponent {}
@@ -90,11 +133,11 @@ entity.addComponent(Enemy);
 Components could be made of multiple attributes, but sometimes they just contain a single attribute.
 In these cases using the attribute's name to match the component's name may seem handy:
 ```javascript
-class Acceleration {
-  constructor() {
-    this.acceleration = 0.1;
-  }
-}
+class Acceleration extends Component {}
+
+Acceleration.schema = {
+  acceleration: { type: Types.Number, default: 0.1 }
+};
 ```
 
 But when accessing the value it seems redundant to use two `acceleration` references:
@@ -105,11 +148,11 @@ let acceleration = entity.getComponent(Acceleration).acceleration;
 
 We suggest to use `value` as the attribute name for these components as:
 ```javascript
-class Acceleration {
-  constructor() {
-    this.value = 0.1;
-  }
-}
+class Acceleration extends Component {}
+
+Acceleration.schema = {
+  value: { type: Types.Number, default: 0.1 }
+};
 
 let acceleration = entity.getComponent(Acceleration).value;
 ```
@@ -119,7 +162,7 @@ Eventually we could end up adding some syntactic sugar for these type of compone
 let acceleration = entity.getComponentValue(Acceleration);
 ```
 
-### Components pooling
+### Component pooling
 
 Usually an ECSY application will involve adding and removing components in real time. Allocating resources in a performance sensitive application is considered a bad pattern because the garbage collector will get called often and may impact performance.
 In order to minimize it, ECSY includes pooling for components.
@@ -130,35 +173,131 @@ entity.addComponent(ComponentA)
 the engine will try to reuse a `ComponentA` instance, from the pool of components previously created, and it won't allocate a new one instead.
 When releasing that component, by calling `entity.removeComponent(ComponentA)`, it will get returned to the pool, ready to be used by another entity.
 
-ECSY should know how to reset a component to its original state, that's why it's highly recommended that components implements a `reset` method to get the benefits from pooling.
+ECSY should know how to reset a component to its original state, if your component has the proper schema defined, ECSY will do this for you.
+
+#### Custom Components
+
+Sometimes it's not possible to define a component with a schema. If you still want to get the benefits of object pooling or redefine how `.copy()` or `.clone()` work, you can override any or all of the methods on the `Component` class.
 
 ```javascript
-// Example of components with `reset` methods implemented
+class ColorArray extends Component {
+  /**
+   * The constructor should set the initial values for a component.
+   * Override this method to set your own initial values.
+   **/
+  constructor(props) {
+    // Pass false to disable using the schema for default values.
+    super(false);
 
-class List extends Component {
-  constructor() {
+    // Set your own default values instead
     this.value = [];
   }
 
-  reset() {
-    this.value.length = 0;
-  }
-}
+  /**
+   * The copy method is used when copying properties from one component to another.
+   * Copy is used when copying/cloning entities/components, it is not used in component pooling.
+   * You can re-implement this method to increase performance or deal with complex data structures.
+   **/
+  copy(src) {
+    this.value.length = src.value.length;
 
-class Position extends Component {
-  constructor() {
-    this.reset();
+    for (let i = 0; i < src.value.length; i++) {
+      const srcColor = src.value[i];
+      const destColor = this.value[i];
+
+      destColor.r = srcColor.r;
+      destColor.g = srcColor.g;
+      destColor.b = srcColor.b;
+    }
+
+    return this;
   }
 
+  /**
+   * Clone returns a new, identical instance of a component.
+   * We don't need to override clone in this case. However, if you needed to pass an argument
+   * to the constructor, you could override clone to do so.
+   * 
+   * clone() {
+   *  return new this.constructor().copy(this);
+   * }
+   **/
+
+  /**
+   * The reset method is used to reset the component back to it's initial state.
+   * It's used in component pools when a component is disposed. It can be called fairly often so it is a common method
+   * to optimize when you are adding/removing a lot of this type of component. You'll want to avoid memory allocation
+   * as much as possible in the reset method. Try to reuse existing data structures whenever possible.
+   **/
   reset() {
-    this.x = 0;
-    this.y = 0;
-    this.z = 0;
+    this.value.forEach(color => {
+      color.r = 0;
+      color.g = 0;
+      color.b = 0;
+    });
   }
 }
 ```
 
-It is possible to use the helper function `createComponentClass` to ease the creation of components as it will implement the `reset` and `copy` functions automatically.
+In extreme cases, you may experience performance bottlenecks due to the default implementation of the `Component` class. If you experience this, you can override that specific component with your own faster implementation.
+
+#### Disable Component Pooling
+
+In other cases you may want to disable component pooling altogether. Some components can't be copied or cloned properly.
+
+In this case you can disable component pooling when you first register a component:
+
+```javascript
+class AudioListener extends Component {
+  constructor(props) {
+    super(false);
+    this.listener = props.listener;
+  }
+
+  clone() {
+    throw new Error("unimplemented");
+  }
+
+  copy() {
+    throw new Error("unimplemented");
+  }
+
+  reset() {
+    throw new Error("unimplemented");
+  }
+}
+
+// Pass false to registerComponent to disable component pooling
+world.registerComponent(AudioListener, false);
+```
+
+#### Custom Component Pooling
+
+Additionally, you can implement your own component pool or configure component pool settings by passing an instance of `ObjectPool` as the second argument to `registerComponent`
+
+```javascript
+import { ObjectPool } from 'ecsy';
+
+// Register MyComponent with an ObjectPool that has 1000 initial instances of MyComponent
+world.registerComponent(MyComponent, new ObjectPool(MyComponent, 1000));
+
+// Use your own custom ObjectPool implementation
+class MyObjectPool extends ObjectPool {
+  acquire() {
+    // Your implementation
+  }
+
+  release(item) {
+    // Your implementation
+  }
+
+  expand(count) {
+    // Your implementation
+  }
+}
+
+world.registerComponent(MyComponent, new MyObjectPool(MyComponent, 1000));
+```
 
 ### System State Components
 
@@ -167,18 +306,17 @@ They can be used to detect when an entity has been added or removed from a query
 
 SSC can be defined by extending `SystemStateComponent` [API Reference](/api/classes/systemstatecomponent) instead of `Component`. Once the SSC is defined, it can be used as any other component.
 ```javascript
-class StateComponentGeometry extends SystemStateComponent {
-  constructor() {
-    super();
-    this.meshReference = null;
-  }
-}
+class StateComponentGeometry extends SystemStateComponent {}
 
-class Geometry {
-  constructor() {
-    this.primitive = "box";
-  }
-}
+StateComponentGeometry.schema = {
+  meshReference: { type: Types.Ref }
+};
+
+class Geometry extends Component {}
+
+Geometry.schema = {
+  primitive: { type: Types.String, default: "box" }
+};
 ```
 
 In this example `StateComponentGeometry` is used to store the mesh resources created as defined in the `Geometry` component.
@@ -220,122 +358,6 @@ MySystem.queries = {
   remove: { components: [Not(Geometry), StateComponentGeometry] },
   normal: { components: [Geometry, StateComponentGeometry] },
 };
-```
-
-## Create component helper
-Creating a component and implementing its `reset` function can be a repetitive task specially when we are working with simple data types.
-At the same time it could lead to side effects errors, specially when pooling components, if there is some bug on one of the components' `reset` function for example.
-In order to ease this task, it is possible to use a helper function called `createComponentClass(schema, className)` which takes a JSON schema with the definition of the component and generate the class, automatically implementing the `reset`, `copy` and `clear` functions.
-
-The JSON defines the number of the attributes of the components, its default value and type.
-
-```javascript
-var ExampleComponent = createComponentClass({
-  number:  { default: 0.5 },
-  string:  { default: "foo" },
-  bool:    { default: true },
-  array:   { default: [1, 2, 3] },
-  vector3: { default: new Vector3(4, 5, 6), type: CustomTypes.Vector3 }
-}, "ExampleComponent");
-```
-
-Basic types (number, boolean, string and arrays) are inferred by the default value. It is possible to use custom type defined by `createType` (explained in the next section).
-The second parameter for `createComponentClass` is the class name for the component. The name is not mandatory but is strongly recommended as it will ease debugging and tracing.
-
-The previous example will create a `ExampleComponent` component that is ready to add to entities, as if it were created manually:
-```javascript
-entity.addComponent(ExampleComponent);
-```
-
-In fact the equivalent of that code could be something like:
-```javascript
-class ExampleComponent extends Component {
-  constructor() {
-    super();
-    this.reset();
-  }
-
-  clear() {
-    this.number = 0;
-    this.string = "";
-    this.bool = false;
-    this.array.length = 0;
-    this.vector3.set(0, 0, 0);
-  }
-
-  copy(src) {
-    this.number = src.number;
-    this.string = src.string;
-    this.bool = src.bool;
-    this.array = src.array.splice();;
-    this.vector3.copy(src.vector3);
-  }
-
-  reset() {
-    this.number = 0.5;
-    this.string = "foo";
-    this.bool = true;
-    this.array = [1, 2, 3];
-    this.vector3 = new Vector3(4, 5, 6);
-  }
-}
-```
-
-Even using such a simple example, without complex data types, is easy to understand that implementing all the functions `clear`, `copy` and `reset` could lead to small bugs that could have unexpected side effects that should not be present when using the `createComponentClass`.
-
-It is important to note that when defining an schema every attribute must have a known type, if no data type is provided for complex types, `createComponentClass` will not implement `clear`, `copy` and `reset` and it will just return the component class with the attributes defined.
-
-### Data types
-
-It is possible to use custom types, to be used in the schema definition when calling `createComponentClass`, by defining them with `createType`:
-
-```javascript
-createType({
-  baseType: T,
-  create: defaultValue => {},
-  reset (src, key, defaultValue) => {},
-  clear: (src, key) => {},
-})
-```
-
-Where:
-- `create(defaultValue)`: Return a value of type `baseType` using a default value.
-- `reset(src, key, defaultValue)`: Reset the `key` attribute on the object `src` with the default value.
-- `clear(src, key)`: Clear the `key` attribute on the object `src`.
-- `copy(src, dst, key)`: Copy the `key` attribute from the object `src` to the object `src`.
-
-Type definition for basic standard types are [already defined](https://github.com/MozillaReality/ecsy/blob/dev/src/StandardTypes.js) in the library: `number`, `boolean`, `string` and `array`.
-
-The following code implements a custom type for a `Vector3` imported from an external library:
-
-```javascript
-  var CustomVector3 = createType({
-    baseType: Vector3,
-    create: defaultValue => {
-      var v = new Vector3(0, 0, 0);
-      if (typeof defaultValue !== "undefined") {
-        v.copy(defaultValue);
-      }
-      return v;
-    },
-    reset: (src, key, defaultValue) => {
-      if (typeof defaultValue !== "undefined") {
-        src[key].copy(defaultValue);
-      } else {
-        src[key].set(0, 0, 0);
-      }
-    },
-    clear: (src, key) => {
-      src[key].set(0, 0, 0);
-    }
-  });
-```
-
-As the type for `Vector3` has been already defined, it is possible to use it to define a component:
-```javascript
-let ExampleComponent = createComponentClass({
-  vector3: { default: new Vector3(4, 5, 6), type: CustomVector3 }
-}, "ExampleComponent");
 ```
 
 ## Entities
@@ -700,12 +722,11 @@ When a component or an entity is removed, one `to be removed` flag is activated 
 // Component to identify a wolf
 class Wolf extends TagComponent {}
 
-// Component to store how long is sleeping the wolf
-class Sleeping extends Component {
-  constructor() {
-    super();
-    this.startSleepingTime = 0;
-  }
+// Component to store how long the wolf is sleeping 
+class Sleeping extends Component {}
+
+Sleeping.schema = {
+  startSleepingTime: { type: Types.Number }
 }
 
 // This system will wake up sleeping wolves randomly
