@@ -78,7 +78,7 @@ ECSY comes with a few primitive types:
 - `Types.Number`: Defaults to `0`.
 - `Types.Boolean`: Defaults to `false`.
 - `Types.String`: Defaults to `""`.
-- `Types.Object`: Defaults to `undefined`. Copies by value, not a deep clone.
+- `Types.Ref`: Defaults to `undefined`. Copies by reference, not a deep clone.
 - `Types.JSON`: Defaults to `null`. Copies/clones via `JSON.parse(JSON.stringify(src))`, this is somewhat expensive but sometimes useful.
 - `Types.Array`: Defaults to `[]`. Copies/clones each item by value.
 
@@ -309,7 +309,7 @@ SSC can be defined by extending `SystemStateComponent` [API Reference](/api/clas
 class StateComponentGeometry extends SystemStateComponent {}
 
 StateComponentGeometry.schema = {
-  meshReference: { type: Types.Object }
+  meshReference: { type: Types.Ref }
 };
 
 class Geometry extends Component {}
