@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+  <head>
+    <meta charset="utf-8">
+    <title>ECSY</title>
+    <meta name="description" content="ECSY experimental entity component system framework for the web">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css?family=Lora:400,700|Montserrat:300" rel="stylesheet">
+    <style>
+      :root {
+        --color-blue: #049EF4;
+        --text-color: #444;
+      }
+      html, body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        font-family: 'Chivo', sans-serif;
+        font-weight: 300;
+      }
+      .flex-container {
+        height: 100%;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .row {
+        width: auto;
+        text-align: center;
+      }
+      h1, h2, h3, h4, h5, h6 {
+        font-family: 'Lora', serif;
+        font-weight: 700;
+      }
+      h1 {
+        font-size: 5em;
+        margin-top: 0px;
+      }
+      span {
+        font-size: 1.2em;
+        color: var(--text-color);
+      }
+      a {
+        text-decoration: none;
+        color: #99A;
+      }
+      a:hover {
+        color: var(--color-blue);
+      }
+      .by {
+        display: block;
+        margin-top: 40px;
+        font-size: 0.8em;
+      }
+  </style>
+  </head>
+  <body>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-77033033-25"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-77033033-25');
+    </script>
+    <div class="flex-container">
+      <div class="row">
+        <h1>ECSY</h1>
+        <span>An highly experimental Entity Component System for the web</span>
+        <br/><br/>
+        <span>
+          <a href="docs">documentation</a> -
+          <a href="examples">examples</a> -
+          <a href="https://github.com/MozillaReality/ecsy">github</a> -
+          <a href="https://discourse.mozilla.org/c/mixed-reality/ecsy">forum</a>
+        </span>
+
+        <span class="by">by the <a href="https://mixedreality.mozilla.org/">Mozilla Mixed Reality team</a></span>
+      </div>
+    </div>
+  </body>
+</html>

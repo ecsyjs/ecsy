@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+  <head>
+    <meta charset="utf-8">
+    <title>ECSY</title>
+    <meta name="description" content="ECSY experimental entity component system framework for the web">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css?family=Lora:400,700|Montserrat:300" rel="stylesheet">
+    <style>
+      :root {
+        --color-blue: #049EF4;
+        --text-color: #444;
+        --border-style: 1px solid #E8E8E8;
+        --panel-width: 350px;
+      }
+      html, body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        font-family: 'Chivo', sans-serif;
+        font-weight: 300;
+      }
+      h1, h2, h3, h4, h5, h6 {
+        font-family: 'Lora', serif;
+        font-weight: 700;
+      }
+      span {
+        color: var(--text-color);
+      }
+      a {
+        text-decoration: none;
+        color: #99A;
+      }
+      a:hover {
+        color: var(--color-blue);
+      }
+      .sidebar {
+        position: fixed;
+        left: 0px;
+        width: var(--panel-width);
+        border-right: var(--border-style);
+        height: 100%;
+        z-index: 100;
+      }
+      .content {
+        padding: 20px;
+      }
+      .sidebar span {
+        display: block;
+        margin-bottom: 10px;
+      }
+      #viewer {
+        padding-left: var(--panel-width);
+      }
+      #viewer, iframe {
+        position: absolute;
+        border: 0px;
+        left: 0;
+        right: 0;
+        width: calc(100% - var(--panel-width));
+        height: 100%;
+        overflow: auto;
+      }
+      .selected {
+        text-decoration: underline;
+      }
+      span a {
+        display: inline;
+      }
+
+      span a:first-child {
+        font-weight: 600;
+      }
+  </style>
+  </head>
+  <body>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-77033033-25"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-77033033-25');
+    </script>
+    <div class="flex-container">
+      <div class="sidebar">
+        <div class="content">
+          <div style="text-align: center">
+              <h1>ECSY</h1>
+          </div>
+        </div>
+      </div>
+      <iframe id="viewer" name="viewer" allowfullscreen="" allowvr="" onmousewheel=""></iframe>
+    </div>
+    <script>
+      const repoUrl = "https://github.com/MozillaReality/ecsy/blob/master/site/examples/";
+
+      let examples = [
+        {name: "Circles and boxes", url: "circles-boxes/index.html"},
+        {name: "Intersecting circles", url: "canvas/index.html"},
+        {name: "Three.js ball", url: "ball-example/three/index.html"},
+        {name: "Babylon.js ball", url: "ball-example/babylon/index.html"},
+        {name: "Factory", url: "factory/index.html"},
+        {name: "System State Components", url: "systemstatecomponents/index.html"}
+      ];
+
+      let hash = window.location.hash;
+      let selectedIndex = -1;
+      if(hash){
+        selectedIndex = examples.findIndex(example => "#"+encodeURI(example.name) == hash);
+      }
+
+      let container = document.getElementsByClassName("content")[0];
+
+      let selectedLine = null;
+
+      //make example list with this template
+      //<span><a href="demo/index.html" target="viewer">Name</a> <a href="source link" target="_blank">(source)</a></span>
+      for(let i=0; i<examples.length; i++){
+        const example = examples[i];
+
+        let demoLink = document.createElement("a");
+        demoLink.href = example.url;
+        demoLink.target = "viewer";
+        demoLink.innerHTML = example.name;
+        demoLink.addEventListener( 'click', function ( event ) {
+          if ( event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey ) return;
+          window.location.hash = encodeURI(example.name);
+
+          if(selectedLine)
+            selectedLine.classList.remove("selected");
+          let line = event.currentTarget.parentNode;
+          line.classList.add("selected");
+          selectedLine = line;
+        });
+
+        let sourceLink = document.createElement("a");
+        sourceLink.href = repoUrl + example.url;
+        sourceLink.target = "_blank";
+        sourceLink.innerHTML = "(source)";
+
+        let exampleLine = document.createElement("span");
+        exampleLine.appendChild(demoLink);
+        exampleLine.append(" ");
+        exampleLine.appendChild(sourceLink);
+
+        if(selectedIndex === i){
+          exampleLine.classList.add("selected");
+          let viewer = document.getElementById("viewer");
+          viewer.src = example.url;
+
+          selectedLine = exampleLine;
+        }
+
+        container.appendChild(exampleLine);
+      }
+    </script>
+  </body>
+</html>

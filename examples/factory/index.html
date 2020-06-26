@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <link rel="stylesheet" href="">
+  </head>
+  <body>
+    <textarea cols="100" rows="20"></textarea>
+    <br/>
+    <button id="createNPC">Create empty NPC</button>
+    <button id="removeName">Remove name from NPC</button>
+    <button id="removeTshirt">Remove tshirt from NPC</button>
+
+    <script type="module">
+
+      var textarea = document.querySelector('textarea');
+      function log(msg) {
+        console.log(msg);
+        textarea.innerHTML += msg + '\n';
+      }
+
+      import {World, System, Component, TagComponent, Not, Types} from '../../build/ecsy.module.js';
+
+      const names = [ 'Isabel', 'Scot', 'Francene', 'Robert', 'Kizzie', 'Leroy', 'Layla', 'Stella', 'Marianela', 'Devorah'];
+      const sizes = [ 'XS', 'S', 'M', 'L', 'XL' ];
+      const colors = [ 'white', 'red', 'yellow', 'purple', 'pink', 'blue', 'cyan', 'black' ];
+
+      // Components
+      class NPC extends TagComponent {}
+
+      class Name extends Component {}
+
+      Name.schema = {
+        value: { type: Types.String }
+      };
+
+      class Tshirt extends Component {}
+
+      Tshirt.schema = {
+        color: { type: Types.String, default: 'white' },
+        size: { type: Types.String, default: 'XL' }
+      };
+
+      // Systems
+      class NameSystem extends System {
+        execute() {
+          this.queries.entities.results.forEach(entity => {
+            var name = randomFromArray(names);
+            log(`Added name '${name}' to player id=${entity.id}`);
+            entity.addComponent(Name, {value: name});
+          });
+        }
+      }
+
+      NameSystem.queries = {
+        entities: { components: [NPC, Not(Name)] }
+      };
+
+      class TshirtSystem extends System {
+        execute() {
+          this.queries.entities.results.forEach(entity => {
+            var size = randomFromArray(sizes);
+            var color = randomFromArray(colors);
+            log(`Added '${color}' '${size}' tshirt to player id=${entity.id}`);
+            entity.addComponent(Tshirt, {color: color, size: size});
+          });
+        }
+      }
+
+      TshirtSystem.queries = {
+        entities: { components: [NPC, Not(Tshirt)] }
+      };
+
+      // Initialize our world
+      var world = new World();
+
+      world
+        .registerComponent(NPC)
+        .registerComponent(Tshirt)
+        .registerComponent(Name)
+        .registerSystem(NameSystem)
+        .registerSystem(TshirtSystem)
+
+      // HTML Code to interact with the world
+
+      document.getElementById('createNPC').addEventListener('click', () => {
+        var npc = world.createEntity();
+        npc.addComponent(NPC);
+        log(`> Created NPC, (id = ${npc.id})`);
+      });
+
+      document.getElementById('removeName').addEventListener('click', () => {
+        var entity = randomEntity();
+        if (!entity) return;
+        log(`> Removing name '${entity.getComponent(Name).value}' from player id=${entity.id}`);
+        entity.removeComponent(Name);
+      });
+
+      document.getElementById('removeTshirt').addEventListener('click', () => {
+        var entity = randomEntity();
+        if (!entity) return;
+        var tshirt = entity.getComponent(Tshirt);
+        log(`> Removing '${tshirt.color}' '${tshirt.size}' from player id=${entity.id}`);
+        entity.removeComponent(Tshirt);
+      });
+
+      // Utils
+      function randomEntity() {
+        return randomFromArray(world.entityManager._entities);
+      }
+
+      function randomFromArray(array) {
+        var idx = Math.floor(Math.random() * array.length);
+        return array[idx];
+      }
+
+
+      function animate() {
+        var time = performance.now();
+        var delta = time - lastTime;
+        world.execute(delta, time);
+        lastTime = time;
+        requestAnimationFrame(animate);
+      }
+
+      var lastTime = performance.now();
+      animate();
+
+      window.world = world;
+    </script>
+  </body>
+</html>

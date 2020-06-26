@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <link rel="stylesheet" href="">
+  </head>
+  <body>
+    <textarea cols="100" rows="20"></textarea>
+    <br/>
+    <button id="createEntity">Create empty entity</button>
+    <button id="addSprite">Add Sprite component</button>
+    <button id="removeSprite">Remove Sprite component</button>
+    <button id="removeSpriteResources">Remove SpriteResources system state component</button>
+    <button id="removeEntity">Remove entity</button>
+
+    <script type="module">
+
+      var textarea = document.querySelector('textarea');
+      function log(msg) {
+        console.log(msg);
+        textarea.innerHTML += msg + '\n';
+      }
+
+      import {World, System, Component, SystemStateComponent, Not, Types} from '../../build/ecsy.module.js';
+
+      class Sprite extends Component {}
+
+      Sprite.schema = {
+        name: { type: Types.String, default: "empty" }
+      };
+
+      class SpriteResources extends SystemStateComponent {}
+
+      SpriteResources.schema = {
+        size: { type: Types.Number },
+        memPosition: { type: Types.Number }
+      };
+
+      // Systems
+      class MainSystem extends System {
+        execute() {
+          this.queries.added.results.forEach(entity => {
+            var memPosition = Math.floor(Math.random() * 1000);
+            var size = Math.floor(Math.random() * 900) + 100;
+
+            log(`Added SpriteResources component: 'memory position: ${memPosition}, size: ${size}kb' to entity id=${entity.id}`);
+            entity.addComponent(SpriteResources, {memPosition, size});
+          });
+
+          this.queries.removed.results.forEach(entity => {
+            var resources = entity.getComponent(SpriteResources);
+            log(`Freeing SpriteResources 'memory position: ${resources.memPosition}, size: ${resources.size}kb'`);
+            log(`Removing SpriteResources component from entity id=${entity.id}`);
+            entity.removeComponent(SpriteResources);
+          });
+        }
+      }
+      MainSystem.queries = {
+        added: { components: [Sprite, Not(SpriteResources)] },
+        removed: { components: [Not(Sprite), SpriteResources] },
+        normal: { components: [Sprite, SpriteResources] }
+      };
+
+      // Initialize our world
+      var world = new World();
+
+      world
+        .registerComponent(Sprite)
+        .registerComponent(SpriteResources)
+        .registerSystem(MainSystem)
+
+      // HTML Code to interact with the world
+      document.getElementById('createEntity').addEventListener('click', () => {
+        var entity = world.createEntity();
+        log(`> Created entity, (id = ${entity.id})`);
+      });
+
+      document.getElementById('addSprite').addEventListener('click', () => {
+        var entity = randomEntity();
+        if (!entity) return;
+        log(`> Adding sprite to entity id=${entity.id}`);
+        entity.addComponent(Sprite);
+      });
+
+      document.getElementById('removeSprite').addEventListener('click', () => {
+        var entity = randomEntity();
+        if (!entity) return;
+        log(`> Removing sprite '${entity.getComponent(Sprite).name}' from entity id=${entity.id}`);
+        entity.removeComponent(Sprite);
+      });
+
+      document.getElementById('removeSpriteResources').addEventListener('click', () => {
+        var entity = randomEntity();
+        if (!entity) return;
+        log(`> Removing SpriteResources component from entity id=${entity.id}`);
+        entity.removeComponent(SpriteResources);
+      });
+
+      document.getElementById('removeEntity').addEventListener('click', () => {
+        var entity = randomEntity();
+        if (!entity) return;
+        log(`> Removing entity id=${entity.id}`);
+        entity.remove();
+      });
+
+      // Utils
+      function randomEntity() {
+        return randomFromArray(world.entityManager._entities);
+      }
+
+      function randomFromArray(array) {
+        var idx = Math.floor(Math.random() * array.length);
+        return array[idx];
+      }
+
+
+      function animate() {
+        var time = performance.now();
+        var delta = time - lastTime;
+        world.execute(delta, time);
+        lastTime = time;
+        requestAnimationFrame(animate);
+      }
+
+      var lastTime = performance.now();
+      animate();
+
+      window.world = world;
+    </script>
+  </body>
+</html>

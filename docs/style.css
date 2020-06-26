@@ -1,0 +1,14 @@
+.sidebar-nav ul li, .sidebar-nav ul li a {
+	font-weight: bold;
+}
+.sidebar-nav ul li a {
+	text-decoration: underline;
+}
+.sidebar-nav ul ul li a {
+	font-weight: normal;
+	text-decoration: underline;
+}
+.back-link {
+	color: grey;
+	padding-left: 1em;
+}

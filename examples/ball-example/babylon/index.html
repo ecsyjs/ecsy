@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <meta name="description" content="">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+      html, body {
+        overflow: hidden;
+        width   : 100%;
+        height  : 100%;
+        margin  : 0;
+        padding : 0;
+      }
+
+      #renderCanvas {
+        width   : 100%;
+        height  : 100%;
+        touch-action: none;
+      }
+		</style>
+    <script src="https://preview.babylonjs.com/babylon.js"></script>
+  </head>
+  <body>
+    <canvas id="renderCanvas"></canvas>
+  </body>
+  <script type="module">
+      import {World} from '../../../build/ecsy.module.js';
+      import {Object3D, Collisionable, Collider, Recovering, Moving, PulsatingScale, Timeout, PulsatingColor, Colliding, Rotating} from './components.mjs';
+      import {RotatingSystem, ColliderSystem, PulsatingColorSystem, PulsatingScaleSystem, MovingSystem,TimeoutSystem} from './systems.mjs';
+
+      var world = new World();
+
+      world
+        .registerComponent(Object3D)
+        .registerComponent(Collisionable)
+        .registerComponent(Collider)
+        .registerComponent(Recovering)
+        .registerComponent(Moving)
+        .registerComponent(PulsatingScale)
+        .registerComponent(Timeout)
+        .registerComponent(PulsatingColor)
+        .registerComponent(Colliding)
+        .registerComponent(Rotating)
+        .registerSystem(RotatingSystem)
+        .registerSystem(PulsatingColorSystem)
+        .registerSystem(PulsatingScaleSystem)
+        .registerSystem(TimeoutSystem)
+        .registerSystem(ColliderSystem)
+        .registerSystem(MovingSystem);
+      var camera, scene, renderer, parent;
+	var mesh;
+
+  init();
+
+  function randomSpherePoint(radius) {
+    var u = Math.random();
+    var v = Math.random();
+    var theta = 2 * Math.PI * u;
+    var phi = Math.acos(2 * v - 1);
+    var x = radius * Math.sin(phi) * Math.cos(theta);
+    var y = radius * Math.sin(phi) * Math.sin(theta);
+    var z = radius * Math.cos(phi);
+    return {x,y,z};
+  }
+
+  var objMoving, states;
+	function init() {
+    var numObjects = 10000;
+    var size = 0.2;
+    var w = 100;
+
+    var canvas = document.getElementById('renderCanvas');
+    var engine = new BABYLON.Engine(canvas, true, {preserveDrawingBuffer: true, stencil: true});
+
+    scene = new BABYLON.Scene(engine);
+
+    var camera = new BABYLON.FreeCamera('camera', new BABYLON.Vector3(0, 5,-20), scene);
+    camera.setTarget(BABYLON.Vector3.Zero());
+    camera.attachControl(canvas, false);
+
+    var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0,1,0), scene);
+
+    objMoving = BABYLON.MeshBuilder.CreateIcoSphere('sphere',{subdivisions: 1}, scene);
+    var material = new BABYLON.StandardMaterial();
+    material.diffuseColor.set(1,1,0);
+    objMoving.material = material;
+
+    var radius = 10;
+    var entity = world.entityManager.createEntity();
+    entity.addComponent(Collider);
+    entity.addComponent(Object3D, {object: objMoving});
+    entity.addComponent(Rotating, {rotatingSpeed: 0.5});
+    objMoving.setPivotMatrix(BABYLON.Matrix.Translation(0, 0, radius), false);
+
+    states = [];
+
+    var rootMesh = BABYLON.MeshBuilder.CreateBox('box',{size: size}, scene);
+    var material = new BABYLON.StandardMaterial("material", scene);
+    material.diffuseColor = new BABYLON.Color3(1, 1, 1);
+    rootMesh.material = material;
+    rootMesh.setEnabled(false);
+    
+    rootMesh.registerInstancedBuffer("color", 4);    
+    rootMesh.instancedBuffers.color = new BABYLON.Color4(1, 0, 0, 1);
+
+    for (var i = 0;i < numObjects; i++) {
+      var entity = world.entityManager.createEntity();
+
+      var mesh = rootMesh.createInstance('box');      
+      mesh.instancedBuffers.color = new BABYLON.Color4(1, 0, 0, 1);
+      mesh.alwaysSelectAsActiveMesh = true;
+      mesh.position.copyFrom(randomSpherePoint(radius));
+
+      var state = {
+        mesh: mesh,
+        colliding: false,
+        rotationSpeed: 0,
+        originalColor: new BABYLON.Color4(1, 0, 0, 1),
+        tmpColor: new BABYLON.Color4()
+      };
+
+      states.push(state);
+
+      entity.addComponent(Object3D, {object: mesh});
+      entity.addComponent(PulsatingColor, {offset: i});
+      entity.addComponent(PulsatingScale, {offset: i});
+
+      if (Math.random() > 0.5) {
+        entity.addComponent(Moving, {offset: i});
+      }
+
+      entity.addComponent(Collisionable);
+    }
+
+    scene.freezeActiveMeshes();
+
+    window.addEventListener( 'resize', () => engine.resize());
+    var lastTime = performance.now();
+    engine.runRenderLoop(function() {
+      var time = performance.now() / 1000;
+      var delta = time-lastTime;
+      lastTime = time;
+      scene.render();
+
+      world.execute(delta, time);
+    });
+	}
+  </script>
+
+  </script>
+</html>
