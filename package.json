@@ -1,6 +1,6 @@
 {
   "name": "ecsy",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Entity Component System in JS",
   "main": "lib/index.js",
   "module": "src/index.js",
