@@ -390,7 +390,7 @@ entity.addComponent(ComponentA, {number: 20, string: "Hi"});
 
 ### Accessing components and modify components
 Components can be accessed from an entity in two ways:
-- `getComponent(Component`: Get the component for read only operations.
+- `getComponent(Component)`: Get the component for read only operations.
 - `getMutableComponent(Component)`: Get the component to modify its values.
 
 If `DEBUG` mode is enabled it will throw an error if you try to modify a component accessed by `getComponent`, but that error will not be thrown on release mode because of performance reasons.
