@@ -56,7 +56,7 @@ export class World {
    * @param delta Delta time since the last call
    * @param time Elapsed time
    */
-  execute(delta: number, time: number): void;
+  execute(delta?: number, time?: number): void;
 
   /**
    * Resume execution of this world.
