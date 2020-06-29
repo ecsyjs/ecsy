@@ -113,4 +113,10 @@ export class SystemManager {
 
     return stats;
   }
+
+  toJSON() {
+    let json = {};
+    
+    return json;
+  }
 }

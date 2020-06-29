@@ -144,4 +144,24 @@ export class Entity {
   remove(forceImmediate) {
     return this._entityManager.removeEntity(this, forceImmediate);
   }
+
+  toJSON() {
+    let components = {};
+    Object.entries(this._components).forEach(([componentName, component]) => {
+      const attributes = (components[componentName] = {});
+      Object.entries(component.constructor.schema).forEach(
+        ([attributeName/*, definition*/]) => {
+          // @todo Based on definition convert the data to JSON
+          attributes[attributeName] = component[attributeName];
+        }
+      );
+    });
+
+    let json = {
+      id: this.id,
+      components: components
+    };
+
+    return json;
+  }
 }

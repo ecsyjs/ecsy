@@ -88,4 +88,11 @@ export class World {
 
     console.log(JSON.stringify(stats, null, 2));
   }
+
+  toJSON() {
+    return {
+      entities: this.entityManager.toJSON(),
+      systems: this.systemManager.toJSON()
+    };
+  }
 }

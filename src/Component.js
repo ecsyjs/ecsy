@@ -59,6 +59,10 @@ export class Component {
       this._pool.release(this);
     }
   }
+
+  toJSON() {
+    console.log(this.schema);
+  }
 }
 
 Component.schema = {};

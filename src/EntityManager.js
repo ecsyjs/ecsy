@@ -306,6 +306,15 @@ export class EntityManager {
 
     return stats;
   }
+
+  toJSON() {
+    let json = {
+      entries: this._entities.map(entity => entity.toJSON()),
+      nextEntityId: this._nextEntityId
+    };
+
+    return json;
+  }
 }
 
 const ENTITY_CREATED = "EntityManager#ENTITY_CREATE";
