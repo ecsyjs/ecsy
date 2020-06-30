@@ -1,5 +1,4 @@
 import { ObjectPool } from "./ObjectPool.js";
-import { componentPropertyName } from "./Utils.js";
 
 export class ComponentManager {
   constructor() {

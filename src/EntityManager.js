@@ -1,7 +1,6 @@
 import { ObjectPool } from "./ObjectPool.js";
 import QueryManager from "./QueryManager.js";
 import EventDispatcher from "./EventDispatcher.js";
-import { getName } from "./Utils.js";
 import { SystemStateComponent } from "./SystemStateComponent.js";
 
 class EntityPool extends ObjectPool {
