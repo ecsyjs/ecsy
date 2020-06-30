@@ -25,7 +25,7 @@ test("Initialize", t => {
 
   t.deepEqual(
     world.systemManager.getSystems().map(s => {
-      return s.constructor.name;
+      return s.getName();
     }),
     ["SystemA", "SystemB", "SystemC", "SystemD", "SystemE"]
   );
@@ -40,7 +40,7 @@ test("Initialize", t => {
 
   t.deepEqual(
     world.systemManager.getSystems().map(s => {
-      return s.constructor.name;
+      return s.getName();
     }),
     ["SystemC", "SystemA", "SystemD", "SystemE", "SystemB"]
   );
@@ -900,7 +900,7 @@ test("Components with the the same name in uppercase and lowercase", t => {
   );
 
   t.deepEqual(
-    Object.values(components).map(c => c.constructor.name),
+    Object.values(components).map(c => c.getName()),
     ["B", "b"]
   );
 });
