@@ -85,8 +85,11 @@ export class EntityManager {
    * @param {Object} values Optional values to replace the default attributes
    */
   entityAddComponent(entity, Component, values) {
-    if (this.world.componentsManager.Components.indexOf(Component) === -1) {
-      //if (!this.world.componentsManager.Components[Component._ecsyId]) {
+    // @todo Probably define Component._ecsyId with a default value and avoid using typeof
+    if (
+      typeof Component._ecsyId === "undefined" &&
+      !this.world.componentsManager._ComponentsMap[Component._ecsyId]
+    ) {
       throw new Error(
         `Attempted to add unregistered component "${Component.getName()}"`
       );
