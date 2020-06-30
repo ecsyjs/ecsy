@@ -59,10 +59,14 @@ export class Component {
       this._pool.release(this);
     }
   }
+
+  getName() {
+    return this.constructor.getName();
+  }
 }
 
 Component.schema = {};
 Component.isComponent = true;
-Component.getName = () => {
+Component.getName = function() {
   return this.displayName || this.name;
 };
