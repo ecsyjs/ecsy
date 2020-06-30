@@ -34,17 +34,17 @@ export class Entity {
   // COMPONENTS
 
   getComponent(Component, includeRemoved) {
-    var component = this._components[Component.name];
+    var component = this._components[Component._ecsyId];
 
     if (!component && includeRemoved === true) {
-      component = this._componentsToRemove[Component.name];
+      component = this._componentsToRemove[Component._ecsyId];
     }
 
     return DEBUG ? wrapImmutableComponent(Component, component) : component;
   }
 
   getRemovedComponent(Component) {
-    return this._componentsToRemove[Component.name];
+    return this._componentsToRemove[Component._ecsyId];
   }
 
   getComponents() {
@@ -60,7 +60,7 @@ export class Entity {
   }
 
   getMutableComponent(Component) {
-    var component = this._components[Component.name];
+    var component = this._components[Component._ecsyId];
     for (var i = 0; i < this.queries.length; i++) {
       var query = this.queries[i];
       // @todo accelerate this check. Maybe having query._Components as an object
@@ -117,8 +117,8 @@ export class Entity {
 
   copy(src) {
     // TODO: This can definitely be optimized
-    for (var componentName in src._components) {
-      var srcComponent = src._components[componentName];
+    for (var ecsyComponentId in src._components) {
+      var srcComponent = src._components[ecsyComponentId];
       this.addComponent(srcComponent.constructor);
       var component = this.getComponent(srcComponent.constructor);
       component.copy(srcComponent);
@@ -136,8 +136,8 @@ export class Entity {
     this._ComponentTypes.length = 0;
     this.queries.length = 0;
 
-    for (var componentName in this._components) {
-      delete this._components[componentName];
+    for (var ecsyComponentId in this._components) {
+      delete this._components[ecsyComponentId];
     }
   }
 

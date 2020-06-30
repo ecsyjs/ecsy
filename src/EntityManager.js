@@ -86,9 +86,10 @@ export class EntityManager {
    * @param {Object} values Optional values to replace the default attributes
    */
   entityAddComponent(entity, Component, values) {
-    if (!this.world.componentsManager.Components[Component.name]) {
+    if (this.world.componentsManager.Components.indexOf(Component) === -1) {
+      //if (!this.world.componentsManager.Components[Component._ecsyId]) {
       throw new Error(
-        `Attempted to add unregistered component "${Component.name}"`
+        `Attempted to add unregistered component "${Component.getName()}"`
       );
     }
 
@@ -97,7 +98,7 @@ export class EntityManager {
       console.warn(
         "Component type already exists on entity.",
         entity,
-        Component.name
+        Component.getName()
       );
       return;
     }
@@ -120,7 +121,7 @@ export class EntityManager {
       component.copy(values);
     }
 
-    entity._components[Component.name] = component;
+    entity._components[Component._ecsyId] = component;
 
     this._queryManager.onEntityComponentAdded(entity, Component);
     this.world.componentsManager.componentAddedToEntity(Component);
@@ -149,10 +150,9 @@ export class EntityManager {
       entity._ComponentTypes.splice(index, 1);
       entity._ComponentTypesToRemove.push(Component);
 
-      var componentName = getName(Component);
-      entity._componentsToRemove[componentName] =
-        entity._components[componentName];
-      delete entity._components[componentName];
+      entity._componentsToRemove[Component._ecsyId] =
+        entity._components[Component._ecsyId];
+      delete entity._components[Component._ecsyId];
     }
 
     // Check each indexed query to see if we need to remove it
@@ -171,9 +171,8 @@ export class EntityManager {
   _entityRemoveComponentSync(entity, Component, index) {
     // Remove T listing on entity and property ref, then free the component.
     entity._ComponentTypes.splice(index, 1);
-    var componentName = getName(Component);
-    var component = entity._components[componentName];
-    delete entity._components[componentName];
+    var component = entity._components[Component._ecsyId];
+    delete entity._components[Component._ecsyId];
     component.dispose();
     this.world.componentsManager.componentRemovedFromEntity(Component);
   }
@@ -252,9 +251,8 @@ export class EntityManager {
       while (entity._ComponentTypesToRemove.length > 0) {
         let Component = entity._ComponentTypesToRemove.pop();
 
-        var componentName = getName(Component);
-        var component = entity._componentsToRemove[componentName];
-        delete entity._componentsToRemove[componentName];
+        var component = entity._componentsToRemove[Component._ecsyId];
+        delete entity._componentsToRemove[Component._ecsyId];
         component.dispose();
         this.world.componentsManager.componentRemovedFromEntity(Component);
 
@@ -296,9 +294,9 @@ export class EntityManager {
       eventDispatcher: this.eventDispatcher.stats
     };
 
-    for (var cname in this.componentsManager._componentPool) {
-      var pool = this.componentsManager._componentPool[cname];
-      stats.componentPool[cname] = {
+    for (var ecsyComponentId in this.componentsManager._componentPool) {
+      var pool = this.componentsManager._componentPool[ecsyComponentId];
+      stats.componentPool[ecsyComponentId] = {
         used: pool.totalUsed(),
         size: pool.count
       };

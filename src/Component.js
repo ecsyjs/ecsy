@@ -63,3 +63,6 @@ export class Component {
 
 Component.schema = {};
 Component.isComponent = true;
+Component.getName = () => {
+  return this.constructor.displayName || this.constructor.name;
+};
