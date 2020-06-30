@@ -1,5 +1,5 @@
 import test from "ava";
-import { World } from "../../src/index.js";
+import { World, Component } from "../../src/index.js";
 import { FooComponent, BarComponent } from "../helpers/components";
 
 test("registerComponents", t => {
@@ -12,5 +12,21 @@ test("registerComponents", t => {
 
   // Can't register the same component twice
   world.registerComponent(FooComponent);
+  t.is(Object.keys(world.componentsManager.Components).length, 2);
+});
+
+test("Register two components with the same name", t => {
+  var world = new World();
+
+  {
+    class ComponentA extends Component {}
+    world.registerComponent(ComponentA);
+  }
+
+  {
+    class ComponentA extends Component {}
+    world.registerComponent(ComponentA);
+  }
+
   t.is(Object.keys(world.componentsManager.Components).length, 2);
 });
