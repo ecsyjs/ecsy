@@ -36,10 +36,10 @@ export class ComponentManager {
       }
     }
 
-    Component._ecsyId = this.nextComponentId++;
+    Component._typeId = this.nextComponentId++;
     this.Components.push(Component);
-    this._ComponentsMap[Component._ecsyId] = Component;
-    this.numComponents[Component._ecsyId] = 0;
+    this._ComponentsMap[Component._typeId] = Component;
+    this.numComponents[Component._typeId] = 0;
 
     if (objectPool === undefined) {
       objectPool = new ObjectPool(Component);
@@ -47,18 +47,18 @@ export class ComponentManager {
       objectPool = undefined;
     }
 
-    this._componentPool[Component._ecsyId] = objectPool;
+    this._componentPool[Component._typeId] = objectPool;
   }
 
   componentAddedToEntity(Component) {
-    this.numComponents[Component._ecsyId]++;
+    this.numComponents[Component._typeId]++;
   }
 
   componentRemovedFromEntity(Component) {
-    this.numComponents[Component._ecsyId]--;
+    this.numComponents[Component._typeId]--;
   }
 
   getComponentsPool(Component) {
-    return this._componentPool[Component._ecsyId];
+    return this._componentPool[Component._typeId];
   }
 }

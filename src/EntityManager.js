@@ -85,10 +85,10 @@ export class EntityManager {
    * @param {Object} values Optional values to replace the default attributes
    */
   entityAddComponent(entity, Component, values) {
-    // @todo Probably define Component._ecsyId with a default value and avoid using typeof
+    // @todo Probably define Component._typeId with a default value and avoid using typeof
     if (
-      typeof Component._ecsyId === "undefined" &&
-      !this.world.componentsManager._ComponentsMap[Component._ecsyId]
+      typeof Component._typeId === "undefined" &&
+      !this.world.componentsManager._ComponentsMap[Component._typeId]
     ) {
       throw new Error(
         `Attempted to add unregistered component "${Component.getName()}"`
@@ -123,7 +123,7 @@ export class EntityManager {
       component.copy(values);
     }
 
-    entity._components[Component._ecsyId] = component;
+    entity._components[Component._typeId] = component;
 
     this._queryManager.onEntityComponentAdded(entity, Component);
     this.world.componentsManager.componentAddedToEntity(Component);
@@ -152,9 +152,9 @@ export class EntityManager {
       entity._ComponentTypes.splice(index, 1);
       entity._ComponentTypesToRemove.push(Component);
 
-      entity._componentsToRemove[Component._ecsyId] =
-        entity._components[Component._ecsyId];
-      delete entity._components[Component._ecsyId];
+      entity._componentsToRemove[Component._typeId] =
+        entity._components[Component._typeId];
+      delete entity._components[Component._typeId];
     }
 
     // Check each indexed query to see if we need to remove it
@@ -173,8 +173,8 @@ export class EntityManager {
   _entityRemoveComponentSync(entity, Component, index) {
     // Remove T listing on entity and property ref, then free the component.
     entity._ComponentTypes.splice(index, 1);
-    var component = entity._components[Component._ecsyId];
-    delete entity._components[Component._ecsyId];
+    var component = entity._components[Component._typeId];
+    delete entity._components[Component._typeId];
     component.dispose();
     this.world.componentsManager.componentRemovedFromEntity(Component);
   }
@@ -253,8 +253,8 @@ export class EntityManager {
       while (entity._ComponentTypesToRemove.length > 0) {
         let Component = entity._ComponentTypesToRemove.pop();
 
-        var component = entity._componentsToRemove[Component._ecsyId];
-        delete entity._componentsToRemove[Component._ecsyId];
+        var component = entity._componentsToRemove[Component._typeId];
+        delete entity._componentsToRemove[Component._typeId];
         component.dispose();
         this.world.componentsManager.componentRemovedFromEntity(Component);
 
