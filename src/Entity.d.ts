@@ -61,7 +61,7 @@ export class Entity {
    */
   addComponent<P, C extends Component<P>>(
     Component: ComponentConstructor<P, C>,
-    values?: P
+    values?: Omit<Partial<C>, "copy" | "clone" | "reset" | "dispose">
   ): this;
 
   /**

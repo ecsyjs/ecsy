@@ -13,7 +13,7 @@ export type ComponentSchema = {
   [propName: string]: ComponentSchemaProp<any>;
 };
 
-export class Component<P> {
+export class Component<P = false> {
   static schema: ComponentSchema;
   static isComponent: true;
   constructor(props?: P | false);
