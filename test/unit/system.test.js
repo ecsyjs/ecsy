@@ -895,6 +895,11 @@ test("Components with the the same name in uppercase and lowercase", t => {
   let components = entity.getComponents();
 
   t.deepEqual(
+    Object.keys(components).map(c => parseInt(c)),
+    [B._ecsyId, b._ecsyId]
+  );
+
+  t.deepEqual(
     Object.values(components).map(c => c.constructor.name),
     ["B", "b"]
   );
