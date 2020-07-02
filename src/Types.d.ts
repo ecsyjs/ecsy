@@ -15,16 +15,16 @@ export interface PropType<T, D> extends PropTypeDefinition<T, D> {
 export type NumberPropType = PropType<number, number>;
 export type BooleanPropType = PropType<boolean, boolean>;
 export type StringPropType = PropType<string, string>;
-export type ArrayPropType = PropType<Array<any>, Array<any>>;
-export type RefPropType = PropType<any, undefined>;
+export type ArrayPropType<T> = PropType<Array<T>, []>;
+export type RefPropType<T> = PropType<T, undefined>;
 export type JSONPropType = PropType<any, null>;
 
-export const Types = {
+export const Types: {
   Number: NumberPropType,
   Boolean: BooleanPropType,
   String: StringPropType,
-  Array: ArrayPropType,
-  Ref: RefPropType,
+  Array: ArrayPropType<any>,
+  Ref: RefPropType<any>,
   JSON: JSONPropType
 };
 
