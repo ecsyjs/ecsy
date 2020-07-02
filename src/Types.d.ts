@@ -1,26 +1,24 @@
-import { Component } from "./Component";
-
 export type TypeCopyFunction<T> = (src: T, dest: T) => T;
 export type TypeCloneFunction<T> = (value: T) => T;
 
-export interface PropTypeDefinition<T> {
+export interface PropTypeDefinition<T, D> {
   name: string
-  default: T
+  default: D
   copy: TypeCopyFunction<T>
   clone: TypeCloneFunction<T>
 }
 
-export interface PropType<T> extends PropTypeDefinition<T> {
+export interface PropType<T, D> extends PropTypeDefinition<T, D> {
   isType: true
 }
 
 export interface PropTypes {
-  Number: PropType<number>;
-  Boolean: PropType<boolean>;
-  String: PropType<string>;
-  Array: PropType<Array<any>>;
-  Ref: PropType<any>;
-  JSON: PropType<any>;
+  Number: PropType<number, number>;
+  Boolean: PropType<boolean, boolean>;
+  String: PropType<string, string>;
+  Array: PropType<Array<any>, Array<any>>;
+  Ref: PropType<any, undefined>;
+  JSON: PropType<any, null>;
 }
 
 export const Types: PropTypes;
@@ -41,4 +39,4 @@ export function cloneClonable<T>(value: T): T;
  * Use createType to create custom type definitions.
  * @param typeDefinition An object with create, reset and clear functions for the custom type.
  */
-export function createType<T>(typeDefinition: PropTypeDefinition<T>): PropType<T>
+export function createType<T, D>(typeDefinition: PropTypeDefinition<T, D>): PropType<T, D>
