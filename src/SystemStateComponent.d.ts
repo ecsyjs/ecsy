@@ -3,11 +3,11 @@ import { Component, ComponentConstructor } from "./Component";
 /**
  * Components that extend the SystemStateComponent are not removed when an entity is deleted.
  */
-export class SystemStateComponent<P> extends Component<P> {
+export class SystemStateComponent<C> extends Component<C> {
   static isSystemStateComponent: true;
 }
 
-export interface SystemStateComponentConstructor<P, C extends Component<P>> extends ComponentConstructor<P, C> {
+export interface SystemStateComponentConstructor<C extends Component<any>> extends ComponentConstructor<C> {
   isSystemStateComponent: true;
   new (): C;
 }

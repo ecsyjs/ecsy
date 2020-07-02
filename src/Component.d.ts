@@ -13,18 +13,18 @@ export type ComponentSchema = {
   [propName: string]: ComponentSchemaProp<any>;
 };
 
-export class Component<P> {
+export class Component<C> {
   static schema: ComponentSchema;
   static isComponent: true;
-  constructor(props?: P | false);
+  constructor(props?: Partial<Omit<C, keyof Component<any>>> | false);
   copy(source: this): this;
   clone(): this;
   reset(): void;
   dispose(): void;
 }
 
-export interface ComponentConstructor<P, C extends Component<P>> {
+export interface ComponentConstructor<C extends Component<any>> {
   schema: ComponentSchema;
   isComponent: true;
-  new (props?: P | false): C;
+  new (props?: Partial<Omit<C, keyof Component<any>>> | false): C;
 }
