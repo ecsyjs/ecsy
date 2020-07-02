@@ -7,6 +7,10 @@ export const copyArray = (src, dest) => {
     return src;
   }
 
+  if (!dest) {
+    return src.slice();
+  }
+
   dest.length = 0;
 
   for (let i = 0; i < src.length; i++) {
@@ -22,7 +26,17 @@ export const copyJSON = src => JSON.parse(JSON.stringify(src));
 
 export const cloneJSON = src => JSON.parse(JSON.stringify(src));
 
-export const copyCopyable = (src, dest) => dest && dest.copy(src);
+export const copyCopyable = (src, dest) => {
+  if (!src) {
+    return src;
+  }
+
+  if (!dest) {
+    return src.clone();
+  }
+
+  return dest.copy(src);
+};
 
 export const cloneClonable = src => src && src.clone();
 
