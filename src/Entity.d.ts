@@ -19,16 +19,16 @@ export class Entity {
    * @param Component Type of component to get
    * @param includeRemoved Whether a component that is staled to be removed should be also considered
    */
-  getComponent<P, C extends Component<P>>(
-      Component: ComponentConstructor<P, C>,
+  getComponent<C extends Component<any>>(
+      Component: ComponentConstructor<C>,
       includeRemoved?: boolean
   ): C;
 
   /**
    * Get a component that is slated to be removed from this entity.
    */
-  getRemovedComponent<P, C extends Component<P>>(
-      Component: ComponentConstructor<P, C>
+  getRemovedComponent<C extends Component<any>>(
+      Component: ComponentConstructor<C>
   ): C;
 
   /**
@@ -50,8 +50,8 @@ export class Entity {
    * Get a mutable reference to a component on this entity.
    * @param Component Type of component to get
    */
-  getMutableComponent<P, C extends Component<P>>(
-    Component: ComponentConstructor<P, C>
+  getMutableComponent<C extends Component<any>>(
+    Component: ComponentConstructor<C>
   ): C;
 
   /**
@@ -59,9 +59,9 @@ export class Entity {
    * @param Component Type of component to add to this entity
    * @param values Optional values to replace the default attributes on the component
    */
-  addComponent<P, C extends Component<P>>(
-    Component: ComponentConstructor<P, C>,
-    values?: P
+  addComponent<C extends Component<any>>(
+    Component: ComponentConstructor<C>,
+    values?: Partial<Omit<C, keyof Component<any>>>
   ): this;
 
   /**
@@ -69,8 +69,8 @@ export class Entity {
    * @param Component Type of component to remove from this entity
    * @param forceImmediate Whether a component should be removed immediately
    */
-  removeComponent<P, C extends Component<P>>(
-    Component: ComponentConstructor<P, C>,
+  removeComponent<C extends Component<any>>(
+    Component: ComponentConstructor<C>,
     forceImmediate?: boolean
   ): this;
 
@@ -79,8 +79,8 @@ export class Entity {
    * @param Component Type of component
    * @param includeRemoved Whether a component that is staled to be removed should be also considered
    */
-  hasComponent<P, C extends Component<P>>(
-    Component: ComponentConstructor<P, C>,
+  hasComponent<C extends Component<any>>(
+    Component: ComponentConstructor<C>,
     includeRemoved?: boolean
   ): boolean;
 
@@ -88,8 +88,8 @@ export class Entity {
    * Check if the entity has a component that is slated to be removed.
    * @param Component Type of component
    */
-  hasRemovedComponent<P, C extends Component<P>>(
-    Component: ComponentConstructor<P, C>
+  hasRemovedComponent<C extends Component<any>>(
+    Component: ComponentConstructor<C>
   ): boolean;
 
   /**
@@ -97,7 +97,7 @@ export class Entity {
    * @param Components Component types to check
    */
   hasAllComponents(
-    Components: Array<ComponentConstructor<any, any>>
+    Components: Array<ComponentConstructor<any>>
   ): boolean
 
   /**
@@ -105,7 +105,7 @@ export class Entity {
    * @param Components Component types to check
    */
   hasAnyComponents(
-    Components: Array<ComponentConstructor<any, any>>
+    Components: Array<ComponentConstructor<any>>
   ): boolean
 
   /**
