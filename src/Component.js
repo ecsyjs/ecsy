@@ -18,7 +18,9 @@ export class Component {
       }
 
       // @DEBUG
-      this.checkUndefinedAttributes(props);
+      if (props !== undefined) {
+        this.checkUndefinedAttributes(props);
+      }
     }
 
     this._pool = null;
