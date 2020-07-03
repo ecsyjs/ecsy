@@ -3,27 +3,42 @@ export const copyValue = src => src;
 export const cloneValue = src => src;
 
 export const copyArray = (src, dest) => {
-  const srcArray = src;
-  const destArray = dest;
-
-  destArray.length = 0;
-
-  for (let i = 0; i < srcArray.length; i++) {
-    destArray.push(srcArray[i]);
+  if (!src) {
+    return src;
   }
 
-  return destArray;
+  if (!dest) {
+    return src.slice();
+  }
+
+  dest.length = 0;
+
+  for (let i = 0; i < src.length; i++) {
+    dest.push(dest[i]);
+  }
+
+  return dest;
 };
 
-export const cloneArray = src => src.slice();
+export const cloneArray = src => src && src.slice();
 
 export const copyJSON = src => JSON.parse(JSON.stringify(src));
 
 export const cloneJSON = src => JSON.parse(JSON.stringify(src));
 
-export const copyCopyable = (src, dest) => dest.copy(src);
+export const copyCopyable = (src, dest) => {
+  if (!src) {
+    return src;
+  }
 
-export const cloneClonable = src => src.clone();
+  if (!dest) {
+    return src.clone();
+  }
+
+  return dest.copy(src);
+};
+
+export const cloneClonable = src => src && src.clone();
 
 export function createType(typeDefinition) {
   var mandatoryProperties = ["name", "default", "copy", "clone"];

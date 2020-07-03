@@ -4,13 +4,13 @@ import { PropType } from "./Types";
  * Base class for components.
  */
 
-export type ComponentSchemaProp<T> = {
-  default?: T;
-  type: PropType<T>;
+export type ComponentSchemaProp = {
+  default?: any;
+  type: PropType<any, any>;
 };
 
 export type ComponentSchema = {
-  [propName: string]: ComponentSchemaProp<any>;
+  [propName: string]: ComponentSchemaProp;
 };
 
 export class Component<C> {
