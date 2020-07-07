@@ -8,9 +8,12 @@ Feel free to submit PRs with more links!
 - 
 
 ## Demos, games and applications
-- Hello WebXR by Mozilla: https://mixedreality.mozilla.org/hello-webxr/
-- Jumpy Balls by Mozilla: https://mixedreality.mozilla.org/jumpy-balls/
+- Hello WebXR: https://mixedreality.mozilla.org/hello-webxr
+- Jumpy Balls: https://mixedreality.mozilla.org/jumpy-balls
 
+## Tools
+- ECSY Devtools: https://github.com/MozillaReality/ecsy-devtools
 
 ## Articles
-- 
+- ECSY Devtools introduction: https://blog.mozvr.com/ecsy-developer-tools/
+- Introducing ECSY: https://blog.mozvr.com/introducing-ecsy/
