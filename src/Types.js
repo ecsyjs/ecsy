@@ -14,7 +14,7 @@ export const copyArray = (src, dest) => {
   dest.length = 0;
 
   for (let i = 0; i < src.length; i++) {
-    dest.push(dest[i]);
+    dest.push(src[i]);
   }
 
   return dest;
