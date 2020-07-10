@@ -5,7 +5,7 @@ Compilation of ECSY demos, components, articles and more.
 Feel free to submit PRs with more links!
 
 ## Components & Systems
-- 
+- ECSY Two, uses HTML canvas instead of WebGL: https://github.com/joshmarinacci/ecsy-two/
 
 ## Demos, games and applications
 - Hello WebXR: https://mixedreality.mozilla.org/hello-webxr
