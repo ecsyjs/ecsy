@@ -14,6 +14,10 @@ export class System {
     return true;
   }
 
+  getName() {
+    return this.constructor.getName();
+  }
+
   constructor(world, attributes) {
     this.world = world;
     this.enabled = true;
@@ -64,9 +68,7 @@ export class System {
           validEvents.forEach(eventName => {
             if (!this.execute) {
               console.warn(
-                `System '${
-                  this.constructor.name
-                }' has defined listen events (${validEvents.join(
+                `System '${this.getName()}' has defined listen events (${validEvents.join(
                   ", "
                 )}) for query '${queryName}' but it does not implement the 'execute' method.`
               );
@@ -178,7 +180,7 @@ export class System {
 
   toJSON() {
     var json = {
-      name: this.constructor.name,
+      name: this.getName(),
       enabled: this.enabled,
       executeTime: this.executeTime,
       priority: this.priority,
@@ -222,6 +224,9 @@ export class System {
 }
 
 System.isSystem = true;
+System.getName = function() {
+  return this.displayName || this.name;
+};
 
 export function Not(Component) {
   return {

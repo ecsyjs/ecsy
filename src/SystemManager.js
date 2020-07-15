@@ -16,7 +16,7 @@ export class SystemManager {
     }
 
     if (this.getSystem(SystemClass) !== undefined) {
-      console.warn(`System '${SystemClass.name}' already registered.`);
+      console.warn(`System '${SystemClass.getName()}' already registered.`);
       return this;
     }
 
@@ -35,7 +35,7 @@ export class SystemManager {
     let system = this.getSystem(SystemClass);
     if (system === undefined) {
       console.warn(
-        `Can unregister system '${SystemClass.name}'. It doesn't exist.`
+        `Can unregister system '${SystemClass.getName()}'. It doesn't exist.`
       );
       return this;
     }
@@ -102,7 +102,7 @@ export class SystemManager {
 
     for (var i = 0; i < this._systems.length; i++) {
       var system = this._systems[i];
-      var systemStats = (stats.systems[system.constructor.name] = {
+      var systemStats = (stats.systems[system.getName()] = {
         queries: {},
         executeTime: system.executeTime
       });

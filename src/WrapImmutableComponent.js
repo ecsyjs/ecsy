@@ -3,7 +3,7 @@ const proxyMap = new WeakMap();
 const proxyHandler = {
   set(target, prop) {
     throw new Error(
-      `Tried to write to "${target.constructor.name}#${String(
+      `Tried to write to "${target.constructor.getName()}#${String(
         prop
       )}" on immutable component. Use .getMutableComponent() to modify a component.`
     );

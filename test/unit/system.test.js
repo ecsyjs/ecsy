@@ -25,7 +25,7 @@ test("Initialize", t => {
 
   t.deepEqual(
     world.systemManager.getSystems().map(s => {
-      return s.constructor.name;
+      return s.getName();
     }),
     ["SystemA", "SystemB", "SystemC", "SystemD", "SystemE"]
   );
@@ -40,7 +40,7 @@ test("Initialize", t => {
 
   t.deepEqual(
     world.systemManager.getSystems().map(s => {
-      return s.constructor.name;
+      return s.getName();
     }),
     ["SystemC", "SystemA", "SystemD", "SystemE", "SystemB"]
   );
@@ -851,6 +851,7 @@ test("Systems with component case sensitive", t => {
   world.execute();
   t.deepEqual(counter, { a: 0, A: 0 });
   let entity_A = world.createEntity();
+
   entity_A.addComponent(A);
   world.execute();
   t.deepEqual(counter, { a: 0, A: 1 });
@@ -892,9 +893,14 @@ test("Components with the the same name in uppercase and lowercase", t => {
   let query = world.getSystem(S).queries.S;
   let entity = query.results[0];
   let components = entity.getComponents();
-  t.deepEqual(Object.keys(components), ["B", "b"]);
+
   t.deepEqual(
-    Object.values(components).map(c => c.constructor.name),
+    Object.keys(components).map(c => parseInt(c)),
+    [B._typeId, b._typeId]
+  );
+
+  t.deepEqual(
+    Object.values(components).map(c => c.getName()),
     ["B", "b"]
   );
 });

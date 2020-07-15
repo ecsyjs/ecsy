@@ -1,7 +1,6 @@
 import { ObjectPool } from "./ObjectPool.js";
 import QueryManager from "./QueryManager.js";
 import EventDispatcher from "./EventDispatcher.js";
-import { getName } from "./Utils.js";
 import { SystemStateComponent } from "./SystemStateComponent.js";
 
 class EntityPool extends ObjectPool {
@@ -86,9 +85,13 @@ export class EntityManager {
    * @param {Object} values Optional values to replace the default attributes
    */
   entityAddComponent(entity, Component, values) {
-    if (!this.world.componentsManager.Components[Component.name]) {
+    // @todo Probably define Component._typeId with a default value and avoid using typeof
+    if (
+      typeof Component._typeId === "undefined" &&
+      !this.world.componentsManager._ComponentsMap[Component._typeId]
+    ) {
       throw new Error(
-        `Attempted to add unregistered component "${Component.name}"`
+        `Attempted to add unregistered component "${Component.getName()}"`
       );
     }
 
@@ -97,7 +100,7 @@ export class EntityManager {
       console.warn(
         "Component type already exists on entity.",
         entity,
-        Component.name
+        Component.getName()
       );
       return;
     }
@@ -120,7 +123,7 @@ export class EntityManager {
       component.copy(values);
     }
 
-    entity._components[Component.name] = component;
+    entity._components[Component._typeId] = component;
 
     this._queryManager.onEntityComponentAdded(entity, Component);
     this.world.componentsManager.componentAddedToEntity(Component);
@@ -149,10 +152,9 @@ export class EntityManager {
       entity._ComponentTypes.splice(index, 1);
       entity._ComponentTypesToRemove.push(Component);
 
-      var componentName = getName(Component);
-      entity._componentsToRemove[componentName] =
-        entity._components[componentName];
-      delete entity._components[componentName];
+      entity._componentsToRemove[Component._typeId] =
+        entity._components[Component._typeId];
+      delete entity._components[Component._typeId];
     }
 
     // Check each indexed query to see if we need to remove it
@@ -171,9 +173,8 @@ export class EntityManager {
   _entityRemoveComponentSync(entity, Component, index) {
     // Remove T listing on entity and property ref, then free the component.
     entity._ComponentTypes.splice(index, 1);
-    var componentName = getName(Component);
-    var component = entity._components[componentName];
-    delete entity._components[componentName];
+    var component = entity._components[Component._typeId];
+    delete entity._components[Component._typeId];
     component.dispose();
     this.world.componentsManager.componentRemovedFromEntity(Component);
   }
@@ -252,9 +253,8 @@ export class EntityManager {
       while (entity._ComponentTypesToRemove.length > 0) {
         let Component = entity._ComponentTypesToRemove.pop();
 
-        var componentName = getName(Component);
-        var component = entity._componentsToRemove[componentName];
-        delete entity._componentsToRemove[componentName];
+        var component = entity._componentsToRemove[Component._typeId];
+        delete entity._componentsToRemove[Component._typeId];
         component.dispose();
         this.world.componentsManager.componentRemovedFromEntity(Component);
 
@@ -296,9 +296,9 @@ export class EntityManager {
       eventDispatcher: this.eventDispatcher.stats
     };
 
-    for (var cname in this.componentsManager._componentPool) {
-      var pool = this.componentsManager._componentPool[cname];
-      stats.componentPool[cname] = {
+    for (var ecsyComponentId in this.componentsManager._componentPool) {
+      var pool = this.componentsManager._componentPool[ecsyComponentId];
+      stats.componentPool[ecsyComponentId] = {
         used: pool.totalUsed(),
         size: pool.count
       };
