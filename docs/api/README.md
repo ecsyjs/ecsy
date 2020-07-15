@@ -1,13 +1,17 @@
 
-# ecsy - v0.3.1
+# ecsy - v0.3.2
 
 ## Type aliases
 
-###  ComponentProps
+###  ArrayPropType
 
-Ƭ **ComponentProps**: *P | false*
+Ƭ **ArrayPropType**: *[PropType](interfaces/proptype.md)‹Array‹T›, []›*
 
-Base class for components.
+___
+
+###  BooleanPropType
+
+Ƭ **BooleanPropType**: *[PropType](interfaces/proptype.md)‹boolean, boolean›*
 
 ___
 
@@ -17,7 +21,7 @@ ___
 
 #### Type declaration:
 
-* \[ **propName**: *string*\]: [ComponentSchemaProp](README.md#componentschemaprop)‹any›
+* \[ **propName**: *string*\]: [ComponentSchemaProp](README.md#componentschemaprop)
 
 ___
 
@@ -25,11 +29,37 @@ ___
 
 Ƭ **ComponentSchemaProp**: *object*
 
+Base class for components.
+
 #### Type declaration:
 
-* **default**? : *T*
+* **default**? : *any*
 
-* **type**: *[PropType](interfaces/proptype.md)‹T›*
+* **type**: *[PropType](interfaces/proptype.md)‹any, any›*
+
+___
+
+###  JSONPropType
+
+Ƭ **JSONPropType**: *[PropType](interfaces/proptype.md)‹any, null›*
+
+___
+
+###  NumberPropType
+
+Ƭ **NumberPropType**: *[PropType](interfaces/proptype.md)‹number, number›*
+
+___
+
+###  RefPropType
+
+Ƭ **RefPropType**: *[PropType](interfaces/proptype.md)‹T, undefined›*
+
+___
+
+###  StringPropType
+
+Ƭ **StringPropType**: *[PropType](interfaces/proptype.md)‹string, string›*
 
 ___
 
@@ -68,29 +98,41 @@ Name | Type |
 
 ### `Const` Types
 
-• **Types**: *[PropTypes](interfaces/proptypes.md)*
+• **Types**: *object*
+
+#### Type declaration:
+
+* **Array**: *[ArrayPropType](README.md#arrayproptype)‹any›*
+
+* **Boolean**: *[BooleanPropType](README.md#booleanproptype)*
+
+* **JSON**: *[JSONPropType](README.md#jsonproptype)*
+
+* **Number**: *[NumberPropType](README.md#numberproptype)*
+
+* **Ref**: *[RefPropType](README.md#refproptype)‹any›*
+
+* **String**: *[StringPropType](README.md#stringproptype)*
 
 ## Functions
 
 ###  Not
 
-▸ **Not**<**P**, **C**>(`Component`: [ComponentConstructor](interfaces/componentconstructor.md)‹P, C›): *[NotComponent](interfaces/notcomponent.md)‹P, C›*
+▸ **Not**<**C**>(`Component`: [ComponentConstructor](interfaces/componentconstructor.md)‹C›): *[NotComponent](interfaces/notcomponent.md)‹C›*
 
 Use the Not class to negate a component query.
 
 **Type parameters:**
 
-▪ **P**
-
-▪ **C**: *[Component](classes/component.md)‹P›*
+▪ **C**: *[Component](classes/component.md)‹any›*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`Component` | [ComponentConstructor](interfaces/componentconstructor.md)‹P, C› |
+`Component` | [ComponentConstructor](interfaces/componentconstructor.md)‹C› |
 
-**Returns:** *[NotComponent](interfaces/notcomponent.md)‹P, C›*
+**Returns:** *[NotComponent](interfaces/notcomponent.md)‹C›*
 
 ___
 
@@ -236,7 +278,7 @@ ___
 
 ###  createType
 
-▸ **createType**<**T**>(`typeDefinition`: [PropTypeDefinition](interfaces/proptypedefinition.md)‹T›): *[PropType](interfaces/proptype.md)‹T›*
+▸ **createType**<**T**, **D**>(`typeDefinition`: [PropTypeDefinition](interfaces/proptypedefinition.md)‹T, D›): *[PropType](interfaces/proptype.md)‹T, D›*
 
 Use createType to create custom type definitions.
 
@@ -244,10 +286,12 @@ Use createType to create custom type definitions.
 
 ▪ **T**
 
+▪ **D**
+
 **Parameters:**
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`typeDefinition` | [PropTypeDefinition](interfaces/proptypedefinition.md)‹T› | An object with create, reset and clear functions for the custom type.  |
+`typeDefinition` | [PropTypeDefinition](interfaces/proptypedefinition.md)‹T, D› | An object with create, reset and clear functions for the custom type.  |
 
-**Returns:** *[PropType](interfaces/proptype.md)‹T›*
+**Returns:** *[PropType](interfaces/proptype.md)‹T, D›*

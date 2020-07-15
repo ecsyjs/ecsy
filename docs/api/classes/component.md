@@ -1,21 +1,21 @@
 
-# Class: Component <**P**>
+# Class: Component <**C**>
 
 ## Type parameters
 
-▪ **P**
+▪ **C**
 
 ## Constructors
 
 ###  constructor
 
-\+ **new Component**(`props?`: [ComponentProps](../README.md#componentprops)‹P›): *[Component](component.md)*
+\+ **new Component**(`props?`: Partial‹Omit‹C, keyof Component<any>›› | false): *[Component](component.md)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`props?` | [ComponentProps](../README.md#componentprops)‹P› |
+`props?` | Partial‹Omit‹C, keyof Component<any>›› &#124; false |
 
 **Returns:** *[Component](component.md)*
 

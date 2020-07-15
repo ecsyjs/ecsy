@@ -47,7 +47,7 @@ ___
 
 ###  execute
 
-▸ **execute**(`delta`: number, `time`: number): *void*
+▸ **execute**(`delta?`: number, `time?`: number): *void*
 
 Update the systems per frame.
 
@@ -55,8 +55,8 @@ Update the systems per frame.
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`delta` | number | Delta time since the last call |
-`time` | number | Elapsed time  |
+`delta?` | number | Delta time since the last call |
+`time?` | number | Elapsed time  |
 
 **Returns:** *void*
 
@@ -104,7 +104,7 @@ ___
 
 ###  registerComponent
 
-▸ **registerComponent**<**C**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹any, C›, `objectPool?`: [ObjectPool](objectpool.md)‹C› | false): *this*
+▸ **registerComponent**<**C**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹C›, `objectPool?`: [ObjectPool](objectpool.md)‹C› | false): *this*
 
 Register a component.
 
@@ -116,7 +116,7 @@ Register a component.
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹any, C› | Type of component to register  |
+`Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹C› | Type of component to register  |
 `objectPool?` | [ObjectPool](objectpool.md)‹C› &#124; false | - |
 
 **Returns:** *this*

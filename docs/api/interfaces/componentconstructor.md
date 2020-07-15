@@ -1,23 +1,21 @@
 
-# Interface: ComponentConstructor <**P, C**>
+# Interface: ComponentConstructor <**C**>
 
 ## Type parameters
 
-▪ **P**
-
-▪ **C**: *[Component](../classes/component.md)‹P›*
+▪ **C**: *[Component](../classes/component.md)‹any›*
 
 ## Constructors
 
 ###  constructor
 
-\+ **new ComponentConstructor**(`props?`: [ComponentProps](../README.md#componentprops)‹P›): *C*
+\+ **new ComponentConstructor**(`props?`: Partial‹Omit‹C, keyof Component<any>›› | false): *C*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`props?` | [ComponentProps](../README.md#componentprops)‹P› |
+`props?` | Partial‹Omit‹C, keyof Component<any>›› &#124; false |
 
 **Returns:** *C*
 

@@ -72,7 +72,7 @@ This needs to be user defined.
 
 * \[ **queryName**: *string*\]: object
 
-* **components**: *[ComponentConstructor](../interfaces/componentconstructor.md)‹any, any› | [NotComponent](../interfaces/notcomponent.md)‹any, any›[]*
+* **components**: *[ComponentConstructor](../interfaces/componentconstructor.md)‹any› | [NotComponent](../interfaces/notcomponent.md)‹any›[]*
 
 * **listen**(): *object*
 

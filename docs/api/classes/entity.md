@@ -23,22 +23,20 @@ A unique ID for this entity.
 
 ###  addComponent
 
-▸ **addComponent**<**P**, **C**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹P, C›, `values?`: P): *this*
+▸ **addComponent**<**C**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹C›, `values?`: Partial‹Omit‹C, keyof Component<any>››): *this*
 
 Add a component to the entity.
 
 **Type parameters:**
 
-▪ **P**
-
-▪ **C**: *[Component](component.md)‹P›*
+▪ **C**: *[Component](component.md)‹any›*
 
 **Parameters:**
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹P, C› | Type of component to add to this entity |
-`values?` | P | Optional values to replace the default attributes on the component  |
+`Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹C› | Type of component to add to this entity |
+`values?` | Partial‹Omit‹C, keyof Component<any>›› | Optional values to replace the default attributes on the component  |
 
 **Returns:** *this*
 
@@ -68,21 +66,19 @@ ___
 
 ###  getComponent
 
-▸ **getComponent**<**P**, **C**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹P, C›, `includeRemoved?`: boolean): *C*
+▸ **getComponent**<**C**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹C›, `includeRemoved?`: boolean): *C*
 
 Get an immutable reference to a component on this entity.
 
 **Type parameters:**
 
-▪ **P**
-
-▪ **C**: *[Component](component.md)‹P›*
+▪ **C**: *[Component](component.md)‹any›*
 
 **Parameters:**
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹P, C› | Type of component to get |
+`Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹C› | Type of component to get |
 `includeRemoved?` | boolean | Whether a component that is staled to be removed should be also considered  |
 
 **Returns:** *C*
@@ -125,21 +121,19 @@ ___
 
 ###  getMutableComponent
 
-▸ **getMutableComponent**<**P**, **C**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹P, C›): *C*
+▸ **getMutableComponent**<**C**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹C›): *C*
 
 Get a mutable reference to a component on this entity.
 
 **Type parameters:**
 
-▪ **P**
-
-▪ **C**: *[Component](component.md)‹P›*
+▪ **C**: *[Component](component.md)‹any›*
 
 **Parameters:**
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹P, C› | Type of component to get  |
+`Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹C› | Type of component to get  |
 
 **Returns:** *C*
 
@@ -147,21 +141,19 @@ ___
 
 ###  getRemovedComponent
 
-▸ **getRemovedComponent**<**P**, **C**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹P, C›): *C*
+▸ **getRemovedComponent**<**C**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹C›): *C*
 
 Get a component that is slated to be removed from this entity.
 
 **Type parameters:**
 
-▪ **P**
-
-▪ **C**: *[Component](component.md)‹P›*
+▪ **C**: *[Component](component.md)‹any›*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹P, C› |
+`Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹C› |
 
 **Returns:** *C*
 
@@ -169,7 +161,7 @@ ___
 
 ###  hasAllComponents
 
-▸ **hasAllComponents**(`Components`: Array‹[ComponentConstructor](../interfaces/componentconstructor.md)‹any, any››): *boolean*
+▸ **hasAllComponents**(`Components`: Array‹[ComponentConstructor](../interfaces/componentconstructor.md)‹any››): *boolean*
 
 Check if the entity has all components in a list.
 
@@ -177,7 +169,7 @@ Check if the entity has all components in a list.
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`Components` | Array‹[ComponentConstructor](../interfaces/componentconstructor.md)‹any, any›› | Component types to check  |
+`Components` | Array‹[ComponentConstructor](../interfaces/componentconstructor.md)‹any›› | Component types to check  |
 
 **Returns:** *boolean*
 
@@ -185,7 +177,7 @@ ___
 
 ###  hasAnyComponents
 
-▸ **hasAnyComponents**(`Components`: Array‹[ComponentConstructor](../interfaces/componentconstructor.md)‹any, any››): *boolean*
+▸ **hasAnyComponents**(`Components`: Array‹[ComponentConstructor](../interfaces/componentconstructor.md)‹any››): *boolean*
 
 Check if the entity has any of the components in a list.
 
@@ -193,7 +185,7 @@ Check if the entity has any of the components in a list.
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`Components` | Array‹[ComponentConstructor](../interfaces/componentconstructor.md)‹any, any›› | Component types to check  |
+`Components` | Array‹[ComponentConstructor](../interfaces/componentconstructor.md)‹any›› | Component types to check  |
 
 **Returns:** *boolean*
 
@@ -201,21 +193,19 @@ ___
 
 ###  hasComponent
 
-▸ **hasComponent**<**P**, **C**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹P, C›, `includeRemoved?`: boolean): *boolean*
+▸ **hasComponent**<**C**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹C›, `includeRemoved?`: boolean): *boolean*
 
 Check if the entity has a component.
 
 **Type parameters:**
 
-▪ **P**
-
-▪ **C**: *[Component](component.md)‹P›*
+▪ **C**: *[Component](component.md)‹any›*
 
 **Parameters:**
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹P, C› | Type of component |
+`Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹C› | Type of component |
 `includeRemoved?` | boolean | Whether a component that is staled to be removed should be also considered  |
 
 **Returns:** *boolean*
@@ -224,21 +214,19 @@ ___
 
 ###  hasRemovedComponent
 
-▸ **hasRemovedComponent**<**P**, **C**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹P, C›): *boolean*
+▸ **hasRemovedComponent**<**C**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹C›): *boolean*
 
 Check if the entity has a component that is slated to be removed.
 
 **Type parameters:**
 
-▪ **P**
-
-▪ **C**: *[Component](component.md)‹P›*
+▪ **C**: *[Component](component.md)‹any›*
 
 **Parameters:**
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹P, C› | Type of component  |
+`Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹C› | Type of component  |
 
 **Returns:** *boolean*
 
@@ -278,21 +266,19 @@ ___
 
 ###  removeComponent
 
-▸ **removeComponent**<**P**, **C**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹P, C›, `forceImmediate?`: boolean): *this*
+▸ **removeComponent**<**C**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹C›, `forceImmediate?`: boolean): *this*
 
 Remove a component from the entity.
 
 **Type parameters:**
 
-▪ **P**
-
-▪ **C**: *[Component](component.md)‹P›*
+▪ **C**: *[Component](component.md)‹any›*
 
 **Parameters:**
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹P, C› | Type of component to remove from this entity |
+`Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹C› | Type of component to remove from this entity |
 `forceImmediate?` | boolean | Whether a component should be removed immediately  |
 
 **Returns:** *this*

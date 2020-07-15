@@ -3,7 +3,7 @@
 
 ## Type parameters
 
-▪ **C**: *[Component](../classes/component.md)‹undefined›*
+▪ **C**: *[Component](../classes/component.md)‹__type›*
 
 ## Constructors
 

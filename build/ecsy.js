@@ -19,15 +19,6 @@
 	}
 
 	/**
-	 * Return a valid property name for the Component
-	 * @param {Component} Component
-	 * @private
-	 */
-	function componentPropertyName(Component) {
-	  return getName(Component);
-	}
-
-	/**
 	 * Get a key from a list of components
 	 * @param {Array(Component)} Components Array of components to generate the key
 	 * @private
@@ -72,7 +63,7 @@
 	    }
 
 	    if (this.getSystem(SystemClass) !== undefined) {
-	      console.warn(`System '${SystemClass.name}' already registered.`);
+	      console.warn(`System '${SystemClass.getName()}' already registered.`);
 	      return this;
 	    }
 
@@ -91,7 +82,7 @@
 	    let system = this.getSystem(SystemClass);
 	    if (system === undefined) {
 	      console.warn(
-	        `Can unregister system '${SystemClass.name}'. It doesn't exist.`
+	        `Can unregister system '${SystemClass.getName()}'. It doesn't exist.`
 	      );
 	      return this;
 	    }
@@ -158,7 +149,7 @@
 
 	    for (var i = 0; i < this._systems.length; i++) {
 	      var system = this._systems[i];
-	      var systemStats = (stats.systems[system.constructor.name] = {
+	      var systemStats = (stats.systems[system.getName()] = {
 	        queries: {},
 	        executeTime: system.executeTime
 	      });
@@ -580,10 +571,17 @@
 	      this._pool.release(this);
 	    }
 	  }
+
+	  getName() {
+	    return this.constructor.getName();
+	  }
 	}
 
 	Component.schema = {};
 	Component.isComponent = true;
+	Component.getName = function() {
+	  return this.displayName || this.name;
+	};
 
 	class SystemStateComponent extends Component {}
 
@@ -671,9 +669,13 @@
 	   * @param {Object} values Optional values to replace the default attributes
 	   */
 	  entityAddComponent(entity, Component, values) {
-	    if (!this.world.componentsManager.Components[Component.name]) {
+	    // @todo Probably define Component._typeId with a default value and avoid using typeof
+	    if (
+	      typeof Component._typeId === "undefined" &&
+	      !this.world.componentsManager._ComponentsMap[Component._typeId]
+	    ) {
 	      throw new Error(
-	        `Attempted to add unregistered component "${Component.name}"`
+	        `Attempted to add unregistered component "${Component.getName()}"`
 	      );
 	    }
 
@@ -682,7 +684,7 @@
 	      console.warn(
 	        "Component type already exists on entity.",
 	        entity,
-	        Component.name
+	        Component.getName()
 	      );
 	      return;
 	    }
@@ -705,7 +707,7 @@
 	      component.copy(values);
 	    }
 
-	    entity._components[Component.name] = component;
+	    entity._components[Component._typeId] = component;
 
 	    this._queryManager.onEntityComponentAdded(entity, Component);
 	    this.world.componentsManager.componentAddedToEntity(Component);
@@ -734,10 +736,9 @@
 	      entity._ComponentTypes.splice(index, 1);
 	      entity._ComponentTypesToRemove.push(Component);
 
-	      var componentName = getName(Component);
-	      entity._componentsToRemove[componentName] =
-	        entity._components[componentName];
-	      delete entity._components[componentName];
+	      entity._componentsToRemove[Component._typeId] =
+	        entity._components[Component._typeId];
+	      delete entity._components[Component._typeId];
 	    }
 
 	    // Check each indexed query to see if we need to remove it
@@ -756,9 +757,8 @@
 	  _entityRemoveComponentSync(entity, Component, index) {
 	    // Remove T listing on entity and property ref, then free the component.
 	    entity._ComponentTypes.splice(index, 1);
-	    var componentName = getName(Component);
-	    var component = entity._components[componentName];
-	    delete entity._components[componentName];
+	    var component = entity._components[Component._typeId];
+	    delete entity._components[Component._typeId];
 	    component.dispose();
 	    this.world.componentsManager.componentRemovedFromEntity(Component);
 	  }
@@ -837,9 +837,8 @@
 	      while (entity._ComponentTypesToRemove.length > 0) {
 	        let Component = entity._ComponentTypesToRemove.pop();
 
-	        var componentName = getName(Component);
-	        var component = entity._componentsToRemove[componentName];
-	        delete entity._componentsToRemove[componentName];
+	        var component = entity._componentsToRemove[Component._typeId];
+	        delete entity._componentsToRemove[Component._typeId];
 	        component.dispose();
 	        this.world.componentsManager.componentRemovedFromEntity(Component);
 
@@ -881,9 +880,9 @@
 	      eventDispatcher: this.eventDispatcher.stats
 	    };
 
-	    for (var cname in this.componentsManager._componentPool) {
-	      var pool = this.componentsManager._componentPool[cname];
-	      stats.componentPool[cname] = {
+	    for (var ecsyComponentId in this.componentsManager._componentPool) {
+	      var pool = this.componentsManager._componentPool[ecsyComponentId];
+	      stats.componentPool[ecsyComponentId] = {
 	        used: pool.totalUsed(),
 	        size: pool.count
 	      };
@@ -900,21 +899,28 @@
 
 	class ComponentManager {
 	  constructor() {
-	    this.Components = {};
+	    this.Components = [];
+	    this._ComponentsMap = {};
+
 	    this._componentPool = {};
 	    this.numComponents = {};
+	    this.nextComponentId = 0;
 	  }
 
 	  registerComponent(Component, objectPool) {
-	    if (this.Components[Component.name]) {
-	      console.warn(`Component type: '${Component.name}' already registered.`);
+	    if (this.Components.indexOf(Component) !== -1) {
+	      console.warn(
+	        `Component type: '${Component.getName()}' already registered.`
+	      );
 	      return;
 	    }
 
 	    const schema = Component.schema;
 
 	    if (!schema) {
-	      throw new Error(`Component "${Component.name}" has no schema property.`);
+	      throw new Error(
+	        `Component "${Component.getName()}" has no schema property.`
+	      );
 	    }
 
 	    for (const propName in schema) {
@@ -922,13 +928,15 @@
 
 	      if (!prop.type) {
 	        throw new Error(
-	          `Invalid schema for component "${Component.name}". Missing type for "${propName}" property.`
+	          `Invalid schema for component "${Component.getName()}". Missing type for "${propName}" property.`
 	        );
 	      }
 	    }
 
-	    this.Components[Component.name] = Component;
-	    this.numComponents[Component.name] = 0;
+	    Component._typeId = this.nextComponentId++;
+	    this.Components.push(Component);
+	    this._ComponentsMap[Component._typeId] = Component;
+	    this.numComponents[Component._typeId] = 0;
 
 	    if (objectPool === undefined) {
 	      objectPool = new ObjectPool(Component);
@@ -936,24 +944,19 @@
 	      objectPool = undefined;
 	    }
 
-	    this._componentPool[Component.name] = objectPool;
+	    this._componentPool[Component._typeId] = objectPool;
 	  }
 
 	  componentAddedToEntity(Component) {
-	    if (!this.Components[Component.name]) {
-	      this.registerComponent(Component);
-	    }
-
-	    this.numComponents[Component.name]++;
+	    this.numComponents[Component._typeId]++;
 	  }
 
 	  componentRemovedFromEntity(Component) {
-	    this.numComponents[Component.name]--;
+	    this.numComponents[Component._typeId]--;
 	  }
 
 	  getComponentsPool(Component) {
-	    var componentName = componentPropertyName(Component);
-	    return this._componentPool[componentName];
+	    return this._componentPool[Component._typeId];
 	  }
 	}
 
@@ -989,17 +992,17 @@
 	  // COMPONENTS
 
 	  getComponent(Component, includeRemoved) {
-	    var component = this._components[Component.name];
+	    var component = this._components[Component._typeId];
 
 	    if (!component && includeRemoved === true) {
-	      component = this._componentsToRemove[Component.name];
+	      component = this._componentsToRemove[Component._typeId];
 	    }
 
 	    return  component;
 	  }
 
 	  getRemovedComponent(Component) {
-	    return this._componentsToRemove[Component.name];
+	    return this._componentsToRemove[Component._typeId];
 	  }
 
 	  getComponents() {
@@ -1015,7 +1018,7 @@
 	  }
 
 	  getMutableComponent(Component) {
-	    var component = this._components[Component.name];
+	    var component = this._components[Component._typeId];
 	    for (var i = 0; i < this.queries.length; i++) {
 	      var query = this.queries[i];
 	      // @todo accelerate this check. Maybe having query._Components as an object
@@ -1072,8 +1075,8 @@
 
 	  copy(src) {
 	    // TODO: This can definitely be optimized
-	    for (var componentName in src._components) {
-	      var srcComponent = src._components[componentName];
+	    for (var ecsyComponentId in src._components) {
+	      var srcComponent = src._components[ecsyComponentId];
 	      this.addComponent(srcComponent.constructor);
 	      var component = this.getComponent(srcComponent.constructor);
 	      component.copy(srcComponent);
@@ -1091,8 +1094,8 @@
 	    this._ComponentTypes.length = 0;
 	    this.queries.length = 0;
 
-	    for (var componentName in this._components) {
-	      delete this._components[componentName];
+	    for (var ecsyComponentId in this._components) {
+	      delete this._components[ecsyComponentId];
 	    }
 	  }
 
@@ -1200,6 +1203,10 @@
 	    return true;
 	  }
 
+	  getName() {
+	    return this.constructor.getName();
+	  }
+
 	  constructor(world, attributes) {
 	    this.world = world;
 	    this.enabled = true;
@@ -1250,9 +1257,7 @@
 	          validEvents.forEach(eventName => {
 	            if (!this.execute) {
 	              console.warn(
-	                `System '${
-                  this.constructor.name
-                }' has defined listen events (${validEvents.join(
+	                `System '${this.getName()}' has defined listen events (${validEvents.join(
                   ", "
                 )}) for query '${queryName}' but it does not implement the 'execute' method.`
 	              );
@@ -1343,7 +1348,7 @@
 
 	  toJSON() {
 	    var json = {
-	      name: this.constructor.name,
+	      name: this.getName(),
 	      enabled: this.enabled,
 	      executeTime: this.executeTime,
 	      priority: this.priority,
@@ -1387,6 +1392,9 @@
 	}
 
 	System.isSystem = true;
+	System.getName = function() {
+	  return this.displayName || this.name;
+	};
 
 	function Not(Component) {
 	  return {
@@ -1408,27 +1416,42 @@
 	const cloneValue = src => src;
 
 	const copyArray = (src, dest) => {
-	  const srcArray = src;
-	  const destArray = dest;
-
-	  destArray.length = 0;
-
-	  for (let i = 0; i < srcArray.length; i++) {
-	    destArray.push(srcArray[i]);
+	  if (!src) {
+	    return src;
 	  }
 
-	  return destArray;
+	  if (!dest) {
+	    return src.slice();
+	  }
+
+	  dest.length = 0;
+
+	  for (let i = 0; i < src.length; i++) {
+	    dest.push(src[i]);
+	  }
+
+	  return dest;
 	};
 
-	const cloneArray = src => src.slice();
+	const cloneArray = src => src && src.slice();
 
 	const copyJSON = src => JSON.parse(JSON.stringify(src));
 
 	const cloneJSON = src => JSON.parse(JSON.stringify(src));
 
-	const copyCopyable = (src, dest) => dest.copy(src);
+	const copyCopyable = (src, dest) => {
+	  if (!src) {
+	    return src;
+	  }
 
-	const cloneClonable = src => src.clone();
+	  if (!dest) {
+	    return src.clone();
+	  }
+
+	  return dest.copy(src);
+	};
+
+	const cloneClonable = src => src && src.clone();
 
 	function createType(typeDefinition) {
 	  var mandatoryProperties = ["name", "default", "copy", "clone"];

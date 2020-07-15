@@ -1,17 +1,15 @@
 
-# Interface: NotComponent <**P, C**>
+# Interface: NotComponent <**C**>
 
 ## Type parameters
 
-▪ **P**
-
-▪ **C**: *[Component](../classes/component.md)‹P›*
+▪ **C**: *[Component](../classes/component.md)‹any›*
 
 ## Properties
 
 ###  Component
 
-• **Component**: *[ComponentConstructor](componentconstructor.md)‹P, C›*
+• **Component**: *[ComponentConstructor](componentconstructor.md)‹C›*
 
 ___
 

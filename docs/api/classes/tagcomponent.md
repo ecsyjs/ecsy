@@ -8,7 +8,7 @@ that do not store data
 
 ###  constructor
 
-\+ **new TagComponent**(`props?`: [ComponentProps](../README.md#componentprops)‹undefined›): *[TagComponent](tagcomponent.md)*
+\+ **new TagComponent**(`props?`: Partial‹Omit‹__type, keyof Component<any>›› | false): *[TagComponent](tagcomponent.md)*
 
 *Inherited from [Component](component.md).[constructor](component.md#constructor)*
 
@@ -16,7 +16,7 @@ that do not store data
 
 Name | Type |
 ------ | ------ |
-`props?` | [ComponentProps](../README.md#componentprops)‹undefined› |
+`props?` | Partial‹Omit‹__type, keyof Component<any>›› &#124; false |
 
 **Returns:** *[TagComponent](tagcomponent.md)*
 

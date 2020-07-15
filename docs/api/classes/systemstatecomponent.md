@@ -1,17 +1,17 @@
 
-# Class: SystemStateComponent <**P**>
+# Class: SystemStateComponent <**C**>
 
 Components that extend the SystemStateComponent are not removed when an entity is deleted.
 
 ## Type parameters
 
-▪ **P**
+▪ **C**
 
 ## Constructors
 
 ###  constructor
 
-\+ **new SystemStateComponent**(`props?`: [ComponentProps](../README.md#componentprops)‹P›): *[SystemStateComponent](systemstatecomponent.md)*
+\+ **new SystemStateComponent**(`props?`: Partial‹Omit‹C, keyof Component<any>›› | false): *[SystemStateComponent](systemstatecomponent.md)*
 
 *Inherited from [Component](component.md).[constructor](component.md#constructor)*
 
@@ -19,7 +19,7 @@ Components that extend the SystemStateComponent are not removed when an entity i
 
 Name | Type |
 ------ | ------ |
-`props?` | [ComponentProps](../README.md#componentprops)‹P› |
+`props?` | Partial‹Omit‹C, keyof Component<any>›› &#124; false |
 
 **Returns:** *[SystemStateComponent](systemstatecomponent.md)*
 

@@ -1,11 +1,9 @@
 
-# Interface: SystemStateComponentConstructor <**P, C**>
+# Interface: SystemStateComponentConstructor <**C**>
 
 ## Type parameters
 
-▪ **P**
-
-▪ **C**: *[Component](../classes/component.md)‹P›*
+▪ **C**: *[Component](../classes/component.md)‹any›*
 
 ## Constructors
 

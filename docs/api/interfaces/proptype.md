@@ -1,9 +1,11 @@
 
-# Interface: PropType <**T**>
+# Interface: PropType <**T, D**>
 
 ## Type parameters
 
 ▪ **T**
+
+▪ **D**
 
 ## Properties
 
@@ -25,7 +27,7 @@ ___
 
 ###  default
 
-• **default**: *T*
+• **default**: *D*
 
 *Inherited from [PropTypeDefinition](proptypedefinition.md).[default](proptypedefinition.md#default)*
 
