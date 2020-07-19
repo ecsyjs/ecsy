@@ -7,7 +7,6 @@ export class ComponentManager {
 
     this._componentPool = {};
     this.numComponents = {};
-    this.nextComponentId = 0;
   }
 
   registerComponent(Component, objectPool) {
