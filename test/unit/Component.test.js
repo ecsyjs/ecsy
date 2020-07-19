@@ -124,3 +124,17 @@ test("clone component", t => {
   t.is(destComponent.jsonWithDefault.value, "test 5");
   t.true(new Vector3(7, 8, 9).equals(destComponent.vector3WithDefault));
 });
+
+test("unique type ids", t => {
+  class ComponentA extends Component {}
+  class ComponentB extends Component {}
+
+  t.assert(ComponentA.getTypeId() !== undefined);
+  t.assert(ComponentB.getTypeId() !== undefined);
+
+  // Verify unique between components.
+  t.not(ComponentA.getTypeId(), ComponentB.getTypeId());
+
+  // Verify multiple calls return the same id.
+  t.is(ComponentA.getTypeId(), ComponentA.getTypeId());
+});
