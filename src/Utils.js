@@ -17,6 +17,20 @@ export function componentPropertyName(Component) {
 }
 
 /**
+ * Returns the unique type id for the Component.
+ * @param {Component} Component
+ * @private
+ */
+function getTypeId(Component) {
+  const id = Component._typeId;
+  if (id === undefined) {
+    const name = getName(Component);
+    console.warn(`Component ${name} has no TypeId. Was it registered?`);
+  }
+  return id;
+}
+
+/**
  * Get a key from a list of components
  * @param {Array(Component)} Components Array of components to generate the key
  * @private
@@ -27,9 +41,9 @@ export function queryKey(Components) {
     var T = Components[n];
     if (typeof T === "object") {
       var operator = T.operator === "not" ? "!" : T.operator;
-      names.push(operator + getName(T.Component));
+      names.push(operator + getTypeId(T.Component));
     } else {
-      names.push(getName(T));
+      names.push(getTypeId(T));
     }
   }
 

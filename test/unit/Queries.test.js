@@ -1,5 +1,5 @@
 import test from "ava";
-import { World, System, Not } from "../../src/index.js";
+import { World, System, Not, Component } from "../../src/index.js";
 import { FooComponent, BarComponent } from "../helpers/components";
 
 function queriesLength(queries) {
@@ -208,4 +208,40 @@ test("Entity living just within the frame", t => {
     removed: 0,
     results: 0
   });
+});
+
+test("Two components with the same name get unique queries", t => {
+  const world = new World();
+
+  // Create two components that have the same name.
+  function createComponentClass() {
+    return class TestComponent extends Component {};
+  }
+  const Component1 = createComponentClass();
+  const Component2 = createComponentClass();
+  world.registerComponent(Component1);
+  world.registerComponent(Component2);
+  t.is(Component1.name, Component2.name);
+
+  // Create an entity for each component.
+  const entity1 = world.createEntity().addComponent(Component1);
+  const entity2 = world.createEntity().addComponent(Component2);
+
+  // Define two queries, one for each entity.
+  class SystemTest extends System {
+    execute() {}
+  }
+  SystemTest.queries = {
+    comp1: { components: [Component1] },
+    comp2: { components: [Component2] },
+  };
+  world.registerSystem(SystemTest);
+
+  // Verify that the query system can identify them as unique components.
+  const system = world.systemManager.getSystem(SystemTest);
+  const query1Entity = system.queries.comp1.results[0];
+  const query2Entity = system.queries.comp2.results[0];
+
+  t.is(query1Entity.id, entity1.id);
+  t.is(query2Entity.id, entity2.id);
 });
