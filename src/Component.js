@@ -70,3 +70,18 @@ Component.isComponent = true;
 Component.getName = function() {
   return this.displayName || this.name;
 };
+
+let nextComponentId = 0;
+
+/**
+ * Returns a unique ID for this Component type.
+ * @return {number}
+ */
+Component.getTypeId = function() {
+  if (this._typeId !== undefined) {
+    return this._typeId;
+  }
+
+  this._typeId = nextComponentId++;
+  return this._typeId;
+}

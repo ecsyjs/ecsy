@@ -36,10 +36,9 @@ export class ComponentManager {
       }
     }
 
-    Component._typeId = this.nextComponentId++;
     this.Components.push(Component);
-    this._ComponentsMap[Component._typeId] = Component;
-    this.numComponents[Component._typeId] = 0;
+    this._ComponentsMap[Component.getTypeId()] = Component;
+    this.numComponents[Component.getTypeId()] = 0;
 
     if (objectPool === undefined) {
       objectPool = new ObjectPool(Component);
@@ -47,18 +46,18 @@ export class ComponentManager {
       objectPool = undefined;
     }
 
-    this._componentPool[Component._typeId] = objectPool;
+    this._componentPool[Component.getTypeId()] = objectPool;
   }
 
   componentAddedToEntity(Component) {
-    this.numComponents[Component._typeId]++;
+    this.numComponents[Component.getTypeId()]++;
   }
 
   componentRemovedFromEntity(Component) {
-    this.numComponents[Component._typeId]--;
+    this.numComponents[Component.getTypeId()]--;
   }
 
   getComponentsPool(Component) {
-    return this._componentPool[Component._typeId];
+    return this._componentPool[Component.getTypeId()];
   }
 }

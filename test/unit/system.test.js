@@ -896,7 +896,7 @@ test("Components with the the same name in uppercase and lowercase", t => {
 
   t.deepEqual(
     Object.keys(components).map(c => parseInt(c)),
-    [B._typeId, b._typeId]
+    [B.getTypeId(), b.getTypeId()]
   );
 
   t.deepEqual(

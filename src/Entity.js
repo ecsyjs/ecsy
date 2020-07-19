@@ -34,17 +34,17 @@ export class Entity {
   // COMPONENTS
 
   getComponent(Component, includeRemoved) {
-    var component = this._components[Component._typeId];
+    var component = this._components[Component.getTypeId()];
 
     if (!component && includeRemoved === true) {
-      component = this._componentsToRemove[Component._typeId];
+      component = this._componentsToRemove[Component.getTypeId()];
     }
 
     return DEBUG ? wrapImmutableComponent(Component, component) : component;
   }
 
   getRemovedComponent(Component) {
-    return this._componentsToRemove[Component._typeId];
+    return this._componentsToRemove[Component.getTypeId()];
   }
 
   getComponents() {
@@ -60,7 +60,7 @@ export class Entity {
   }
 
   getMutableComponent(Component) {
-    var component = this._components[Component._typeId];
+    var component = this._components[Component.getTypeId()];
     for (var i = 0; i < this.queries.length; i++) {
       var query = this.queries[i];
       // @todo accelerate this check. Maybe having query._Components as an object
