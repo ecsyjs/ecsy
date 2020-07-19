@@ -27,9 +27,9 @@ export function queryKey(Components) {
     var T = Components[n];
     if (typeof T === "object") {
       var operator = T.operator === "not" ? "!" : T.operator;
-      names.push(operator + getName(T.Component));
+      names.push(operator + T.Component._typeId);
     } else {
-      names.push(getName(T));
+      names.push(T._typeId);
     }
   }
 
