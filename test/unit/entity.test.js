@@ -19,7 +19,10 @@ test("adding/removing components sync", async t => {
   t.is(entity.getComponentTypes().length, 1);
   t.true(entity.hasComponent(FooComponent));
   t.false(entity.hasComponent(BarComponent));
-  t.deepEqual(Object.keys(entity.getComponents()), ["FooComponent"]);
+  t.deepEqual(
+    Object.values(entity.getComponents()).map(comp => comp.constructor),
+    [FooComponent]
+  );
 
   // Entity doesn't contain BarComponent
   t.false(entity.hasAllComponents([FooComponent, BarComponent]));
@@ -29,16 +32,20 @@ test("adding/removing components sync", async t => {
   t.true(entity.hasComponent(FooComponent));
   t.true(entity.hasComponent(BarComponent));
   t.true(entity.hasAllComponents([FooComponent, BarComponent]));
-  t.deepEqual(Object.keys(entity.getComponents()), [
-    "FooComponent",
-    "BarComponent"
-  ]);
+  t.deepEqual(
+    Object.values(entity.getComponents()).map(comp => comp.constructor),
+    [FooComponent, BarComponent]
+  );
+
   entity.removeComponent(FooComponent, true);
   t.is(entity.getComponentTypes().length, 1);
   t.false(entity.hasComponent(FooComponent));
   t.true(entity.hasComponent(BarComponent));
   t.false(entity.hasAllComponents([FooComponent, BarComponent]));
-  t.deepEqual(Object.keys(entity.getComponents()), ["BarComponent"]);
+  t.deepEqual(
+    Object.values(entity.getComponents()).map(comp => comp.constructor),
+    [BarComponent]
+  );
 
   entity.addComponent(FooComponent);
   entity.removeAllComponents(true);
@@ -46,10 +53,13 @@ test("adding/removing components sync", async t => {
   t.false(entity.hasComponent(FooComponent));
   t.false(entity.hasComponent(BarComponent));
   t.false(entity.hasAllComponents([FooComponent, BarComponent]));
-  t.deepEqual(Object.keys(entity.getComponents()), []);
+  t.deepEqual(
+    Object.values(entity.getComponents()).map(comp => comp.constructor),
+    []
+  );
 });
 
-test.only("clearing pooled components", async t => {
+test("clearing pooled components", async t => {
   var world, entity;
 
   // Component with no constructor
@@ -151,13 +161,22 @@ test("removing components deferred", async t => {
   t.false(entity.hasComponent(FooComponent));
   t.false(entity.hasComponent(FooComponent));
   t.false(entity.hasComponent(BarComponent));
-  t.deepEqual(Object.keys(entity.getComponents()), []);
-  t.deepEqual(Object.keys(entity.getComponentsToRemove()), ["FooComponent"]);
+  t.deepEqual(
+    Object.values(entity.getComponents()).map(comp => comp.constructor),
+    []
+  );
+  t.deepEqual(
+    Object.values(entity.getComponentsToRemove()).map(comp => comp.constructor),
+    [FooComponent]
+  );
 
   world.entityManager.processDeferredRemoval();
   t.is(entity.getComponentTypes().length, 0);
   t.false(entity.hasComponent(FooComponent));
-  t.deepEqual(Object.keys(entity.getComponents()), []);
+  t.deepEqual(
+    Object.values(entity.getComponents()).map(comp => comp.constructor),
+    []
+  );
 });
 
 test("remove entity", async t => {
