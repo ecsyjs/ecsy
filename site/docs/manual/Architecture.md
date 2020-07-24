@@ -393,7 +393,7 @@ Components can be accessed from an entity in two ways:
 - `getComponent(Component)`: Get the component for read only operations.
 - `getMutableComponent(Component)`: Get the component to modify its values.
 
-If `DEBUG` mode is enabled it will throw an error if you try to modify a component accessed by `getComponent`, but that error will not be thrown on release mode because of performance reasons.
+If `development` mode is enabled it will throw an error if you try to modify a component accessed by `getComponent`, but that error will not be thrown on release mode because of performance reasons.
 
 These two access modes help to implement `reactive queries`([more info](/manual/Architecture?id=reactive-queries)), which are basically lists of entities populated with components that have mutated somehow, without much overhead on the execution as we avoid using custom setters or proxies.
 This means every time you request a mutable component, it will get marked as modified and systems listening for that will get notified accordingly.

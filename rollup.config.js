@@ -8,7 +8,8 @@ export default [
     input: "src/index.js",
     plugins: [
       replace({
-        _DEBUG_: true
+        "process.env.NODE_ENV": JSON.stringify("development"),
+        delimiters: ["", ""]
       }),
       json({ exclude: ["node_modules/**"] })
     ],
@@ -43,7 +44,8 @@ export default [
     input: "src/index.js",
     plugins: [
       replace({
-        _DEBUG_: false
+        "process.env.NODE_ENV": JSON.stringify("production"),
+        delimiters: ["", ""]
       }),
       json({ exclude: ["node_modules/**"] }),
       terser()
