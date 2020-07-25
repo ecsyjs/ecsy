@@ -40,6 +40,13 @@ And finally we define the systems that will add the logic to the game:
 
 ![Wolves and dragons example](https://ecsy.io/docs/manual/images/dragons.svg)
 
+## Debug mode
+ECSY will output some debug messages when in development mode. Development mode is active depending on the environment you are running ECSY in.
+
+In CommonJS environments it is controlled by the value of the `NODE_ENV` environment variable. This means Webpack and similar tools can change the value for development and production builds. This ensures you get helpful messages during development and a smaller bundle size in production.
+
+When using the UMD or ES Module builds then the unminified builds will have development mode on and the minified builds will have it turned off.
+
 ## World
 By default your application should have at least one `world`. A world is basically a container for `entities`, `components` and `systems`.  Even so, you can have multiple worlds running at the same time and enable or disable them as you need.
 [API Reference](/api/classes/world).
