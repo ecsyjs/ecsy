@@ -44,7 +44,7 @@ export class World {
    * Get a system registered in this world.
    * @param System Type of system to get.
    */
-  getSystem<S extends System>(System: SystemConstructor<S>): System;
+  getSystem<S extends System>(System: SystemConstructor<S>): S;
 
   /**
    * Get a list of systems registered in this world.
