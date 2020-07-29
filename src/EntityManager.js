@@ -96,12 +96,13 @@ export class EntityManager {
     }
 
     if (~entity._ComponentTypes.indexOf(Component)) {
-      // @todo Just on debug mode
-      console.warn(
-        "Component type already exists on entity.",
-        entity,
-        Component.getName()
-      );
+      if (process.env.NODE_ENV !== "production") {
+        console.warn(
+          "Component type already exists on entity.",
+          entity,
+          Component.getName()
+        );
+      }
       return;
     }
 

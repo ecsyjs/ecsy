@@ -40,6 +40,13 @@ And finally we define the systems that will add the logic to the game:
 
 ![Wolves and dragons example](https://ecsy.io/docs/manual/images/dragons.svg)
 
+## Debug mode
+ECSY will output some debug messages when in development mode. Development mode is active depending on the environment you are running ECSY in.
+
+In CommonJS environments it is controlled by the value of the `NODE_ENV` environment variable. This means Webpack and similar tools can change the value for development and production builds. This ensures you get helpful messages during development and a smaller bundle size in production.
+
+When using the UMD or ES Module builds then the unminified builds will have development mode on and the minified builds will have it turned off.
+
 ## World
 By default your application should have at least one `world`. A world is basically a container for `entities`, `components` and `systems`.  Even so, you can have multiple worlds running at the same time and enable or disable them as you need.
 [API Reference](/api/classes/world).
@@ -393,7 +400,7 @@ Components can be accessed from an entity in two ways:
 - `getComponent(Component)`: Get the component for read only operations.
 - `getMutableComponent(Component)`: Get the component to modify its values.
 
-If `DEBUG` mode is enabled it will throw an error if you try to modify a component accessed by `getComponent`, but that error will not be thrown on release mode because of performance reasons.
+If `development` mode is enabled it will throw an error if you try to modify a component accessed by `getComponent`, but that error will not be thrown on release mode because of performance reasons.
 
 These two access modes help to implement `reactive queries`([more info](/manual/Architecture?id=reactive-queries)), which are basically lists of entities populated with components that have mutated somehow, without much overhead on the execution as we avoid using custom setters or proxies.
 This means every time you request a mutable component, it will get marked as modified and systems listening for that will get notified accordingly.
