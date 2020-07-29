@@ -25,14 +25,6 @@
     var world = new World();
 
     world
-      .registerSystem(RotatingSystem)
-      .registerSystem(PulsatingColorSystem)
-      .registerSystem(PulsatingScaleSystem)
-      .registerSystem(TimeoutSystem)
-      .registerSystem(ColliderSystem)
-      .registerSystem(MovingSystem);
-
-    world
       .registerComponent(Object3D)
       .registerComponent(Collidable)
       .registerComponent(Collider)
@@ -43,6 +35,14 @@
       .registerComponent(PulsatingColor)
       .registerComponent(Colliding)
       .registerComponent(Rotating);
+
+    world
+      .registerSystem(RotatingSystem)
+      .registerSystem(PulsatingColorSystem)
+      .registerSystem(PulsatingScaleSystem)
+      .registerSystem(TimeoutSystem)
+      .registerSystem(ColliderSystem)
+      .registerSystem(MovingSystem);
 
     var camera, scene, renderer, parent;
     var clock = new THREE.Clock();
@@ -104,7 +104,7 @@
 
       var geometry = new THREE.BoxBufferGeometry( size, size, size );
 
-      for (var i = 0;i < numObjects; i++) {
+      for (var i = 0; i < numObjects; i++) {
 
         var material = new THREE.MeshStandardMaterial({color: new THREE.Color(1,0,0)});
         var mesh = new THREE.Mesh( geometry, material );
