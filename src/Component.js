@@ -17,8 +17,7 @@ export class Component {
         }
       }
 
-      // @DEBUG
-      if (props !== undefined) {
+      if (process.env.NODE_ENV !== "production" && props !== undefined) {
         this.checkUndefinedAttributes(props);
       }
     }
@@ -38,7 +37,9 @@ export class Component {
     }
 
     // @DEBUG
-    this.checkUndefinedAttributes(source);
+    if (process.env.NODE_ENV !== "production") {
+      this.checkUndefinedAttributes(source);
+    }
 
     return this;
   }
