@@ -1,5 +1,6 @@
 import test from "ava";
 import { World } from "../../src/World";
+import { System } from "../../src/System";
 import { Component } from "../../src/Component";
 import {
   createType,
@@ -144,4 +145,32 @@ test("unique type ids", t => {
 
   // Verify multiple calls return the same id.
   t.is(ComponentA._typeId, ComponentA._typeId);
+});
+
+test("registering components before systems", t => {
+  class ComponentA extends Component {}
+  class ComponentB extends Component {}
+
+  class SystemA extends System {}
+  SystemA.queries = { S: { components: [ComponentA, ComponentB] } };
+
+  let world = new World();
+
+  const error1 = t.throws(() => {
+    world.registerSystem(SystemA);
+  });
+  t.is(
+    error1.message,
+    "Tried to create a query 'SystemA.S' with unregistered components: [ComponentA, ComponentB]"
+  );
+
+  world.registerComponent(ComponentA);
+
+  const error2 = t.throws(() => {
+    world.registerSystem(SystemA);
+  });
+  t.is(
+    error2.message,
+    "Tried to create a query 'SystemA.S' with unregistered components: [ComponentB]"
+  );
 });

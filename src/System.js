@@ -1,4 +1,5 @@
 import Query from "./Query.js";
+import { componentRegistered } from "./Utils.js";
 
 export class System {
   canExecute() {
@@ -49,12 +50,12 @@ export class System {
 
         // Detect if the components have already been registered
         let unregisteredComponents = Components.filter(
-          Component => Component._typeId === undefined
+          Component => !componentRegistered(Component)
         );
 
         if (unregisteredComponents.length > 0) {
           throw new Error(
-            `Trying to create a query '${
+            `Tried to create a query '${
               this.constructor.name
             }.${queryName}' with unregistered components: [${unregisteredComponents
               .map(c => c.getName())
