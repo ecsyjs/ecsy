@@ -233,7 +233,7 @@ test("Two components with the same name get unique queries", t => {
   }
   SystemTest.queries = {
     comp1: { components: [Component1] },
-    comp2: { components: [Component2] },
+    comp2: { components: [Component2] }
   };
   world.registerSystem(SystemTest);
 
