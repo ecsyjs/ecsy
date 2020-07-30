@@ -29,7 +29,7 @@ export class World {
       window.dispatchEvent(event);
     }
 
-    this.lastTime = now();
+    this.lastTime = now() / 1000;
   }
 
   registerComponent(Component, objectPool) {
@@ -57,7 +57,7 @@ export class World {
 
   execute(delta, time) {
     if (!delta) {
-      time = now();
+      time = now() / 1000;
       delta = time - this.lastTime;
       this.lastTime = time;
     }
