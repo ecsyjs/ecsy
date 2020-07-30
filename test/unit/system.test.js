@@ -170,7 +170,6 @@ test("Queries with 'Not' operator", t => {
   };
 
   const error = t.throws(() => {
-    debugger;
     world.registerSystem(SystemNotNot);
   });
 
