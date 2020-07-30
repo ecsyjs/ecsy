@@ -22,7 +22,7 @@ export function componentPropertyName(Component) {
  * @private
  */
 export function queryKey(Components) {
-  var names = [];
+  var ids = [];
   for (var n = 0; n < Components.length; n++) {
     var T = Components[n];
 
@@ -32,13 +32,13 @@ export function queryKey(Components) {
 
     if (typeof T === "object") {
       var operator = T.operator === "not" ? "!" : T.operator;
-      names.push(operator + T.Component._typeId);
+      ids.push(operator + T.Component._typeId);
     } else {
-      names.push(T._typeId);
+      ids.push(T._typeId);
     }
   }
 
-  return names.sort().join("-");
+  return ids.sort().join("-");
 }
 
 // Detector for browser's "window"
