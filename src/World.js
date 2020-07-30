@@ -86,6 +86,6 @@ export class World {
       system: this.systemManager.stats()
     };
 
-    console.log(JSON.stringify(stats, null, 2));
+    return stats;
   }
 }

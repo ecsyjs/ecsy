@@ -299,7 +299,7 @@ export class EntityManager {
 
     for (var ecsyComponentId in this.componentsManager._componentPool) {
       var pool = this.componentsManager._componentPool[ecsyComponentId];
-      stats.componentPool[ecsyComponentId] = {
+      stats.componentPool[pool.T.getName()] = {
         used: pool.totalUsed(),
         size: pool.count
       };
