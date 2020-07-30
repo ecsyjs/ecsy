@@ -1,4 +1,5 @@
 import Query from "./Query.js";
+import { componentRegistered } from "./Utils.js";
 
 export class System {
   canExecute() {
@@ -46,7 +47,24 @@ export class System {
         if (!Components || Components.length === 0) {
           throw new Error("'components' attribute can't be empty in a query");
         }
+
+        // Detect if the components have already been registered
+        let unregisteredComponents = Components.filter(
+          Component => !componentRegistered(Component)
+        );
+
+        if (unregisteredComponents.length > 0) {
+          throw new Error(
+            `Tried to create a query '${
+              this.constructor.name
+            }.${queryName}' with unregistered components: [${unregisteredComponents
+              .map(c => c.getName())
+              .join(", ")}]`
+          );
+        }
+
         var query = this.world.entityManager.queryComponents(Components);
+
         this._queries[queryName] = query;
         if (queryConfig.mandatory === true) {
           this._mandatoryQueries.push(query);
