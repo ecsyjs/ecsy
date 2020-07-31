@@ -93,8 +93,8 @@ export function enableRemoteDevtools(remoteId) {
     // var peer = new Peer(remoteId);
     var peer = new Peer(remoteId, {
       host: "peerjs.ecsy.io",
-      /*secure: true, */
-      port: 9000,
+      secure: true,
+      port: 443,
       config: {
         iceServers: [
           { url: "stun:stun.l.google.com:19302" },
