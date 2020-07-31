@@ -90,7 +90,23 @@ export function enableRemoteDevtools(remoteId) {
   window.addEventListener("ecsy-world-created", onWorldCreated);
 
   let onLoaded = () => {
-    var peer = new Peer(remoteId);
+    // var peer = new Peer(remoteId);
+    var peer = new Peer(remoteId, {
+      host: "peerjs.ecsy.io",
+      /*secure: true, */
+      port: 9000,
+      config: {
+        iceServers: [
+          { url: "stun:stun.l.google.com:19302" },
+          { url: "stun:stun1.l.google.com:19302" },
+          { url: "stun:stun2.l.google.com:19302" },
+          { url: "stun:stun3.l.google.com:19302" },
+          { url: "stun:stun4.l.google.com:19302" }
+        ]
+      },
+      debug: 3
+    });
+
     peer.on("open", (/* id */) => {
       peer.on("connection", connection => {
         window.__ECSY_REMOTE_DEVTOOLS.connection = connection;
