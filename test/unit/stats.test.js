@@ -31,15 +31,15 @@ test("Stats", async t => {
       numEntities: 10,
       numQueries: 3,
       queries: {
-        FooComponent: {
+        0: {
           numComponents: 1,
           numEntities: 10
         },
-        BarComponent: {
+        1: {
           numComponents: 1,
           numEntities: 4
         },
-        "BarComponent-FooComponent": {
+        "0-1": {
           numComponents: 2,
           numEntities: 4
         }
