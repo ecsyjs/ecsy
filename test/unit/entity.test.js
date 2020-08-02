@@ -241,6 +241,40 @@ test("get component production", async t => {
   process.env.NODE_ENV = oldNodeEnv;
 });
 
+test("get removed component development", async t => {
+  var world = new World();
+
+  world.registerComponent(FooComponent);
+
+  // Sync
+  var entity = world.createEntity();
+  entity.addComponent(FooComponent);
+  entity.removeComponent(FooComponent);
+
+  const component = entity.getRemovedComponent(FooComponent);
+
+  t.throws(() => (component.variableFoo = 4));
+});
+
+test("get removed component production", async t => {
+  const oldNodeEnv = process.env.NODE_ENV;
+  process.env.NODE_ENV = "production";
+  var world = new World();
+
+  world.registerComponent(FooComponent);
+
+  // Sync
+  var entity = world.createEntity();
+  entity.addComponent(FooComponent);
+  entity.removeComponent(FooComponent);
+
+  const component = entity.getRemovedComponent(FooComponent);
+
+  t.notThrows(() => (component.variableFoo = 4));
+
+  process.env.NODE_ENV = oldNodeEnv;
+});
+
 test("get mutable component", async t => {
   var world = new World();
 

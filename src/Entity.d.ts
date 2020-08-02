@@ -29,7 +29,7 @@ export class Entity {
    */
   getRemovedComponent<C extends Component<any>>(
       Component: ComponentConstructor<C>
-  ): C;
+  ): Readonly<C> | undefined;
 
   /**
    * Get an object containing all the components on this entity, where the object keys are the component types.
