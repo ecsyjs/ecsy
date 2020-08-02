@@ -52,11 +52,11 @@
           .addComponent(Movement);
 
         var circle = entity.getMutableComponent(Circle);
-        circle.position.set(random(0, canvas.width), random(0, canvas.height), 0);
+        circle.position.set(random(0, canvas.width), random(0, canvas.height));
         circle.radius = random(20, 100);
 
         var movement = entity.getMutableComponent(Movement);
-        movement.velocity.set(random(-20, 20), random(-20, 20), 0);
+        movement.velocity.set(random(-20, 20), random(-20, 20));
       }
 
       window.world = world;
