@@ -20,9 +20,9 @@ export class Entity {
    * @param includeRemoved Whether a component that is staled to be removed should be also considered
    */
   getComponent<C extends Component<any>>(
-      Component: ComponentConstructor<C>,
-      includeRemoved?: boolean
-  ): C;
+    Component: ComponentConstructor<C>,
+    includeRemoved?: boolean
+  ): Readonly<C> | undefined;
 
   /**
    * Get a component that is slated to be removed from this entity.
