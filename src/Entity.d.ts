@@ -52,7 +52,7 @@ export class Entity {
    */
   getMutableComponent<C extends Component<any>>(
     Component: ComponentConstructor<C>
-  ): C;
+  ): C | undefined;
 
   /**
    * Add a component to the entity.

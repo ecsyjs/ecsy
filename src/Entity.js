@@ -60,6 +60,11 @@ export class Entity {
 
   getMutableComponent(Component) {
     var component = this._components[Component._typeId];
+
+    if (!component) {
+      return;
+    }
+
     for (var i = 0; i < this.queries.length; i++) {
       var query = this.queries[i];
       // @todo accelerate this check. Maybe having query._Components as an object

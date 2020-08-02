@@ -241,6 +241,21 @@ test("get component production", async t => {
   process.env.NODE_ENV = oldNodeEnv;
 });
 
+test("get mutable component", async t => {
+  var world = new World();
+
+  world.registerComponent(FooComponent);
+
+  // Sync
+  var entity = world.createEntity();
+  entity.addComponent(FooComponent);
+  const component = entity.getMutableComponent(FooComponent);
+
+  t.notThrows(() => (component.variableFoo = 4));
+
+  t.deepEqual(entity.getMutableComponent(BarComponent), undefined);
+});
+
 test("Delete entity from entitiesByNames", async t => {
   var world = new World();
 
