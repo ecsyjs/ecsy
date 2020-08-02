@@ -193,7 +193,7 @@ test("remove entity", async t => {
   t.is(world.entityManager.count(), 0);
 });
 
-test("get component includeRemoved", async t => {
+test("get component development", async t => {
   var world = new World();
 
   world.registerComponent(FooComponent);
@@ -202,16 +202,43 @@ test("get component includeRemoved", async t => {
   var entity = world.createEntity();
   entity.addComponent(FooComponent);
   const component = entity.getComponent(FooComponent);
+
+  t.throws(() => (component.variableFoo = 4));
+
   entity.removeComponent(FooComponent);
 
   t.is(entity.hasComponent(FooComponent), false);
   t.is(entity.getComponent(FooComponent), undefined);
 
-  t.is(entity.hasRemovedComponent(FooComponent), true);
-  t.deepEqual(entity.getRemovedComponent(FooComponent), component);
+  const removedComponent = entity.getComponent(FooComponent, true);
 
-  t.is(entity.hasComponent(FooComponent, true), true);
-  t.deepEqual(entity.getComponent(FooComponent, true), component);
+  t.throws(() => (removedComponent.variableFoo = 14));
+});
+
+test("get component production", async t => {
+  const oldNodeEnv = process.env.NODE_ENV;
+  process.env.NODE_ENV = "production";
+  var world = new World();
+
+  world.registerComponent(FooComponent);
+
+  // Sync
+  var entity = world.createEntity();
+  entity.addComponent(FooComponent);
+  const component = entity.getComponent(FooComponent);
+
+  t.notThrows(() => (component.variableFoo = 4));
+
+  entity.removeComponent(FooComponent);
+
+  t.is(entity.hasComponent(FooComponent), false);
+  t.is(entity.getComponent(FooComponent), undefined);
+
+  const removedComponent = entity.getComponent(FooComponent, true);
+
+  t.notThrows(() => (removedComponent.variableFoo = 14));
+
+  process.env.NODE_ENV = oldNodeEnv;
 });
 
 test("Delete entity from entitiesByNames", async t => {
