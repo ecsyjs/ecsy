@@ -50,7 +50,7 @@ world = new World();
 
 The `World` constructor accepts an option object with the following parameters:
 - ***entityClass***: Provide the base class for entities that implements or extends `Entity`.
-- ***entityPoolSize***: Define the initial entity pool size for entities. It can help to avoid GC during execution if the application keep extending the pool dynamically at execution time.
+- ***entityPoolSize***: Define the initial entity pool size for entities. It can help to avoid GC during execution if the application expands the pool dynamically at execution time.
 
 ```javascript
 // We know we will have around 10k enemies in our game initially so let's reserve that size initially instead of keep extending the pool as we need more entities
