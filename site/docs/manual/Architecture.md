@@ -48,7 +48,7 @@ By default your application should have at least one `world`. A world is basical
 world = new World();
 ```
 
-The `World` constructor accept an option object with the following parameters:
+The `World` constructor accepts an option object with the following parameters:
 - ***entityClass***: Provide the base class for entities that implements or extends `Entity`.
 - ***entityPoolSize***: Define the initial entity pool size for entities. It can help to avoid GC during execution if the application keep extending the pool dynamically at execution time.
 
@@ -868,4 +868,3 @@ You can use that file to compare against other executions by using `benchmarker`
 > benchmarker compare results1.json results2.json
 ```
 It will dump a table with a summary comparing all the executions. This can be useful when doing big refactors to compare across different branches to make sure that there is not regression in performance.
-
