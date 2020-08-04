@@ -22,14 +22,14 @@ export class Entity {
   getComponent<C extends Component<any>>(
     Component: ComponentConstructor<C>,
     includeRemoved?: boolean
-  ): Readonly<C> | undefined;
+  ): Readonly<C>;
 
   /**
    * Get a component that is slated to be removed from this entity.
    */
   getRemovedComponent<C extends Component<any>>(
       Component: ComponentConstructor<C>
-  ): Readonly<C> | undefined;
+  ): Readonly<C>;
 
   /**
    * Get an object containing all the components on this entity, where the object keys are the component types.
@@ -52,7 +52,7 @@ export class Entity {
    */
   getMutableComponent<C extends Component<any>>(
     Component: ComponentConstructor<C>
-  ): C | undefined;
+  ): C;
 
   /**
    * Add a component to the entity.
