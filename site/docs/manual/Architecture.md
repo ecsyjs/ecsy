@@ -523,7 +523,7 @@ let results = this.queries.queryA.results;
 for (var i = 0; i < results.length; i++) {
   let entity = results[i];
   if (i === 1) {
-    // This will cause the results list to mutate and results.length will be decremented and you won't reach the end elements in there.
+    // This will cause the results list to be mutated, results.length will be decremented and you won't reach the end elements.
     entity.remove();
   }
 }
