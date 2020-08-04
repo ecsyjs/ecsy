@@ -21,7 +21,7 @@ export abstract class System {
       listen?: {
         added?: boolean,
         removed?: boolean,
-        changed?: boolean | Component<any>[],
+        changed?: boolean | ComponentConstructor<any>[],
       },
     }
   };
