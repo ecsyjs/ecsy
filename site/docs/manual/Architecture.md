@@ -517,7 +517,7 @@ class SystemName extends System {
 
 If there is a `reactive query` (A query that *listens* for entities added or removed to it or which components has changed, [more info](/manual/Architecture?id=reactive-queries)) on the list of queries defined by a system, this system is called `reactive system` as it will react to changes on the entities and its components.
 
-It's important to notice that if you plan to mutate the results of a query while you are iterating it (eg: adding or removing components that will make not match the query structure anymore, or removing the entity itself) you should traverse the results in reverse order:
+If you plan to mutate the results of a query while you are iterating it (eg: adding or removing components that will not match the query structure anymore, or removing the entity itself) you should traverse the results in reverse order:
 ```javascript
 let results = this.queries.queryA.results;
 for (var i = 0; i < results.length; i++) {
