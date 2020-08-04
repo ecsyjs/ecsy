@@ -43,7 +43,11 @@ export class Entity {
   }
 
   getRemovedComponent(Component) {
-    return this._componentsToRemove[Component._typeId];
+    const component = this._componentsToRemove[Component._typeId];
+
+    return process.env.NODE_ENV !== "production"
+      ? wrapImmutableComponent(Component, component)
+      : component;
   }
 
   getComponents() {
@@ -60,6 +64,11 @@ export class Entity {
 
   getMutableComponent(Component) {
     var component = this._components[Component._typeId];
+
+    if (!component) {
+      return;
+    }
+
     for (var i = 0; i < this.queries.length; i++) {
       var query = this.queries[i];
       // @todo accelerate this check. Maybe having query._Components as an object
