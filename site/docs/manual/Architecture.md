@@ -828,7 +828,7 @@ There is one special use case when removing components and entities. When using 
 ## Extending core functionality
 
 It is possible to provide a custom `Entity` class to modify the default behaviour.
-To do so you need to import `_Entity` from `ecsy` and extends it in your class definition:
+To do so you need to import `_Entity` from `ecsy` and extend it in your class definition:
 ```javascript
 import { _Entity, World } from "entity";
 
