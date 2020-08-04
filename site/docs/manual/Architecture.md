@@ -53,7 +53,7 @@ The `World` constructor accepts an option object with the following parameters:
 - ***entityPoolSize***: Define the initial entity pool size for entities. It can help to avoid GC during execution if the application expands the pool dynamically at execution time.
 
 ```javascript
-// We know we will have around 10k enemies in our game initially so let's reserve that size initially instead of keep extending the pool as we need more entities
+// We know we will initially have around 10k enemies in our game so let's allocate 10k enemies initially and expand the pool as needed.
 world = new World({ entityPoolSize: 10000 });
 ```
 
