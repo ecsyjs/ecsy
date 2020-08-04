@@ -530,7 +530,7 @@ for (var i = 0; i < results.length; i++) {
 
 // The correct way to do it
 let results = this.queries.queryA.results;
-for (var i = 0; i < results.length; i++) {
+for (var i = results.length - 1; i >= 0; i++) {
   let entity = results[i];
   if (i === 1) {
     // This will modify the length of the results but as we are moving backward it won't affect us
