@@ -43,7 +43,7 @@ export abstract class System<S extends { queries: SystemQueryDefinitions }> {
    * The results of the queries.
    * Should be used inside of execute.
    */
-  queries: { [K in keyof S["queries"]]: SystemQueryResults<InstanceType<Extract<S["queries"][K]["components"][number], ComponentConstructor<Component<any>>>>> }
+  queries: { [K in keyof S["queries"]]: SystemQueryResults<InstanceType<Extract<S["queries"][K]["components"][number], ComponentConstructor<Component<any>>>> | undefined> }
 
   world: World;
   /**
