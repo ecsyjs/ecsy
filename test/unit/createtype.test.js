@@ -2,7 +2,7 @@ import test from "ava";
 import { createType, copyCopyable, cloneClonable } from "../../src/Types";
 import { Vector3 } from "../helpers/customtypes";
 
-test("Create simple type", t => {
+test("Create simple type", (t) => {
   // Empty
   const error1 = t.throws(() => {
     createType({});
@@ -35,18 +35,18 @@ test("Create simple type", t => {
     name: "test",
     default: undefined,
     copy: () => {},
-    clone: () => {}
+    clone: () => {},
   });
   t.not(type, null);
   t.true(type.isType);
 });
 
-test("Create vector3 type", t => {
+test("Create vector3 type", (t) => {
   var CustomVector3 = createType({
     name: "Vector3",
     default: new Vector3(),
     copy: copyCopyable,
-    clone: cloneClonable
+    clone: cloneClonable,
   });
 
   t.true(CustomVector3.isType);

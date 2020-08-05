@@ -11,7 +11,7 @@ export class ComponentManager {
   }
 
   hasComponent(Component) {
-    return this.Components.indexOf(Component) !== -1
+    return this.Components.indexOf(Component) !== -1;
   }
 
   registerComponent(Component, objectPool) {

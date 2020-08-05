@@ -3,7 +3,7 @@ import test from "ava";
 import { World, Not, System, SystemStateComponent } from "../../src/index.js";
 import { FooComponent } from "../helpers/components";
 
-test("reset", t => {
+test("reset", (t) => {
   var world = new World();
 
   class StateComponentA extends SystemStateComponent {}
@@ -13,11 +13,11 @@ test("reset", t => {
 
   class SystemA extends System {
     execute() {
-      this.queries.added.results.forEach(entity => {
+      this.queries.added.results.forEach((entity) => {
         entity.addComponent(StateComponentA);
       });
 
-      this.queries.remove.results.forEach(entity => {
+      this.queries.remove.results.forEach((entity) => {
         entity.removeComponent(StateComponentA);
       });
 
@@ -30,7 +30,7 @@ test("reset", t => {
   SystemA.queries = {
     added: { components: [FooComponent, Not(StateComponentA)] },
     remove: { components: [Not(FooComponent), StateComponentA] },
-    normal: { components: [FooComponent, StateComponentA] }
+    normal: { components: [FooComponent, StateComponentA] },
   };
 
   world.registerSystem(SystemA);
