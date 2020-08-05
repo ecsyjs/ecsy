@@ -7,7 +7,7 @@ export default class EventDispatcher {
     this._listeners = {};
     this.stats = {
       fired: 0,
-      handled: 0
+      handled: 0,
     };
   }
 

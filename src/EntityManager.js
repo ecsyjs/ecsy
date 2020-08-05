@@ -294,14 +294,14 @@ export class EntityManager {
       numComponentPool: Object.keys(this.componentsManager._componentPool)
         .length,
       componentPool: {},
-      eventDispatcher: this.eventDispatcher.stats
+      eventDispatcher: this.eventDispatcher.stats,
     };
 
     for (var ecsyComponentId in this.componentsManager._componentPool) {
       var pool = this.componentsManager._componentPool[ecsyComponentId];
       stats.componentPool[pool.T.getName()] = {
         used: pool.totalUsed(),
-        size: pool.count
+        size: pool.count,
       };
     }
 

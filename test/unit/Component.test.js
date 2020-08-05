@@ -6,7 +6,7 @@ import {
   createType,
   copyCopyable,
   cloneClonable,
-  Types
+  Types,
 } from "../../src/Types";
 import { Vector3 } from "../helpers/customtypes";
 
@@ -16,7 +16,7 @@ CustomTypes.Vector3 = createType({
   name: "Vector3",
   default: new Vector3(),
   copy: copyCopyable,
-  clone: cloneClonable
+  clone: cloneClonable,
 });
 
 class TestComponent extends Component {}
@@ -33,16 +33,16 @@ TestComponent.schema = {
   booleanWithDefault: { type: Types.Boolean, default: true },
   refWithDefault: {
     type: Types.Ref,
-    default: { value: "test ref" }
+    default: { value: "test ref" },
   },
   jsonWithDefault: { type: Types.JSON, default: { value: "test json" } },
   vector3WithDefault: {
     type: CustomTypes.Vector3,
-    default: new Vector3(1, 2, 3)
-  }
+    default: new Vector3(1, 2, 3),
+  },
 };
 
-test("default values", t => {
+test("default values", (t) => {
   const component = new TestComponent();
 
   t.is(component.string, "");
@@ -64,7 +64,7 @@ test("default values", t => {
   t.true(new Vector3(1, 2, 3).equals(component.vector3WithDefault));
 });
 
-test("copy component", t => {
+test("copy component", (t) => {
   const srcComponent = new TestComponent();
   srcComponent.string = "abc";
   srcComponent.number = 1;
@@ -96,7 +96,7 @@ test("copy component", t => {
   t.true(new Vector3(7, 8, 9).equals(destComponent.vector3WithDefault));
 });
 
-test("clone component", t => {
+test("clone component", (t) => {
   const srcComponent = new TestComponent();
   srcComponent.string = "abc";
   srcComponent.number = 1;
@@ -127,7 +127,7 @@ test("clone component", t => {
   t.true(new Vector3(7, 8, 9).equals(destComponent.vector3WithDefault));
 });
 
-test("unique type ids", t => {
+test("unique type ids", (t) => {
   class ComponentA extends Component {}
   class ComponentB extends Component {}
 
@@ -147,7 +147,7 @@ test("unique type ids", t => {
   t.is(ComponentA._typeId, ComponentA._typeId);
 });
 
-test("registering components before systems", t => {
+test("registering components before systems", (t) => {
   class ComponentA extends Component {}
   class ComponentB extends Component {}
 

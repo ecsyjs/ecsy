@@ -2,7 +2,7 @@ import test from "ava";
 import { World, Component } from "../../src/index.js";
 import { FooComponent, BarComponent } from "../helpers/components";
 
-test("registerComponents", t => {
+test("registerComponents", (t) => {
   var world = new World();
 
   world.registerComponent(FooComponent);
@@ -15,7 +15,7 @@ test("registerComponents", t => {
   t.is(Object.keys(world.componentsManager.Components).length, 2);
 });
 
-test("Register two components with the same name", t => {
+test("Register two components with the same name", (t) => {
   var world = new World();
 
   {

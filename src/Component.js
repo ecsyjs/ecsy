@@ -77,7 +77,7 @@ export class Component {
     const schema = this.constructor.schema;
 
     // Check that the attributes defined in source are also defined in the schema
-    Object.keys(src).forEach(srcKey => {
+    Object.keys(src).forEach((srcKey) => {
       if (!schema.hasOwnProperty(srcKey)) {
         console.warn(
           `Trying to set attribute '${srcKey}' not defined in the '${this.constructor.name}' schema. Please fix the schema, the attribute value won't be set`
@@ -89,6 +89,6 @@ export class Component {
 
 Component.schema = {};
 Component.isComponent = true;
-Component.getName = function() {
+Component.getName = function () {
   return this.displayName || this.name;
 };

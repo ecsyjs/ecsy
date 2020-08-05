@@ -4,7 +4,7 @@ import { FooComponent, BarComponent } from "../helpers/components";
 
 function queriesLength(queries) {
   let result = {};
-  Object.entries(queries).forEach(q => {
+  Object.entries(queries).forEach((q) => {
     const name = q[0];
     const values = q[1];
     result[name] = values.length;
@@ -13,7 +13,7 @@ function queriesLength(queries) {
   return result;
 }
 
-test("Reactive queries with Not operator", t => {
+test("Reactive queries with Not operator", (t) => {
   var world = new World();
 
   world.registerComponent(FooComponent).registerComponent(BarComponent);
@@ -29,17 +29,17 @@ test("Reactive queries with Not operator", t => {
       listen: {
         added: true,
         changed: true,
-        removed: true
-      }
+        removed: true,
+      },
     },
     not: {
       components: [FooComponent, Not(BarComponent)],
       listen: {
         added: true,
         changed: true,
-        removed: true
-      }
-    }
+        removed: true,
+      },
+    },
   };
 
   // Register empty system
@@ -52,14 +52,14 @@ test("Reactive queries with Not operator", t => {
     added: 0,
     changed: 0,
     removed: 0,
-    results: 0
+    results: 0,
   });
 
   t.deepEqual(queriesLength(system.queries.not), {
     added: 0,
     changed: 0,
     removed: 0,
-    results: 0
+    results: 0,
   });
 
   //
@@ -70,7 +70,7 @@ test("Reactive queries with Not operator", t => {
     added: 0,
     changed: 0,
     removed: 0,
-    results: 0
+    results: 0,
   });
 
   // It matches the `Not(BarComponent)`
@@ -78,7 +78,7 @@ test("Reactive queries with Not operator", t => {
     added: 1,
     changed: 0,
     removed: 0,
-    results: 1
+    results: 1,
   });
 
   // clean up reactive queries
@@ -91,7 +91,7 @@ test("Reactive queries with Not operator", t => {
     added: 1,
     changed: 0,
     removed: 0,
-    results: 1
+    results: 1,
   });
 
   // It does not match `Not(BarComponent)` so it's being removed
@@ -99,7 +99,7 @@ test("Reactive queries with Not operator", t => {
     added: 0,
     changed: 0,
     removed: 1,
-    results: 0
+    results: 0,
   });
 
   // clean up
@@ -111,7 +111,7 @@ test("Reactive queries with Not operator", t => {
     added: 0,
     changed: 0,
     removed: 1,
-    results: 0
+    results: 0,
   });
 
   // It does match `Not(BarComponent)` so it's being added
@@ -119,11 +119,11 @@ test("Reactive queries with Not operator", t => {
     added: 1,
     changed: 0,
     removed: 0,
-    results: 1
+    results: 1,
   });
 });
 
-test("Entity living just within the frame", t => {
+test("Entity living just within the frame", (t) => {
   var world = new World();
 
   world.registerComponent(FooComponent);
@@ -139,9 +139,9 @@ test("Entity living just within the frame", t => {
       listen: {
         added: true,
         changed: true,
-        removed: true
-      }
-    }
+        removed: true,
+      },
+    },
   };
 
   // Register empty system
@@ -155,7 +155,7 @@ test("Entity living just within the frame", t => {
     added: 0,
     changed: 0,
     removed: 0,
-    results: 0
+    results: 0,
   });
 
   let entity = world.createEntity().addComponent(FooComponent);
@@ -165,7 +165,7 @@ test("Entity living just within the frame", t => {
     added: 1,
     changed: 0,
     removed: 0,
-    results: 1
+    results: 1,
   });
 
   let addedEntity = query.added[0];
@@ -182,7 +182,7 @@ test("Entity living just within the frame", t => {
     added: 1,
     changed: 0,
     removed: 1,
-    results: 0
+    results: 0,
   });
 
   addedEntity = query.added[0];
@@ -206,11 +206,11 @@ test("Entity living just within the frame", t => {
     added: 0,
     changed: 0,
     removed: 0,
-    results: 0
+    results: 0,
   });
 });
 
-test("Two components with the same name get unique queries", t => {
+test("Two components with the same name get unique queries", (t) => {
   const world = new World();
 
   // Create two components that have the same name.
@@ -233,7 +233,7 @@ test("Two components with the same name get unique queries", t => {
   }
   SystemTest.queries = {
     comp1: { components: [Component1] },
-    comp2: { components: [Component2] }
+    comp2: { components: [Component2] },
   };
   world.registerSystem(SystemTest);
 
