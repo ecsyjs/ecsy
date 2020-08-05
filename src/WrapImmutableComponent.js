@@ -7,7 +7,7 @@ const proxyHandler = {
         prop
       )}" on immutable component. Use .getMutableComponent() to modify a component.`
     );
-  }
+  },
 };
 
 export default function wrapImmutableComponent(T, component) {

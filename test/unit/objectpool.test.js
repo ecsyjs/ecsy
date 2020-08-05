@@ -4,16 +4,16 @@ import {
   TagComponent,
   World,
   Types,
-  ObjectPool
+  ObjectPool,
 } from "../../src/index";
 
-test("Detecting Pool", t => {
+test("Detecting Pool", (t) => {
   var world = new World();
 
   class NoPoolComponent extends Component {}
   class PoolComponent extends Component {}
   PoolComponent.schema = {
-    num: { type: Types.Number }
+    num: { type: Types.Number },
   };
   class PoolTagComponent extends TagComponent {}
   class CustomPoolComponent extends Component {}
@@ -42,7 +42,7 @@ test("Detecting Pool", t => {
   );
 });
 
-test("ObjectPool", t => {
+test("ObjectPool", (t) => {
   var id = 0;
 
   class T extends Component {

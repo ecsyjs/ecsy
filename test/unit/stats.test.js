@@ -2,14 +2,14 @@ import test from "ava";
 import { World, System } from "../../src/index.js";
 import { FooComponent, BarComponent } from "../helpers/components";
 
-test("Stats", async t => {
+test("Stats", async (t) => {
   var world = new World();
 
   class SystemA extends System {}
   SystemA.queries = {
     compFoo: { components: [FooComponent] },
     compBar: { components: [BarComponent] },
-    compBtoh: { components: [FooComponent, BarComponent] }
+    compBtoh: { components: [FooComponent, BarComponent] },
   };
 
   world
@@ -33,41 +33,41 @@ test("Stats", async t => {
       queries: {
         0: {
           numComponents: 1,
-          numEntities: 10
+          numEntities: 10,
         },
         1: {
           numComponents: 1,
-          numEntities: 4
+          numEntities: 4,
         },
         "0-1": {
           numComponents: 2,
-          numEntities: 4
-        }
+          numEntities: 4,
+        },
       },
       numComponentPool: 2,
       componentPool: {
         FooComponent: {
           used: 10,
-          size: 12
+          size: 12,
         },
         BarComponent: {
           used: 4,
-          size: 5
-        }
+          size: 5,
+        },
       },
       eventDispatcher: {
         fired: 24,
-        handled: 0
-      }
+        handled: 0,
+      },
     },
     system: {
       numSystems: 1,
       systems: {
         SystemA: {
           queries: {},
-          executeTime: 0
-        }
-      }
-    }
+          executeTime: 0,
+        },
+      },
+    },
   });
 });

@@ -4,7 +4,7 @@ import {
   DemoSettings,
   Movement,
   Circle,
-  Intersecting
+  Intersecting,
 } from "./components.js";
 import { fillCircle, drawLine, intersection } from "./utils.js";
 
@@ -50,7 +50,7 @@ export class MovementSystem extends System {
 
 MovementSystem.queries = {
   entities: { components: [Circle, Movement] },
-  context: { components: [CanvasContext, DemoSettings], mandatory: true }
+  context: { components: [CanvasContext, DemoSettings], mandatory: true },
 };
 
 export class IntersectionSystem extends System {
@@ -103,7 +103,7 @@ export class IntersectionSystem extends System {
 }
 
 IntersectionSystem.queries = {
-  entities: { components: [Circle] }
+  entities: { components: [Circle] },
 };
 
 export class Renderer extends System {
@@ -160,5 +160,5 @@ export class Renderer extends System {
 Renderer.queries = {
   circles: { components: [Circle] },
   intersectingCircles: { components: [Intersecting] },
-  context: { components: [CanvasContext], mandatory: true }
+  context: { components: [CanvasContext], mandatory: true },
 };

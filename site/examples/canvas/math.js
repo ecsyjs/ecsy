@@ -1,7 +1,7 @@
 import {
   createType,
   copyCopyable,
-  cloneClonable
+  cloneClonable,
 } from "../../build/ecsy.module.js";
 
 export class Vector2 {
@@ -31,5 +31,5 @@ export const Vector2Type = createType({
   name: "Vector2",
   default: new Vector2(),
   copy: copyCopyable,
-  clone: cloneClonable
+  clone: cloneClonable,
 });

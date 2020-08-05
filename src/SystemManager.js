@@ -57,7 +57,7 @@ export class SystemManager {
   }
 
   getSystem(SystemClass) {
-    return this._systems.find(s => s instanceof SystemClass);
+    return this._systems.find((s) => s instanceof SystemClass);
   }
 
   getSystems() {
@@ -84,12 +84,12 @@ export class SystemManager {
   }
 
   stop() {
-    this._executeSystems.forEach(system => system.stop());
+    this._executeSystems.forEach((system) => system.stop());
   }
 
   execute(delta, time, forcePlay) {
     this._executeSystems.forEach(
-      system =>
+      (system) =>
         (forcePlay || system.enabled) && this.executeSystem(system, delta, time)
     );
   }
@@ -97,14 +97,14 @@ export class SystemManager {
   stats() {
     var stats = {
       numSystems: this._systems.length,
-      systems: {}
+      systems: {},
     };
 
     for (var i = 0; i < this._systems.length; i++) {
       var system = this._systems[i];
       var systemStats = (stats.systems[system.getName()] = {
         queries: {},
-        executeTime: system.executeTime
+        executeTime: system.executeTime,
       });
       for (var name in system.ctx) {
         systemStats.queries[name] = system.ctx[name].stats();
