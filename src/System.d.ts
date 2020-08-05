@@ -71,16 +71,7 @@ export abstract class System<S extends { queries: SystemQueryDefinitions }> {
 
 export interface SystemConstructor<T extends System<any>> {
   isSystem: true;
-  queries: {
-    [queryName: string]: {
-      components: (ComponentConstructor<any> | NotComponent<any>)[],
-      listen?: {
-        added?: boolean,
-        removed?: boolean,
-        changed?: boolean | ComponentConstructor<any>[],
-      },
-    }
-  };
+  queries: SystemQueryDefinitions;
   new (...args: any): T;
 }
 
