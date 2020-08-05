@@ -42,6 +42,10 @@ export class World {
     return this;
   }
 
+  hasRegisteredComponent(Component) {
+    return this.componentsManager.hasComponent(Component)
+  }
+
   unregisterSystem(System) {
     this.systemManager.unregisterSystem(System);
     return this;
