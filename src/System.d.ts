@@ -7,6 +7,17 @@ interface Attributes {
   [propName: string]: any;
 }
 
+export interface SystemQueries {
+  [queryName: string]: {
+    components: (ComponentConstructor<any> | NotComponent<any>)[],
+    listen?: {
+      added?: boolean,
+      removed?: boolean,
+      changed?: boolean | ComponentConstructor<any>[],
+    },
+  }
+}
+
 /**
  * A system that manipulates entities in the world.
  */
@@ -15,16 +26,7 @@ export abstract class System {
    * Defines what Components the System will query for.
    * This needs to be user defined.
    */
-  static queries: {
-    [queryName: string]: {
-      components: (ComponentConstructor<any> | NotComponent<any>)[],
-      listen?: {
-        added?: boolean,
-        removed?: boolean,
-        changed?: boolean | ComponentConstructor<any>[],
-      },
-    }
-  };
+  static queries: SystemQueries;
 
   static isSystem: true;
 
@@ -69,6 +71,7 @@ export abstract class System {
 
 export interface SystemConstructor<T extends System> {
   isSystem: true;
+  queries: SystemQueries
   new (...args: any): T;
 }
 
