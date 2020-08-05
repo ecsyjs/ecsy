@@ -43,7 +43,7 @@ export class World {
   }
 
   hasRegisteredComponent(Component) {
-    return this.componentsManager.hasComponent(Component)
+    return this.componentsManager.hasComponent(Component);
   }
 
   unregisterSystem(System) {
