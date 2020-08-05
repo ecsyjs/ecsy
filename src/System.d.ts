@@ -7,24 +7,33 @@ interface Attributes {
   [propName: string]: any;
 }
 
+export interface SystemQueryDefinitions  {
+  [queryName: string]: {
+    components: (ComponentConstructor<any> | NotComponent<any>)[],
+    listen?: {
+      added?: boolean,
+      removed?: boolean,
+      changed?: boolean | ComponentConstructor<any>[],
+    },
+  }
+}
+
+export interface SystemQueryResults<Q extends (Component<any> | undefined) = undefined> {
+  results: Entity<Q>[],
+  added?: Entity<Q>[],
+  removed?: Entity<undefined>[],
+  changed?: Entity<Q>[],
+}
+
 /**
  * A system that manipulates entities in the world.
  */
-export abstract class System {
+export abstract class System<S extends { queries: SystemQueryDefinitions }> {
   /**
    * Defines what Components the System will query for.
    * This needs to be user defined.
    */
-  static queries: {
-    [queryName: string]: {
-      components: (ComponentConstructor<any> | NotComponent<any>)[],
-      listen?: {
-        added?: boolean,
-        removed?: boolean,
-        changed?: boolean | ComponentConstructor<any>[],
-      },
-    }
-  };
+  static queries: SystemQueryDefinitions;
 
   static isSystem: true;
 
@@ -34,14 +43,7 @@ export abstract class System {
    * The results of the queries.
    * Should be used inside of execute.
    */
-  queries: {
-    [queryName: string]: {
-      results: Entity[],
-      added?: Entity[],
-      removed?: Entity[],
-      changed?: Entity[],
-    }
-  }
+  queries: { [K in keyof S["queries"]]: SystemQueryResults<InstanceType<Extract<S["queries"][K]["components"][number], ComponentConstructor<Component<any>>>>> }
 
   world: World;
   /**
@@ -67,8 +69,18 @@ export abstract class System {
   abstract execute(delta: number, time: number): void;
 }
 
-export interface SystemConstructor<T extends System> {
+export interface SystemConstructor<T extends System<any>> {
   isSystem: true;
+  queries: {
+    [queryName: string]: {
+      components: (ComponentConstructor<any> | NotComponent<any>)[],
+      listen?: {
+        added?: boolean,
+        removed?: boolean,
+        changed?: boolean | ComponentConstructor<any>[],
+      },
+    }
+  };
   new (...args: any): T;
 }
 

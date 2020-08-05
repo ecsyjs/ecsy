@@ -3,7 +3,7 @@ import { Component, ComponentConstructor } from "./Component";
 /**
  * An entity in the world.
  */
-export class Entity {
+export class Entity<Components extends (Component<any> | undefined) = undefined> {
   /**
    * A unique ID for this entity.
    */
@@ -19,17 +19,17 @@ export class Entity {
    * @param Component Type of component to get
    * @param includeRemoved Whether a component that is staled to be removed should be also considered
    */
-  getComponent<C extends Component<any>>(
-    Component: ComponentConstructor<C>,
+  getComponent<C extends Components> (
+    Component: C extends Component<any> ? ComponentConstructor<C> : ComponentConstructor<any>,
     includeRemoved?: boolean
-  ): Readonly<C>;
+  ): C extends undefined ? Readonly<C> | undefined : Readonly<C>;
 
   /**
    * Get a component that is slated to be removed from this entity.
    */
   getRemovedComponent<C extends Component<any>>(
       Component: ComponentConstructor<C>
-  ): Readonly<C>;
+  ): Readonly<C> | undefined;
 
   /**
    * Get an object containing all the components on this entity, where the object keys are the component types.
@@ -50,9 +50,9 @@ export class Entity {
    * Get a mutable reference to a component on this entity.
    * @param Component Type of component to get
    */
-  getMutableComponent<C extends Component<any>>(
-    Component: ComponentConstructor<C>
-  ): C;
+  getMutableComponent<C extends Components>(
+    Component: C extends Component<any> ? ComponentConstructor<C> : ComponentConstructor<any>
+  ): C extends undefined ? C | undefined : C;
 
   /**
    * Add a component to the entity.
@@ -130,3 +130,5 @@ export class Entity {
       forceImmediate?: boolean
   ): void;
 }
+
+
