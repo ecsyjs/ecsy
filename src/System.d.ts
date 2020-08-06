@@ -53,7 +53,7 @@ export abstract class System {
   /**
    * Called when the system is added to the world.
    */
-  abstract init(attributes?: Attributes): void
+  init(attributes?: Attributes): void
 
   /**
    * Resume execution of this system.
