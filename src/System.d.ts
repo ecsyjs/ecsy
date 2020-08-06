@@ -46,10 +46,17 @@ export abstract class System {
   }
 
   world: World;
+
   /**
    * Whether the system will execute during the world tick.
    */
   enabled: boolean;
+
+  /**
+   * Called when the system is added to the world.
+   */
+  init(attributes?: Attributes): void
+
   /**
    * Resume execution of this system.
    */
