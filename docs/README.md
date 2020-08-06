@@ -29,6 +29,15 @@ For detailed information on the architecture and API please visit the [documenta
 - Modern Javascript: ES6, classes, modules,...
 - Pool for components and entities
 
+## Goals
+Our goal is for ECSY to be a lightweight, simple, and performant ECS library that can be easily extended and encoruages open source collaboration.
+
+ECSY will not ship with features that bind it to a rendering engine or framework. Instead, we encourage the community to build framework specific projects like [ecsy-three](https://github.com/MozillaReality/ecsy-three), [ecsy-babylon](https://github.com/kaliber5/ecsy-babylon), and [ecsy-two](https://github.com/joshmarinacci/ecsy-two).
+
+ECSY does not adhere strictly to "pure ECS design". We focus on APIs that push users towards good ECS design like putting their logic in systems and data in components. However, we will sometimes break the rules for API ergonomics, performance in a JS context, or integration with non-ECS frameworks.
+
+ECSY is designed for a community driven ecosystem. We encourage users to come up with modular components and systems that can be composed into larger games, apps, and engines.
+
 # Examples
 - Ball example:
   - three.js: https://ecsy.io/examples/ball-example/three

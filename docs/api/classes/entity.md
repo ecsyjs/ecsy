@@ -64,9 +64,9 @@ Name | Type |
 
 ___
 
-###  getComponent
+### `Optional` getComponent
 
-▸ **getComponent**<**C**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹C›, `includeRemoved?`: boolean): *C*
+▸ **getComponent**<**C**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹C›, `includeRemoved?`: boolean): *Readonly‹C›*
 
 Get an immutable reference to a component on this entity.
 
@@ -81,7 +81,7 @@ Name | Type | Description |
 `Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹C› | Type of component to get |
 `includeRemoved?` | boolean | Whether a component that is staled to be removed should be also considered  |
 
-**Returns:** *C*
+**Returns:** *Readonly‹C›*
 
 ___
 
@@ -119,7 +119,7 @@ Get an object containing all the components that are slated to be removed from t
 
 ___
 
-###  getMutableComponent
+### `Optional` getMutableComponent
 
 ▸ **getMutableComponent**<**C**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹C›): *C*
 
@@ -139,9 +139,9 @@ Name | Type | Description |
 
 ___
 
-###  getRemovedComponent
+### `Optional` getRemovedComponent
 
-▸ **getRemovedComponent**<**C**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹C›): *C*
+▸ **getRemovedComponent**<**C**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹C›): *Readonly‹C›*
 
 Get a component that is slated to be removed from this entity.
 
@@ -155,7 +155,7 @@ Name | Type |
 ------ | ------ |
 `Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹C› |
 
-**Returns:** *C*
+**Returns:** *Readonly‹C›*
 
 ___
 

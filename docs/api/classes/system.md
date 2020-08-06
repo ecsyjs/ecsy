@@ -63,24 +63,10 @@ ___
 
 ### `Static` queries
 
-▪ **queries**: *object*
+▪ **queries**: *[SystemQueries](../interfaces/systemqueries.md)*
 
 Defines what Components the System will query for.
 This needs to be user defined.
-
-#### Type declaration:
-
-* \[ **queryName**: *string*\]: object
-
-* **components**: *[ComponentConstructor](../interfaces/componentconstructor.md)‹any› | [NotComponent](../interfaces/notcomponent.md)‹any›[]*
-
-* **listen**(): *object*
-
-  * **added**? : *boolean*
-
-  * **changed**? : *boolean | [Component](component.md)‹any›[]*
-
-  * **removed**? : *boolean*
 
 ## Methods
 
@@ -97,6 +83,22 @@ Name | Type | Description |
 ------ | ------ | ------ |
 `delta` | number | - |
 `time` | number |   |
+
+**Returns:** *void*
+
+___
+
+###  init
+
+▸ **init**(`attributes?`: [Attributes](../interfaces/attributes.md)): *void*
+
+Called when the system is added to the world.
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`attributes?` | [Attributes](../interfaces/attributes.md) |
 
 **Returns:** *void*
 

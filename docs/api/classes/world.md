@@ -64,7 +64,7 @@ ___
 
 ###  getSystem
 
-▸ **getSystem**<**S**>(`System`: [SystemConstructor](../interfaces/systemconstructor.md)‹S›): *[System](system.md)*
+▸ **getSystem**<**S**>(`System`: [SystemConstructor](../interfaces/systemconstructor.md)‹S›): *S*
 
 Get a system registered in this world.
 
@@ -78,7 +78,7 @@ Name | Type | Description |
 ------ | ------ | ------ |
 `System` | [SystemConstructor](../interfaces/systemconstructor.md)‹S› | Type of system to get.  |
 
-**Returns:** *[System](system.md)*
+**Returns:** *S*
 
 ___
 
@@ -89,6 +89,26 @@ ___
 Get a list of systems registered in this world.
 
 **Returns:** *Array‹[System](system.md)›*
+
+___
+
+###  hasRegisteredComponent
+
+▸ **hasRegisteredComponent**<**C**>(`Component`: [Component](component.md)‹C›): *boolean*
+
+Evluate whether a component has been registered to this world or not.
+
+**Type parameters:**
+
+▪ **C**: *[Component](component.md)‹any›*
+
+**Parameters:**
+
+Name | Type | Description |
+------ | ------ | ------ |
+`Component` | [Component](component.md)‹C› | Type of component to to evaluate  |
+
+**Returns:** *boolean*
 
 ___
 

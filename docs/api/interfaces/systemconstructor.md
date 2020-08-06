@@ -24,3 +24,9 @@ Name | Type |
 ###  isSystem
 
 • **isSystem**: *true*
+
+___
+
+###  queries
+
+• **queries**: *[SystemQueries](systemqueries.md)*

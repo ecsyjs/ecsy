@@ -199,9 +199,6 @@ class Benchmarks {
  * @param {Component} Component
  * @private
  */
-function getName(Component) {
-  return Component.name;
-}
 
 /**
  * Get a key from a list of components
@@ -209,18 +206,23 @@ function getName(Component) {
  * @private
  */
 function queryKey(Components) {
-  var names = [];
+  var ids = [];
   for (var n = 0; n < Components.length; n++) {
     var T = Components[n];
+
+    if (!componentRegistered(T)) {
+      throw new Error(`Tried to create a query with an unregistered component`);
+    }
+
     if (typeof T === "object") {
       var operator = T.operator === "not" ? "!" : T.operator;
-      names.push(operator + getName(T.Component));
+      ids.push(operator + T.Component._typeId);
     } else {
-      names.push(getName(T));
+      ids.push(T._typeId);
     }
   }
 
-  return names.sort().join("-");
+  return ids.sort().join("-");
 }
 
 // Detector for browser's "window"
@@ -231,6 +233,13 @@ const now =
   hasWindow && typeof window.performance !== "undefined"
     ? performance.now.bind(performance)
     : Date.now.bind(Date);
+
+function componentRegistered(T) {
+  return (
+    (typeof T === "object" && T.Component._typeId !== undefined) ||
+    (T.isComponent && T._typeId !== undefined)
+  );
+}
 
 class SystemManager {
   constructor(world) {
@@ -289,7 +298,7 @@ class SystemManager {
   }
 
   getSystem(SystemClass) {
-    return this._systems.find(s => s instanceof SystemClass);
+    return this._systems.find((s) => s instanceof SystemClass);
   }
 
   getSystems() {
@@ -316,12 +325,12 @@ class SystemManager {
   }
 
   stop() {
-    this._executeSystems.forEach(system => system.stop());
+    this._executeSystems.forEach((system) => system.stop());
   }
 
   execute(delta, time, forcePlay) {
     this._executeSystems.forEach(
-      system =>
+      (system) =>
         (forcePlay || system.enabled) && this.executeSystem(system, delta, time)
     );
   }
@@ -329,14 +338,14 @@ class SystemManager {
   stats() {
     var stats = {
       numSystems: this._systems.length,
-      systems: {}
+      systems: {},
     };
 
     for (var i = 0; i < this._systems.length; i++) {
       var system = this._systems[i];
       var systemStats = (stats.systems[system.getName()] = {
         queries: {},
-        executeTime: system.executeTime
+        executeTime: system.executeTime,
       });
       for (var name in system.ctx) {
         systemStats.queries[name] = system.ctx[name].stats();
@@ -407,7 +416,7 @@ class EventDispatcher {
     this._listeners = {};
     this.stats = {
       fired: 0,
-      handled: 0
+      handled: 0,
     };
   }
 
@@ -489,7 +498,7 @@ class Query {
     this.Components = [];
     this.NotComponents = [];
 
-    Components.forEach(component => {
+    Components.forEach((component) => {
       if (typeof component === "object") {
         this.NotComponents.push(component.Component);
       } else {
@@ -563,10 +572,10 @@ class Query {
       key: this.key,
       reactive: this.reactive,
       components: {
-        included: this.Components.map(C => C.name),
-        not: this.NotComponents.map(C => C.name)
+        included: this.Components.map((C) => C.name),
+        not: this.NotComponents.map((C) => C.name),
       },
-      numEntities: this.entities.length
+      numEntities: this.entities.length,
     };
   }
 
@@ -576,7 +585,7 @@ class Query {
   stats() {
     return {
       numComponents: this.Components.length,
-      numEntities: this.entities.length
+      numEntities: this.entities.length,
     };
   }
 }
@@ -713,6 +722,10 @@ class Component {
           }
         }
       }
+
+      if (process.env.NODE_ENV !== "production" && props !== undefined) {
+        this.checkUndefinedAttributes(props);
+      }
     }
 
     this._pool = null;
@@ -727,6 +740,11 @@ class Component {
       if (source.hasOwnProperty(key)) {
         this[key] = prop.type.copy(source[key], this[key]);
       }
+    }
+
+    // @DEBUG
+    if (process.env.NODE_ENV !== "production") {
+      this.checkUndefinedAttributes(source);
     }
 
     return this;
@@ -760,11 +778,24 @@ class Component {
   getName() {
     return this.constructor.getName();
   }
+
+  checkUndefinedAttributes(src) {
+    const schema = this.constructor.schema;
+
+    // Check that the attributes defined in source are also defined in the schema
+    Object.keys(src).forEach((srcKey) => {
+      if (!schema.hasOwnProperty(srcKey)) {
+        console.warn(
+          `Trying to set attribute '${srcKey}' not defined in the '${this.constructor.name}' schema. Please fix the schema, the attribute value won't be set`
+        );
+      }
+    });
+  }
 }
 
 Component.schema = {};
 Component.isComponent = true;
-Component.getName = function() {
+Component.getName = function () {
   return this.displayName || this.name;
 };
 
@@ -865,12 +896,13 @@ class EntityManager {
     }
 
     if (~entity._ComponentTypes.indexOf(Component)) {
-      // @todo Just on debug mode
-      console.warn(
-        "Component type already exists on entity.",
-        entity,
-        Component.getName()
-      );
+      if (process.env.NODE_ENV !== "production") {
+        console.warn(
+          "Component type already exists on entity.",
+          entity,
+          Component.getName()
+        );
+      }
       return;
     }
 
@@ -1062,14 +1094,14 @@ class EntityManager {
       numComponentPool: Object.keys(this.componentsManager._componentPool)
         .length,
       componentPool: {},
-      eventDispatcher: this.eventDispatcher.stats
+      eventDispatcher: this.eventDispatcher.stats,
     };
 
     for (var ecsyComponentId in this.componentsManager._componentPool) {
       var pool = this.componentsManager._componentPool[ecsyComponentId];
-      stats.componentPool[ecsyComponentId] = {
+      stats.componentPool[pool.T.getName()] = {
         used: pool.totalUsed(),
-        size: pool.count
+        size: pool.count,
       };
     }
 
@@ -1090,6 +1122,10 @@ class ComponentManager {
     this._componentPool = {};
     this.numComponents = {};
     this.nextComponentId = 0;
+  }
+
+  hasComponent(Component) {
+    return this.Components.indexOf(Component) !== -1;
   }
 
   registerComponent(Component, objectPool) {
@@ -1147,6 +1183,33 @@ class ComponentManager {
 
 const Version = "0.3.1";
 
+const proxyMap = new WeakMap();
+
+const proxyHandler = {
+  set(target, prop) {
+    throw new Error(
+      `Tried to write to "${target.constructor.getName()}#${String(
+        prop
+      )}" on immutable component. Use .getMutableComponent() to modify a component.`
+    );
+  },
+};
+
+function wrapImmutableComponent(T, component) {
+  if (component === undefined) {
+    return undefined;
+  }
+
+  let wrappedComponent = proxyMap.get(component);
+
+  if (!wrappedComponent) {
+    wrappedComponent = new Proxy(component, proxyHandler);
+    proxyMap.set(component, wrappedComponent);
+  }
+
+  return wrappedComponent;
+}
+
 class Entity {
   constructor(entityManager) {
     this._entityManager = entityManager || null;
@@ -1183,11 +1246,17 @@ class Entity {
       component = this._componentsToRemove[Component._typeId];
     }
 
-    return  component;
+    return process.env.NODE_ENV !== "production"
+      ? wrapImmutableComponent(Component, component)
+      : component;
   }
 
   getRemovedComponent(Component) {
-    return this._componentsToRemove[Component._typeId];
+    const component = this._componentsToRemove[Component._typeId];
+
+    return process.env.NODE_ENV !== "production"
+      ? wrapImmutableComponent(Component, component)
+      : component;
   }
 
   getComponents() {
@@ -1204,6 +1273,11 @@ class Entity {
 
   getMutableComponent(Component) {
     var component = this._components[Component._typeId];
+
+    if (!component) {
+      return;
+    }
+
     for (var i = 0; i < this.queries.length; i++) {
       var query = this.queries[i];
       // @todo accelerate this check. Maybe having query._Components as an object
@@ -1291,7 +1365,7 @@ class Entity {
 
 const DEFAULT_OPTIONS$1 = {
   entityPoolSize: 0,
-  entityClass: Entity
+  entityClass: Entity,
 };
 
 class World {
@@ -1308,12 +1382,12 @@ class World {
 
     if (hasWindow && typeof CustomEvent !== "undefined") {
       var event = new CustomEvent("ecsy-world-created", {
-        detail: { world: this, version: Version }
+        detail: { world: this, version: Version },
       });
       window.dispatchEvent(event);
     }
 
-    this.lastTime = now();
+    this.lastTime = now() / 1000;
   }
 
   registerComponent(Component, objectPool) {
@@ -1324,6 +1398,10 @@ class World {
   registerSystem(System, attributes) {
     this.systemManager.registerSystem(System, attributes);
     return this;
+  }
+
+  hasRegisteredComponent(Component) {
+    return this.componentsManager.hasComponent(Component);
   }
 
   unregisterSystem(System) {
@@ -1341,7 +1419,7 @@ class World {
 
   execute(delta, time) {
     if (!delta) {
-      time = now();
+      time = now() / 1000;
       delta = time - this.lastTime;
       this.lastTime = time;
     }
@@ -1367,10 +1445,10 @@ class World {
   stats() {
     var stats = {
       entities: this.entityManager.stats(),
-      system: this.systemManager.stats()
+      system: this.systemManager.stats(),
     };
 
-    console.log(JSON.stringify(stats, null, 2));
+    return stats;
   }
 }
 
@@ -1382,9 +1460,9 @@ class TagComponent extends Component {
 
 TagComponent.isTagComponent = true;
 
-const copyValue = src => src;
+const copyValue = (src) => src;
 
-const cloneValue = src => src;
+const cloneValue = (src) => src;
 
 const copyArray = (src, dest) => {
   if (!src) {
@@ -1404,11 +1482,11 @@ const copyArray = (src, dest) => {
   return dest;
 };
 
-const cloneArray = src => src && src.slice();
+const cloneArray = (src) => src && src.slice();
 
-const copyJSON = src => JSON.parse(JSON.stringify(src));
+const copyJSON = (src) => JSON.parse(JSON.stringify(src));
 
-const cloneJSON = src => JSON.parse(JSON.stringify(src));
+const cloneJSON = (src) => JSON.parse(JSON.stringify(src));
 
 const copyCopyable = (src, dest) => {
   if (!src) {
@@ -1422,12 +1500,12 @@ const copyCopyable = (src, dest) => {
   return dest.copy(src);
 };
 
-const cloneClonable = src => src && src.clone();
+const cloneClonable = (src) => src && src.clone();
 
 function createType(typeDefinition) {
   var mandatoryProperties = ["name", "default", "copy", "clone"];
 
-  var undefinedProperties = mandatoryProperties.filter(p => {
+  var undefinedProperties = mandatoryProperties.filter((p) => {
     return !typeDefinition.hasOwnProperty(p);
   });
 
@@ -1452,43 +1530,43 @@ const Types = {
     name: "Number",
     default: 0,
     copy: copyValue,
-    clone: cloneValue
+    clone: cloneValue,
   }),
 
   Boolean: createType({
     name: "Boolean",
     default: false,
     copy: copyValue,
-    clone: cloneValue
+    clone: cloneValue,
   }),
 
   String: createType({
     name: "String",
     default: "",
     copy: copyValue,
-    clone: cloneValue
+    clone: cloneValue,
   }),
 
   Array: createType({
     name: "Array",
     default: [],
     copy: copyArray,
-    clone: cloneArray
+    clone: cloneArray,
   }),
 
   Ref: createType({
     name: "Ref",
     default: undefined,
     copy: copyValue,
-    clone: cloneValue
+    clone: cloneValue,
   }),
 
   JSON: createType({
     name: "JSON",
     default: null,
     copy: copyJSON,
-    clone: cloneJSON
-  })
+    clone: cloneJSON,
+  }),
 };
 
 function generateId(length) {
@@ -1513,27 +1591,27 @@ function injectScript(src, onLoad) {
 
 function hookConsoleAndErrors(connection) {
   var wrapFunctions = ["error", "warning", "log"];
-  wrapFunctions.forEach(key => {
+  wrapFunctions.forEach((key) => {
     if (typeof console[key] === "function") {
       var fn = console[key].bind(console);
       console[key] = (...args) => {
         connection.send({
           method: "console",
           type: key,
-          args: JSON.stringify(args)
+          args: JSON.stringify(args),
         });
         return fn.apply(null, args);
       };
     }
   });
 
-  window.addEventListener("error", error => {
+  window.addEventListener("error", (error) => {
     connection.send({
       method: "error",
       error: JSON.stringify({
         message: error.error.message,
-        stack: error.error.stack
-      })
+        stack: error.error.stack,
+      }),
     });
   });
 }
@@ -1591,7 +1669,7 @@ function enableRemoteDevtools(remoteId) {
 
   // This is used to collect the worlds created before the communication is being established
   let worldsBeforeLoading = [];
-  let onWorldCreated = e => {
+  let onWorldCreated = (e) => {
     var world = e.detail.world;
     Version = e.detail.version;
     worldsBeforeLoading.push(world);
@@ -1599,16 +1677,32 @@ function enableRemoteDevtools(remoteId) {
   window.addEventListener("ecsy-world-created", onWorldCreated);
 
   let onLoaded = () => {
-    var peer = new Peer(remoteId);
+    // var peer = new Peer(remoteId);
+    var peer = new Peer(remoteId, {
+      host: "peerjs.ecsy.io",
+      secure: true,
+      port: 443,
+      config: {
+        iceServers: [
+          { url: "stun:stun.l.google.com:19302" },
+          { url: "stun:stun1.l.google.com:19302" },
+          { url: "stun:stun2.l.google.com:19302" },
+          { url: "stun:stun3.l.google.com:19302" },
+          { url: "stun:stun4.l.google.com:19302" },
+        ],
+      },
+      debug: 3,
+    });
+
     peer.on("open", (/* id */) => {
-      peer.on("connection", connection => {
+      peer.on("connection", (connection) => {
         window.__ECSY_REMOTE_DEVTOOLS.connection = connection;
-        connection.on("open", function() {
+        connection.on("open", function () {
           // infoDiv.style.visibility = "hidden";
           infoDiv.innerHTML = "Connected";
 
           // Receive messages
-          connection.on("data", function(data) {
+          connection.on("data", function (data) {
             if (data.type === "init") {
               var script = document.createElement("script");
               script.setAttribute("type", "text/javascript");
@@ -1620,9 +1714,9 @@ function enableRemoteDevtools(remoteId) {
                   "ecsy-world-created",
                   onWorldCreated
                 );
-                worldsBeforeLoading.forEach(world => {
+                worldsBeforeLoading.forEach((world) => {
                   var event = new CustomEvent("ecsy-world-created", {
-                    detail: { world: world, version: Version }
+                    detail: { world: world, version: Version },
                   });
                   window.dispatchEvent(event);
                 });
@@ -1637,7 +1731,7 @@ function enableRemoteDevtools(remoteId) {
               if (data.returnEval) {
                 connection.send({
                   method: "evalReturn",
-                  value: value
+                  value: value,
                 });
               }
             }
