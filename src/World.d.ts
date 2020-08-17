@@ -11,7 +11,8 @@ export interface WorldOptions {
 /**
  * The World is the root of the ECS.
  */
-export class World {
+export class World<EntityType extends Entity = Entity> {
+
   /**
    * Whether the world tick should execute.
    */
@@ -28,7 +29,7 @@ export class World {
    */
   registerComponent<C extends Component<any>>(Component: ComponentConstructor<C>, objectPool?: ObjectPool<C> | false): this;
 
-/**
+  /**
    * Evluate whether a component has been registered to this world or not.
    * @param Component Type of component to to evaluate
    */
@@ -68,7 +69,7 @@ export class World {
    * Resume execution of this world.
    */
   play(): void
- 
+
   /**
    * Stop execution of this world.
    */
@@ -77,5 +78,6 @@ export class World {
   /**
    * Create a new entity
    */
-  createEntity(name?: string): Entity
+  createEntity(name?: string): EntityType
+
 }
