@@ -19,17 +19,17 @@ export class Entity {
    * @param Component Type of component to get
    * @param includeRemoved Whether a component that is staled to be removed should be also considered
    */
-  getComponent?<C extends Component<any>>(
+  getComponent<C extends Component<any>>(
     Component: ComponentConstructor<C>,
     includeRemoved?: boolean
-  ): Readonly<C>;
+  ): Readonly<C> | undefined;
 
   /**
    * Get a component that is slated to be removed from this entity.
    */
-  getRemovedComponent?<C extends Component<any>>(
+  getRemovedComponent<C extends Component<any>>(
       Component: ComponentConstructor<C>
-  ): Readonly<C>;
+  ): Readonly<C> | undefined;
 
   /**
    * Get an object containing all the components on this entity, where the object keys are the component types.
@@ -50,9 +50,9 @@ export class Entity {
    * Get a mutable reference to a component on this entity.
    * @param Component Type of component to get
    */
-  getMutableComponent?<C extends Component<any>>(
+  getMutableComponent<C extends Component<any>>(
     Component: ComponentConstructor<C>
-  ): C;
+  ): C | undefined;
 
   /**
    * Add a component to the entity.

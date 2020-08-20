@@ -1,27 +1,47 @@
-export class Component {
-  constructor(props) {
-    if (props !== false) {
-      const schema = this.constructor.schema;
-
-      for (const key in schema) {
-        if (props && props.hasOwnProperty(key)) {
-          this[key] = props[key];
-        } else {
-          const schemaProp = schema[key];
-          if (schemaProp.hasOwnProperty("default")) {
-            this[key] = schemaProp.type.clone(schemaProp.default);
-          } else {
-            const type = schemaProp.type;
-            this[key] = type.clone(type.default);
-          }
-        }
-      }
-
-      if (process.env.NODE_ENV !== "production" && props !== undefined) {
-        this.checkUndefinedAttributes(props);
-      }
+export class AbstractComponent {
+  copy() {
+    if (process.env.NODE_ENV !== "production") {
+      throw new Error(`'.copy()' method unimplemented`);
     }
+    return this;
+  }
 
+  clone() {
+    return new this.constructor().copy(this);
+  }
+
+  setProperties() {
+    if (process.env.NODE_ENV !== "production") {
+      throw new Error(`'.setProperties()' method unimplemented`);
+    }
+    return this;
+  }
+
+  reset() {
+    if (process.env.NODE_ENV !== "production") {
+      throw new Error(`'.reset()' method unimplemented`);
+    }
+  }
+
+  dispose() {
+    if (this._pool) {
+      this._pool.release(this);
+    }
+  }
+
+  getName() {
+    return this.constructor.getName();
+  }
+}
+AbstractComponent.getName = function() {
+  return this.displayName || this.name;
+};
+AbstractComponent.isComponent = true;
+
+export class Component extends AbstractComponent {
+  constructor(props) {
+    super();
+    this.setProperties(props);
     this._pool = null;
   }
 
@@ -44,8 +64,28 @@ export class Component {
     return this;
   }
 
-  clone() {
-    return new this.constructor().copy(this);
+  setProperties(props) {
+    const schema = this.constructor.schema;
+
+    for (const key in schema) {
+      if (props && props.hasOwnProperty(key)) {
+        this[key] = props[key];
+      } else {
+        const schemaProp = schema[key];
+        if (schemaProp.hasOwnProperty("default")) {
+          this[key] = schemaProp.type.clone(schemaProp.default);
+        } else {
+          const type = schemaProp.type;
+          this[key] = type.clone(type.default);
+        }
+      }
+    }
+
+    if (process.env.NODE_ENV !== "production" && props !== undefined) {
+      this.checkUndefinedAttributes(props);
+    }
+
+    return this;
   }
 
   reset() {
@@ -60,12 +100,6 @@ export class Component {
         const type = schemaProp.type;
         this[key] = type.copy(type.default, this[key]);
       }
-    }
-  }
-
-  dispose() {
-    if (this._pool) {
-      this._pool.release(this);
     }
   }
 
@@ -88,7 +122,4 @@ export class Component {
 }
 
 Component.schema = {};
-Component.isComponent = true;
-Component.getName = function () {
-  return this.displayName || this.name;
-};
+Component.isSchemaComponent = true;
