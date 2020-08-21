@@ -64,9 +64,9 @@ Name | Type |
 
 ___
 
-### `Optional` getComponent
+###  getComponent
 
-▸ **getComponent**<**C**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹C›, `includeRemoved?`: boolean): *Readonly‹C›*
+▸ **getComponent**<**C**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹C›, `includeRemoved?`: boolean): *Readonly‹C› | undefined*
 
 Get an immutable reference to a component on this entity.
 
@@ -81,7 +81,7 @@ Name | Type | Description |
 `Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹C› | Type of component to get |
 `includeRemoved?` | boolean | Whether a component that is staled to be removed should be also considered  |
 
-**Returns:** *Readonly‹C›*
+**Returns:** *Readonly‹C› | undefined*
 
 ___
 
@@ -119,9 +119,9 @@ Get an object containing all the components that are slated to be removed from t
 
 ___
 
-### `Optional` getMutableComponent
+###  getMutableComponent
 
-▸ **getMutableComponent**<**C**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹C›): *C*
+▸ **getMutableComponent**<**C**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹C›): *C | undefined*
 
 Get a mutable reference to a component on this entity.
 
@@ -135,13 +135,13 @@ Name | Type | Description |
 ------ | ------ | ------ |
 `Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹C› | Type of component to get  |
 
-**Returns:** *C*
+**Returns:** *C | undefined*
 
 ___
 
-### `Optional` getRemovedComponent
+###  getRemovedComponent
 
-▸ **getRemovedComponent**<**C**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹C›): *Readonly‹C›*
+▸ **getRemovedComponent**<**C**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹C›): *Readonly‹C› | undefined*
 
 Get a component that is slated to be removed from this entity.
 
@@ -155,7 +155,7 @@ Name | Type |
 ------ | ------ |
 `Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹C› |
 
-**Returns:** *Readonly‹C›*
+**Returns:** *Readonly‹C› | undefined*
 
 ___
 

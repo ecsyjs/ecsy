@@ -28,6 +28,14 @@ Whether the system will execute during the world tick.
 
 ___
 
+###  priority
+
+• **priority**: *number*
+
+Execution priority (i.e: order) of the system.
+
+___
+
 ###  queries
 
 • **queries**: *object*
