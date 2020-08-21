@@ -53,6 +53,11 @@ export abstract class System {
   enabled: boolean;
 
   /**
+   * Execution priority (i.e: order) of the system.
+   */
+  readonly priority: number;
+
+  /**
    * Called when the system is added to the world.
    */
   init(attributes?: Attributes): void
