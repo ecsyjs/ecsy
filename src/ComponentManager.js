@@ -23,21 +23,24 @@ export class ComponentManager {
     }
 
     const schema = Component.schema;
+    if (schema) {
+      for (const propName in schema) {
+        const prop = schema[propName];
+        if (!prop.type) {
+          throw new Error(
+            `Invalid schema for component "${Component.getName()}". Missing type for "${propName}" property.`
+          );
+        }
+      }
+    }
 
-    if (!schema) {
+    console.log(Component.getName());
+    console.log(Component.isSchemaComponent);
+
+    if (Component.isSchemaComponent && !schema) {
       throw new Error(
         `Component "${Component.getName()}" has no schema property.`
       );
-    }
-
-    for (const propName in schema) {
-      const prop = schema[propName];
-
-      if (!prop.type) {
-        throw new Error(
-          `Invalid schema for component "${Component.getName()}". Missing type for "${propName}" property.`
-        );
-      }
     }
 
     Component._typeId = this.nextComponentId++;

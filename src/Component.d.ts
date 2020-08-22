@@ -4,27 +4,43 @@ import { PropType } from "./Types";
  * Base class for components.
  */
 
-export type ComponentSchemaProp = {
-  default?: any;
-  type: PropType<any, any>;
+export type ComponentSchemaProp<T> = {
+  default?: T;
+  type: PropType<T, T>;
 };
 
 export type ComponentSchema = {
-  [propName: string]: ComponentSchemaProp;
+  [propName: string]: ComponentSchemaProp<any>;
 };
 
-export class Component<C> {
-  static schema: ComponentSchema;
+export type SchemaProperties<Schema> =
+  Partial<Omit<Schema, keyof Component<Schema>>>;
+
+export class AbstractComponent<Properties> {
   static isComponent: true;
-  constructor(props?: Partial<Omit<C, keyof Component<any>>> | false);
-  copy(source: this): this;
-  clone(): this;
+  static getName(): string;
+  constructor(props?: Properties);
+  copy(source: this | Properties): this;
+  clone(): this
+  setProperties(props?: Properties): this;
   reset(): void;
   dispose(): void;
 }
 
-export interface ComponentConstructor<C extends Component<any>> {
-  schema: ComponentSchema;
+export class Component<Schema>
+  extends AbstractComponent<SchemaProperties<Schema>> {
+  static schema: ComponentSchema;
+  static isSchemaComponent: true;
+  constructor(props?: SchemaProperties<Schema>);
+}
+
+export interface ComponentConstructor<C extends AbstractComponent<any>> {
   isComponent: true;
-  new (props?: Partial<Omit<C, keyof Component<any>>> | false): C;
+  new (...args: any): C;
+}
+
+export interface SchemaConstructable<C extends Component<C>> {
+  schema: ComponentSchema;
+  isSchemaComponent: true;
+  new (props?: SchemaProperties<C>): C;
 }
