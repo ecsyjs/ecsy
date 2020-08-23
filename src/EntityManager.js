@@ -216,7 +216,6 @@ export class EntityManager {
         this.entitiesToRemove.push(entity);
       }
     }
-
   }
 
   _releaseEntity(entity, index) {

@@ -78,5 +78,4 @@ test("remove entity clears and reset components first ", (t) => {
   entity.remove();
   world.entityManager.processDeferredRemoval();
   t.is(component.isReset, true);
-
 });
