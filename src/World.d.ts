@@ -32,7 +32,7 @@ export class World {
    * Evluate whether a component has been registered to this world or not.
    * @param Component Type of component to to evaluate
    */
-  hasRegisteredComponent<C extends Component<any>>(Component: Component<C>): boolean;
+  hasRegisteredComponent<C extends Component<any>>(Component: ComponentConstructor<C>): boolean;
 
   /**
    * Register a system.
@@ -68,7 +68,7 @@ export class World {
    * Resume execution of this world.
    */
   play(): void
- 
+
   /**
    * Stop execution of this world.
    */
