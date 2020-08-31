@@ -42,8 +42,8 @@ export class Entity {
       : component;
   }
 
-  getComponentOrThrow(Component) {
-    const component = this.getComponent(Component);
+  getComponentOrThrow(Component, includeRemoved) {
+    const component = this.getComponent(Component, includeRemoved);
     if (!component) {
       throw new Error(
         `Entity ${this.id} does not have component ${Component.getName()}.`
