@@ -84,6 +84,16 @@ export class Entity {
     return component;
   }
 
+  getMutableComponentOrThrow(Component) {
+    const component = this.getMutableComponent(Component);
+    if (!component) {
+      throw new Error(
+        `Entity ${this.id} does not have component ${Component.getName()}.`
+      );
+    }
+    return component;
+  }
+
   addComponent(Component, values) {
     this._entityManager.entityAddComponent(this, Component, values);
     return this;
