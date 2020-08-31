@@ -25,10 +25,20 @@ export class Entity {
   ): Readonly<C> | undefined;
 
   /**
+   * Get an immutable reference to a component on this entity. Throws if the component is not on the entity.
+   * @param Component Type of component to get
+   * @param includeRemoved Whether a component that is staled to be removed should be also considered
+   */
+  getComponentOrThrow<C extends Component<any>>(
+    Component: ComponentConstructor<C>,
+    includeRemoved?: boolean
+  ): Readonly<C>;
+
+  /**
    * Get a component that is slated to be removed from this entity.
    */
   getRemovedComponent<C extends Component<any>>(
-      Component: ComponentConstructor<C>
+    Component: ComponentConstructor<C>
   ): Readonly<C> | undefined;
 
   /**
@@ -53,6 +63,14 @@ export class Entity {
   getMutableComponent<C extends Component<any>>(
     Component: ComponentConstructor<C>
   ): C | undefined;
+
+  /**
+   * Get a mutable reference to a component on this entity. Throws if the component is not on the entity.
+   * @param Component Type of component to get
+   */
+  getMutableComponent<C extends Component<any>>(
+    Component: ComponentConstructor<C>
+  ): C;
 
   /**
    * Add a component to the entity.
@@ -96,37 +114,29 @@ export class Entity {
    * Check if the entity has all components in a list.
    * @param Components Component types to check
    */
-  hasAllComponents(
-    Components: Array<ComponentConstructor<any>>
-  ): boolean
+  hasAllComponents(Components: Array<ComponentConstructor<any>>): boolean;
 
   /**
    * Check if the entity has any of the components in a list.
    * @param Components Component types to check
    */
-  hasAnyComponents(
-    Components: Array<ComponentConstructor<any>>
-  ): boolean
+  hasAnyComponents(Components: Array<ComponentConstructor<any>>): boolean;
 
   /**
    * Remove all components on this entity.
    * @param forceImmediate Whether all components should be removed immediately
    */
-  removeAllComponents(
-      forceImmediate?: boolean
-  ): void
+  removeAllComponents(forceImmediate?: boolean): void;
 
-  copy(source: this): this
+  copy(source: this): this;
 
-  clone(): this
+  clone(): this;
 
-  reset(): void
+  reset(): void;
 
   /**
    * Remove this entity from the world.
    * @param forceImmediate Whether this entity should be removed immediately
    */
-  remove(
-      forceImmediate?: boolean
-  ): void;
+  remove(forceImmediate?: boolean): void;
 }
