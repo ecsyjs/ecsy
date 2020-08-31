@@ -42,6 +42,16 @@ export class Entity {
       : component;
   }
 
+  getComponentOrThrow(Component) {
+    const component = this.getComponent(Component);
+    if (!component) {
+      throw new Error(
+        `Entity ${this.id} does not have component ${Component.getName()}.`
+      );
+    }
+    return component;
+  }
+
   getRemovedComponent(Component) {
     const component = this._componentsToRemove[Component._typeId];
 
