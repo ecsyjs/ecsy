@@ -68,7 +68,7 @@ export class Entity {
    * Get a mutable reference to a component on this entity. Throws if the component is not on the entity.
    * @param Component Type of component to get
    */
-  getMutableComponent<C extends Component<any>>(
+  getMutableComponentOrThrow<C extends Component<any>>(
     Component: ComponentConstructor<C>
   ): C;
 
