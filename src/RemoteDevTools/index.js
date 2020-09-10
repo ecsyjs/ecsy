@@ -4,27 +4,27 @@ import { hasWindow } from "../Utils.js";
 
 function hookConsoleAndErrors(connection) {
   var wrapFunctions = ["error", "warning", "log"];
-  wrapFunctions.forEach(key => {
+  wrapFunctions.forEach((key) => {
     if (typeof console[key] === "function") {
       var fn = console[key].bind(console);
       console[key] = (...args) => {
         connection.send({
           method: "console",
           type: key,
-          args: JSON.stringify(args)
+          args: JSON.stringify(args),
         });
         return fn.apply(null, args);
       };
     }
   });
 
-  window.addEventListener("error", error => {
+  window.addEventListener("error", (error) => {
     connection.send({
       method: "error",
       error: JSON.stringify({
         message: error.error.message,
-        stack: error.error.stack
-      })
+        stack: error.error.stack,
+      }),
     });
   });
 }
@@ -82,7 +82,7 @@ export function enableRemoteDevtools(remoteId) {
 
   // This is used to collect the worlds created before the communication is being established
   let worldsBeforeLoading = [];
-  let onWorldCreated = e => {
+  let onWorldCreated = (e) => {
     var world = e.detail.world;
     Version = e.detail.version;
     worldsBeforeLoading.push(world);
@@ -90,16 +90,32 @@ export function enableRemoteDevtools(remoteId) {
   window.addEventListener("ecsy-world-created", onWorldCreated);
 
   let onLoaded = () => {
-    var peer = new Peer(remoteId);
+    // var peer = new Peer(remoteId);
+    var peer = new Peer(remoteId, {
+      host: "peerjs.ecsy.io",
+      secure: true,
+      port: 443,
+      config: {
+        iceServers: [
+          { url: "stun:stun.l.google.com:19302" },
+          { url: "stun:stun1.l.google.com:19302" },
+          { url: "stun:stun2.l.google.com:19302" },
+          { url: "stun:stun3.l.google.com:19302" },
+          { url: "stun:stun4.l.google.com:19302" },
+        ],
+      },
+      debug: 3,
+    });
+
     peer.on("open", (/* id */) => {
-      peer.on("connection", connection => {
+      peer.on("connection", (connection) => {
         window.__ECSY_REMOTE_DEVTOOLS.connection = connection;
-        connection.on("open", function() {
+        connection.on("open", function () {
           // infoDiv.style.visibility = "hidden";
           infoDiv.innerHTML = "Connected";
 
           // Receive messages
-          connection.on("data", function(data) {
+          connection.on("data", function (data) {
             if (data.type === "init") {
               var script = document.createElement("script");
               script.setAttribute("type", "text/javascript");
@@ -111,9 +127,9 @@ export function enableRemoteDevtools(remoteId) {
                   "ecsy-world-created",
                   onWorldCreated
                 );
-                worldsBeforeLoading.forEach(world => {
+                worldsBeforeLoading.forEach((world) => {
                   var event = new CustomEvent("ecsy-world-created", {
-                    detail: { world: world, version: Version }
+                    detail: { world: world, version: Version },
                   });
                   window.dispatchEvent(event);
                 });
@@ -128,7 +144,7 @@ export function enableRemoteDevtools(remoteId) {
               if (data.returnEval) {
                 connection.send({
                   method: "evalReturn",
-                  value: value
+                  value: value,
                 });
               }
             }

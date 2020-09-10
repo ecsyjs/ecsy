@@ -7,7 +7,7 @@ import { Entity } from "./Entity.js";
 
 const DEFAULT_OPTIONS = {
   entityPoolSize: 0,
-  entityClass: Entity
+  entityClass: Entity,
 };
 
 export class World {
@@ -24,12 +24,12 @@ export class World {
 
     if (hasWindow && typeof CustomEvent !== "undefined") {
       var event = new CustomEvent("ecsy-world-created", {
-        detail: { world: this, version: Version }
+        detail: { world: this, version: Version },
       });
       window.dispatchEvent(event);
     }
 
-    this.lastTime = now();
+    this.lastTime = now() / 1000;
   }
 
   registerComponent(Component, objectPool) {
@@ -40,6 +40,10 @@ export class World {
   registerSystem(System, attributes) {
     this.systemManager.registerSystem(System, attributes);
     return this;
+  }
+
+  hasRegisteredComponent(Component) {
+    return this.componentsManager.hasComponent(Component);
   }
 
   unregisterSystem(System) {
@@ -57,7 +61,7 @@ export class World {
 
   execute(delta, time) {
     if (!delta) {
-      time = now();
+      time = now() / 1000;
       delta = time - this.lastTime;
       this.lastTime = time;
     }
@@ -83,9 +87,9 @@ export class World {
   stats() {
     var stats = {
       entities: this.entityManager.stats(),
-      system: this.systemManager.stats()
+      system: this.systemManager.stats(),
     };
 
-    console.log(JSON.stringify(stats, null, 2));
+    return stats;
   }
 }

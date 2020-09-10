@@ -14,7 +14,7 @@ export {
   copyJSON,
   cloneJSON,
   copyCopyable,
-  cloneClonable
+  cloneClonable,
 } from "./Types.js";
 export { Version } from "./Version.js";
 export { enableRemoteDevtools } from "./RemoteDevTools/index.js";

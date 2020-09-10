@@ -1,4 +1,5 @@
 import Query from "./Query.js";
+import { componentRegistered } from "./Utils.js";
 
 export class System {
   canExecute() {
@@ -46,13 +47,30 @@ export class System {
         if (!Components || Components.length === 0) {
           throw new Error("'components' attribute can't be empty in a query");
         }
+
+        // Detect if the components have already been registered
+        let unregisteredComponents = Components.filter(
+          (Component) => !componentRegistered(Component)
+        );
+
+        if (unregisteredComponents.length > 0) {
+          throw new Error(
+            `Tried to create a query '${
+              this.constructor.name
+            }.${queryName}' with unregistered components: [${unregisteredComponents
+              .map((c) => c.getName())
+              .join(", ")}]`
+          );
+        }
+
         var query = this.world.entityManager.queryComponents(Components);
+
         this._queries[queryName] = query;
         if (queryConfig.mandatory === true) {
           this._mandatoryQueries.push(query);
         }
         this.queries[queryName] = {
-          results: query.entities
+          results: query.entities,
         };
 
         // Reactive configuration added/removed/changed
@@ -61,11 +79,11 @@ export class System {
         const eventMapping = {
           added: Query.prototype.ENTITY_ADDED,
           removed: Query.prototype.ENTITY_REMOVED,
-          changed: Query.prototype.COMPONENT_CHANGED // Query.prototype.ENTITY_CHANGED
+          changed: Query.prototype.COMPONENT_CHANGED, // Query.prototype.ENTITY_CHANGED
         };
 
         if (queryConfig.listen) {
-          validEvents.forEach(eventName => {
+          validEvents.forEach((eventName) => {
             if (!this.execute) {
               console.warn(
                 `System '${this.getName()}' has defined listen events (${validEvents.join(
@@ -85,7 +103,7 @@ export class System {
                   let eventList = (this.queries[queryName][eventName] = []);
                   query.eventDispatcher.addEventListener(
                     Query.prototype.COMPONENT_CHANGED,
-                    entity => {
+                    (entity) => {
                       // Avoid duplicates
                       if (eventList.indexOf(entity) === -1) {
                         eventList.push(entity);
@@ -133,7 +151,7 @@ export class System {
 
                 query.eventDispatcher.addEventListener(
                   eventMapping[eventName],
-                  entity => {
+                  (entity) => {
                     // @fixme overhead?
                     if (eventList.indexOf(entity) === -1)
                       eventList.push(entity);
@@ -184,7 +202,7 @@ export class System {
       enabled: this.enabled,
       executeTime: this.executeTime,
       priority: this.priority,
-      queries: {}
+      queries: {},
     };
 
     if (this.constructor.queries) {
@@ -193,7 +211,7 @@ export class System {
         let query = this.queries[queryName];
         let queryDefinition = queries[queryName];
         let jsonQuery = (json.queries[queryName] = {
-          key: this._queries[queryName].key
+          key: this._queries[queryName].key,
         });
 
         jsonQuery.mandatory = queryDefinition.mandatory === true;
@@ -208,10 +226,10 @@ export class System {
           jsonQuery.listen = {};
 
           const methods = ["added", "removed", "changed"];
-          methods.forEach(method => {
+          methods.forEach((method) => {
             if (query[method]) {
               jsonQuery.listen[method] = {
-                entities: query[method].length
+                entities: query[method].length,
               };
             }
           });
@@ -224,13 +242,13 @@ export class System {
 }
 
 System.isSystem = true;
-System.getName = function() {
+System.getName = function () {
   return this.displayName || this.name;
 };
 
 export function Not(Component) {
   return {
     operator: "not",
-    Component: Component
+    Component: Component,
   };
 }

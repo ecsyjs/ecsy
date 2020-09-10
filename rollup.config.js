@@ -1,11 +1,18 @@
 import json from "rollup-plugin-json";
 import resolve from "@rollup/plugin-node-resolve";
 import { terser } from "rollup-plugin-terser";
+import replace from "@rollup/plugin-replace";
 
 export default [
   {
     input: "src/index.js",
-    plugins: [json({ exclude: ["node_modules/**"] })],
+    plugins: [
+      replace({
+        "process.env.NODE_ENV": JSON.stringify("development"),
+        delimiters: ["", ""]
+      }),
+      json({ exclude: ["node_modules/**"] })
+    ],
     output: [
       {
         format: "umd",
@@ -35,7 +42,14 @@ export default [
   },
   {
     input: "src/index.js",
-    plugins: [json({ exclude: ["node_modules/**"] }), terser()],
+    plugins: [
+      replace({
+        "process.env.NODE_ENV": JSON.stringify("production"),
+        delimiters: ["", ""]
+      }),
+      json({ exclude: ["node_modules/**"] }),
+      terser()
+    ],
     output: [
       {
         format: "umd",

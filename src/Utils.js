@@ -22,18 +22,23 @@ export function componentPropertyName(Component) {
  * @private
  */
 export function queryKey(Components) {
-  var names = [];
+  var ids = [];
   for (var n = 0; n < Components.length; n++) {
     var T = Components[n];
+
+    if (!componentRegistered(T)) {
+      throw new Error(`Tried to create a query with an unregistered component`);
+    }
+
     if (typeof T === "object") {
       var operator = T.operator === "not" ? "!" : T.operator;
-      names.push(operator + getName(T.Component));
+      ids.push(operator + T.Component._typeId);
     } else {
-      names.push(getName(T));
+      ids.push(T._typeId);
     }
   }
 
-  return names.sort().join("-");
+  return ids.sort().join("-");
 }
 
 // Detector for browser's "window"
@@ -44,3 +49,10 @@ export const now =
   hasWindow && typeof window.performance !== "undefined"
     ? performance.now.bind(performance)
     : Date.now.bind(Date);
+
+export function componentRegistered(T) {
+  return (
+    (typeof T === "object" && T.Component._typeId !== undefined) ||
+    (T.isComponent && T._typeId !== undefined)
+  );
+}

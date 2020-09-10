@@ -16,6 +16,10 @@ export class Component {
           }
         }
       }
+
+      if (process.env.NODE_ENV !== "production" && props !== undefined) {
+        this.checkUndefinedAttributes(props);
+      }
     }
 
     this._pool = null;
@@ -30,6 +34,11 @@ export class Component {
       if (source.hasOwnProperty(key)) {
         this[key] = prop.type.copy(source[key], this[key]);
       }
+    }
+
+    // @DEBUG
+    if (process.env.NODE_ENV !== "production") {
+      this.checkUndefinedAttributes(source);
     }
 
     return this;
@@ -63,10 +72,23 @@ export class Component {
   getName() {
     return this.constructor.getName();
   }
+
+  checkUndefinedAttributes(src) {
+    const schema = this.constructor.schema;
+
+    // Check that the attributes defined in source are also defined in the schema
+    Object.keys(src).forEach((srcKey) => {
+      if (!schema.hasOwnProperty(srcKey)) {
+        console.warn(
+          `Trying to set attribute '${srcKey}' not defined in the '${this.constructor.name}' schema. Please fix the schema, the attribute value won't be set`
+        );
+      }
+    });
+  }
 }
 
 Component.schema = {};
 Component.isComponent = true;
-Component.getName = function() {
+Component.getName = function () {
   return this.displayName || this.name;
 };

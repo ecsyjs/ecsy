@@ -10,6 +10,10 @@ export class ComponentManager {
     this.nextComponentId = 0;
   }
 
+  hasComponent(Component) {
+    return this.Components.indexOf(Component) !== -1;
+  }
+
   registerComponent(Component, objectPool) {
     if (this.Components.indexOf(Component) !== -1) {
       console.warn(

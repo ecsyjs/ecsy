@@ -144,12 +144,12 @@
       // Create world and register the systems on it
       var world = new World();
       world
-        .registerSystem(MovableSystem)
-        .registerSystem(RendererSystem)
         .registerComponent(Renderable)
         .registerComponent(Shape)
         .registerComponent(Velocity)
-        .registerComponent(Position);
+        .registerComponent(Position)
+        .registerSystem(MovableSystem)
+        .registerSystem(RendererSystem);
 
       // Some helper functions when creating the components
       function getRandomVelocity() {

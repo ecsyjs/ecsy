@@ -48,6 +48,15 @@ By default your application should have at least one `world`. A world is basical
 world = new World();
 ```
 
+The `World` constructor accepts an option object with the following parameters:
+- ***entityClass***: Provide the base class for entities that implements or extends `Entity`.
+- ***entityPoolSize***: Define the initial entity pool size for entities. It can help to avoid GC during execution if the application expands the pool dynamically at execution time.
+
+```javascript
+// We know we will initially have around 10k enemies in our game so let's allocate 10k enemies initially and expand the pool as needed.
+world = new World({ entityPoolSize: 10000 });
+```
+
 ## Components
 A `Component` ([API Reference](/api/classes/component)) is an object that can store data but should have not behaviour (As that should be handled by systems). There is not a mandatory way to define a component.
 
@@ -393,7 +402,7 @@ Components can be accessed from an entity in two ways:
 - `getComponent(Component)`: Get the component for read only operations.
 - `getMutableComponent(Component)`: Get the component to modify its values.
 
-If `DEBUG` mode is enabled it will throw an error if you try to modify a component accessed by `getComponent`, but that error will not be thrown on release mode because of performance reasons.
+If `development` mode is enabled it will throw an error if you try to modify a component accessed by `getComponent`, but that error will not be thrown on release mode because of performance reasons.
 
 These two access modes help to implement `reactive queries`([more info](/manual/Architecture?id=reactive-queries)), which are basically lists of entities populated with components that have mutated somehow, without much overhead on the execution as we avoid using custom setters or proxies.
 This means every time you request a mutable component, it will get marked as modified and systems listening for that will get notified accordingly.
@@ -508,11 +517,41 @@ class SystemName extends System {
 
 If there is a `reactive query` (A query that *listens* for entities added or removed to it or which components has changed, [more info](/manual/Architecture?id=reactive-queries)) on the list of queries defined by a system, this system is called `reactive system` as it will react to changes on the entities and its components.
 
+If you plan to mutate the results of a query while you are iterating it (eg: adding or removing components that will not match the query structure anymore, or removing the entity itself) you should traverse the results in reverse order:
+```javascript
+let results = this.queries.queryA.results;
+for (var i = 0; i < results.length; i++) {
+  let entity = results[i];
+  if (i === 1) {
+    // This will cause the results list to be mutated, results.length will be decremented and you won't reach the end elements.
+    entity.remove();
+  }
+}
+
+// The correct way to do it
+let results = this.queries.queryA.results;
+for (var i = results.length - 1; i >= 0; i++) {
+  let entity = results[i];
+  if (i === 1) {
+    // This will modify the length of the results but as we are moving backward it won't affect us
+    entity.remove();
+  }
+}
+```
+
 ### Registering a system
 
 Systems should be registered in a world in order to initialize them and add them to the default scheduler that will execute them on each frame.
 ```javascript
-world.registerSystem(SystemName);
+world.registerSystem(SystemClass);
+```
+
+### Unregistering a system
+
+Systems can be unregistered, and they will get removed from the execution queue and the world. So if you want to use them again you need to register them again.
+If you just want to temporaly disable its execution, you must use `System.stop()/play()` instead.
+```javascript
+world.unregisterSystem(SystemClass);
 ```
 
 ### Execution order
@@ -785,3 +824,47 @@ But if `SystemB` does the same, just `SystemC` will be able to react to it, as t
 Because of that is important that you define an appropriate execution order based on the needs for your reactive systems.
 
 There is one special use case when removing components and entities. When using `System State Components` they should be removed explicitly and they will not get removed if `entity.remove` is being called. [More info](/manual/Architecture?id=system-state-components)
+
+## Extending core functionality
+
+It is possible to provide a custom `Entity` class to modify the default behaviour.
+To do so you need to import `_Entity` from `ecsy` and extend it in your class definition:
+```javascript
+import { _Entity, World } from "entity";
+
+class MyEntity extends _Entity {
+  customMethod() {}
+}
+
+// Use the new entity class
+let world = new World({ entityClass: MyEntity });
+let entity = world.createEntity();
+
+// Call our custom method on our entity class
+entity.customMethod();
+```
+You can see an example of this extensibility in `ecsy-three`. In `ecsy-three` we extend both the entity class: https://github.com/MozillaReality/ecsy-three/blob/dev/src/core/entity.js and also the world class: https://github.com/MozillaReality/ecsy-three/blob/dev/src/core/world.js
+
+## Developing
+
+### Debug mode
+ECSY will output some debug messages when in development mode. Development mode is active depending on the environment you are running ECSY in.
+
+In CommonJS environments it is controlled by the value of the `NODE_ENV` environment variable. This means Webpack and similar tools can change the value for development and production builds. This ensures you get helpful messages during development and a smaller bundle size in production.
+
+When using the UMD or ES Module builds then the unminified builds will have development mode on and the minified builds will have it turned off.
+
+### Benchmarks
+
+ECSY includes benchmarks (https://github.com/MozillaReality/ecsy/tree/dev/benchmarks) to test the performance and detect regressions.
+To run the benchmarks locally you need to execute `npm run benchmarks`:
+It will dump a JSON with the results of all the benchmarks and it will write a `benchmark_result.json` file.
+
+You can use that file to compare against other executions by using `benchmarker` (`https://github.com/fernandojsg/benchmarker`):
+```
+# Install benchmarker globally
+> npm install -g benchmarker-js
+
+> benchmarker compare results1.json results2.json
+```
+It will dump a table with a summary comparing all the executions. This can be useful when doing big refactors to compare across different branches to make sure that there is not regression in performance.

@@ -28,6 +28,12 @@ export class World {
    */
   registerComponent<C extends Component<any>>(Component: ComponentConstructor<C>, objectPool?: ObjectPool<C> | false): this;
 
+/**
+   * Evluate whether a component has been registered to this world or not.
+   * @param Component Type of component to to evaluate
+   */
+  hasRegisteredComponent<C extends Component<any>>(Component: Component<C>): boolean;
+
   /**
    * Register a system.
    * @param System Type of system to register
@@ -44,7 +50,7 @@ export class World {
    * Get a system registered in this world.
    * @param System Type of system to get.
    */
-  getSystem<S extends System>(System: SystemConstructor<S>): System;
+  getSystem<S extends System>(System: SystemConstructor<S>): S;
 
   /**
    * Get a list of systems registered in this world.

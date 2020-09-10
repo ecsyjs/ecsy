@@ -1,6 +1,6 @@
-export const copyValue = src => src;
+export const copyValue = (src) => src;
 
-export const cloneValue = src => src;
+export const cloneValue = (src) => src;
 
 export const copyArray = (src, dest) => {
   if (!src) {
@@ -20,11 +20,11 @@ export const copyArray = (src, dest) => {
   return dest;
 };
 
-export const cloneArray = src => src && src.slice();
+export const cloneArray = (src) => src && src.slice();
 
-export const copyJSON = src => JSON.parse(JSON.stringify(src));
+export const copyJSON = (src) => JSON.parse(JSON.stringify(src));
 
-export const cloneJSON = src => JSON.parse(JSON.stringify(src));
+export const cloneJSON = (src) => JSON.parse(JSON.stringify(src));
 
 export const copyCopyable = (src, dest) => {
   if (!src) {
@@ -38,12 +38,12 @@ export const copyCopyable = (src, dest) => {
   return dest.copy(src);
 };
 
-export const cloneClonable = src => src && src.clone();
+export const cloneClonable = (src) => src && src.clone();
 
 export function createType(typeDefinition) {
   var mandatoryProperties = ["name", "default", "copy", "clone"];
 
-  var undefinedProperties = mandatoryProperties.filter(p => {
+  var undefinedProperties = mandatoryProperties.filter((p) => {
     return !typeDefinition.hasOwnProperty(p);
   });
 
@@ -68,41 +68,41 @@ export const Types = {
     name: "Number",
     default: 0,
     copy: copyValue,
-    clone: cloneValue
+    clone: cloneValue,
   }),
 
   Boolean: createType({
     name: "Boolean",
     default: false,
     copy: copyValue,
-    clone: cloneValue
+    clone: cloneValue,
   }),
 
   String: createType({
     name: "String",
     default: "",
     copy: copyValue,
-    clone: cloneValue
+    clone: cloneValue,
   }),
 
   Array: createType({
     name: "Array",
     default: [],
     copy: copyArray,
-    clone: cloneArray
+    clone: cloneArray,
   }),
 
   Ref: createType({
     name: "Ref",
     default: undefined,
     copy: copyValue,
-    clone: cloneValue
+    clone: cloneValue,
   }),
 
   JSON: createType({
     name: "JSON",
     default: null,
     copy: copyJSON,
-    clone: cloneJSON
-  })
+    clone: cloneJSON,
+  }),
 };

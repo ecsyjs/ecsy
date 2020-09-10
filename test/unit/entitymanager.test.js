@@ -1,7 +1,7 @@
 import test from "ava";
 import { World } from "../../src";
 
-test("entity id", t => {
+test("entity id", (t) => {
   var world = new World();
 
   for (var i = 0; i < 10; i++) {
@@ -13,7 +13,7 @@ test("entity id", t => {
   // @todo Check ids
 });
 
-test("deferred entity remove", t => {
+test("deferred entity remove", (t) => {
   var world = new World();
 
   for (let i = 0; i < 10; i++) {

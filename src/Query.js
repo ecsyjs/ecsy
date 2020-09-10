@@ -9,7 +9,7 @@ export default class Query {
     this.Components = [];
     this.NotComponents = [];
 
-    Components.forEach(component => {
+    Components.forEach((component) => {
       if (typeof component === "object") {
         this.NotComponents.push(component.Component);
       } else {
@@ -83,10 +83,10 @@ export default class Query {
       key: this.key,
       reactive: this.reactive,
       components: {
-        included: this.Components.map(C => C.name),
-        not: this.NotComponents.map(C => C.name)
+        included: this.Components.map((C) => C.name),
+        not: this.NotComponents.map((C) => C.name),
       },
-      numEntities: this.entities.length
+      numEntities: this.entities.length,
     };
   }
 
@@ -96,7 +96,7 @@ export default class Query {
   stats() {
     return {
       numComponents: this.Components.length,
-      numEntities: this.entities.length
+      numEntities: this.entities.length,
     };
   }
 }

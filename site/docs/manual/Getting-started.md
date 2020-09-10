@@ -68,9 +68,10 @@ for (let i = 0; i < 10; i++) {
     .addComponent(Position, { x: Math.random() * 10, y: Math.random() * 10, z: 0});
 }
 ```
-With that, we have just created 11 entities. 10 with the `Acceleration` and `Position` components, and one with just the `Position` component. 
-Notice that the Position component is added using custom parameters. If we didn't use the parameters then the
-component would use the default values declared in the Position class. 
+
+With that, we have just created 11 entities. 10 with the `Acceleration` and `Position` components, and one with just the `Position` component.
+Notice that the `Position` component is added using custom parameters. If we didn't use the parameters then the
+component would use the default values declared in the `Position` class.
 
 ## Creating a system
 Now we are going to define a [system](/manual/Architecture?id=systems) to process the components we just created.
