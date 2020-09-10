@@ -1004,6 +1004,7 @@ class EntityManager {
     if (!~index) throw new Error("Tried to remove entity not in list");
 
     entity.alive = false;
+    this.entityRemoveAllComponents(entity, immediately);
 
     if (entity.numStateComponents === 0) {
       // Remove from entity list
@@ -1015,8 +1016,6 @@ class EntityManager {
         this.entitiesToRemove.push(entity);
       }
     }
-
-    this.entityRemoveAllComponents(entity, immediately);
   }
 
   _releaseEntity(entity, index) {

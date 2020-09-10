@@ -1,19 +1,23 @@
 
-# Class: System
+# Class: System <**EntityType**>
 
 A system that manipulates entities in the world.
+
+## Type parameters
+
+▪ **EntityType**: *[Entity](entity.md)*
 
 ## Constructors
 
 ###  constructor
 
-\+ **new System**(`world`: [World](world.md), `attributes?`: [Attributes](../interfaces/attributes.md)): *[System](system.md)*
+\+ **new System**(`world`: [World](world.md)‹EntityType›, `attributes?`: [Attributes](../interfaces/attributes.md)): *[System](system.md)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`world` | [World](world.md) |
+`world` | [World](world.md)‹EntityType› |
 `attributes?` | [Attributes](../interfaces/attributes.md) |
 
 **Returns:** *[System](system.md)*
@@ -47,19 +51,19 @@ Should be used inside of execute.
 
 * \[ **queryName**: *string*\]: object
 
-* **added**? : *[Entity](entity.md)[]*
+* **added**? : *EntityType[]*
 
-* **changed**? : *[Entity](entity.md)[]*
+* **changed**? : *EntityType[]*
 
-* **removed**? : *[Entity](entity.md)[]*
+* **removed**? : *EntityType[]*
 
-* **results**: *[Entity](entity.md)[]*
+* **results**: *EntityType[]*
 
 ___
 
 ###  world
 
-• **world**: *[World](world.md)*
+• **world**: *[World](world.md)‹EntityType›*
 
 ___
 

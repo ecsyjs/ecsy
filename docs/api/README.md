@@ -1,5 +1,5 @@
 
-# ecsy - v0.4.1
+# ecsy - v0.4.2
 
 ## Type aliases
 

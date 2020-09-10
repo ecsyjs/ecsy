@@ -1,7 +1,11 @@
 
-# Class: World
+# Class: World <**EntityType**>
 
 The World is the root of the ECS.
+
+## Type parameters
+
+▪ **EntityType**: *[Entity](entity.md)*
 
 ## Constructors
 
@@ -31,7 +35,7 @@ Whether the world tick should execute.
 
 ###  createEntity
 
-▸ **createEntity**(`name?`: string): *[Entity](entity.md)*
+▸ **createEntity**(`name?`: string): *EntityType*
 
 Create a new entity
 
@@ -41,7 +45,7 @@ Name | Type |
 ------ | ------ |
 `name?` | string |
 
-**Returns:** *[Entity](entity.md)*
+**Returns:** *EntityType*
 
 ___
 
@@ -94,7 +98,7 @@ ___
 
 ###  hasRegisteredComponent
 
-▸ **hasRegisteredComponent**<**C**>(`Component`: [Component](component.md)‹C›): *boolean*
+▸ **hasRegisteredComponent**<**C**>(`Component`: [ComponentConstructor](../interfaces/componentconstructor.md)‹C›): *boolean*
 
 Evluate whether a component has been registered to this world or not.
 
@@ -106,7 +110,7 @@ Evluate whether a component has been registered to this world or not.
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`Component` | [Component](component.md)‹C› | Type of component to to evaluate  |
+`Component` | [ComponentConstructor](../interfaces/componentconstructor.md)‹C› | Type of component to to evaluate  |
 
 **Returns:** *boolean*
 
