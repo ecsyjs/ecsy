@@ -1,4 +1,4 @@
-import { Component, ComponentConstructor } from "./Component";
+import { ComponentConstructor } from "./Component";
 import { System, SystemConstructor } from "./System";
 import { Entity } from "./Entity";
 import { ObjectPool } from "./ObjectPool";
@@ -12,7 +12,6 @@ export interface WorldOptions {
  * The World is the root of the ECS.
  */
 export class World<EntityType extends Entity = Entity> {
-
   /**
    * Whether the world tick should execute.
    */
@@ -27,13 +26,18 @@ export class World<EntityType extends Entity = Entity> {
    * Register a component.
    * @param Component Type of component to register
    */
-  registerComponent<C extends Component<any>>(Component: ComponentConstructor<C>, objectPool?: ObjectPool<C> | false): this;
+  registerComponent<C extends any>(
+    Component: ComponentConstructor<C>,
+    objectPool?: ObjectPool<C> | false
+  ): this;
 
   /**
    * Evluate whether a component has been registered to this world or not.
    * @param Component Type of component to to evaluate
    */
-  hasRegisteredComponent<C extends Component<any>>(Component: ComponentConstructor<C>): boolean;
+  hasRegisteredComponent<C extends any>(
+    Component: ComponentConstructor<C>
+  ): boolean;
 
   /**
    * Register a system.
@@ -68,16 +72,15 @@ export class World<EntityType extends Entity = Entity> {
   /**
    * Resume execution of this world.
    */
-  play(): void
+  play(): void;
 
   /**
    * Stop execution of this world.
    */
-  stop(): void
+  stop(): void;
 
   /**
    * Create a new entity
    */
-  createEntity(name?: string): EntityType
-
+  createEntity(name?: string): EntityType;
 }
