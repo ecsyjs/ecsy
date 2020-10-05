@@ -10,21 +10,26 @@ export type ComponentSchema = {
 };
 
 // Base class for components,
-declare class BaseComponent<C> {
-  static schema: ComponentSchema;
-  static isComponent: true;
+export declare class ComponentClass<C> {
   copy(source: this): this;
   clone(): this;
   reset(): void;
   dispose(): void;
+  constructor(props?: Partial<C> | false);
 }
 
-type Component<T> = BaseComponent<T> & T;
+export type ComponentInstance<C> = ComponentClass<C> & C;
 
-export interface ComponentConstructor {
+interface ComponentStatic {
   schema: ComponentSchema;
   isComponent: true;
-  new <T>(props?: Partial<T> | false): Component<T>;
+  new <C>(props?: Partial<C> | false): ComponentInstance<C>;
 }
 
-export declare const Component: ComponentConstructor;
+export interface ComponentConstructor<C> {
+  schema: ComponentSchema;
+  isComponent: true;
+  new (props?: Partial<C> | false): ComponentInstance<C>;
+}
+
+export declare const Component: ComponentStatic;

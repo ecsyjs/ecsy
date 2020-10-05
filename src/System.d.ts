@@ -1,4 +1,4 @@
-import {Component, ComponentConstructor} from "./Component";
+import { ComponentConstructor } from "./Component";
 import { Entity } from "./Entity";
 import { World } from "./World";
 
@@ -9,13 +9,13 @@ interface Attributes {
 
 export interface SystemQueries {
   [queryName: string]: {
-    components: (ComponentConstructor<any> | NotComponent<any>)[],
+    components: (ComponentConstructor<any> | NotComponent<any>)[];
     listen?: {
-      added?: boolean,
-      removed?: boolean,
-      changed?: boolean | ComponentConstructor<any>[],
-    },
-  }
+      added?: boolean;
+      removed?: boolean;
+      changed?: boolean | ComponentConstructor<any>[];
+    };
+  };
 }
 
 /**
@@ -38,12 +38,12 @@ export abstract class System<EntityType extends Entity = Entity> {
    */
   queries: {
     [queryName: string]: {
-      results: EntityType[],
-      added?: EntityType[],
-      removed?: EntityType[],
-      changed?: EntityType[],
-    }
-  }
+      results: EntityType[];
+      added?: EntityType[];
+      removed?: EntityType[];
+      changed?: EntityType[];
+    };
+  };
 
   world: World<EntityType>;
 
@@ -60,7 +60,7 @@ export abstract class System<EntityType extends Entity = Entity> {
   /**
    * Called when the system is added to the world.
    */
-  init(attributes?: Attributes): void
+  init(attributes?: Attributes): void;
 
   /**
    * Resume execution of this system.
@@ -83,16 +83,18 @@ export abstract class System<EntityType extends Entity = Entity> {
 
 export interface SystemConstructor<T extends System> {
   isSystem: true;
-  queries: SystemQueries
+  queries: SystemQueries;
   new (...args: any): T;
 }
 
-export interface NotComponent<C extends Component<any>> {
-  type: "not",
-  Component: ComponentConstructor<C>
+export interface NotComponent<C extends any> {
+  type: "not";
+  Component: ComponentConstructor<C>;
 }
 
 /**
  * Use the Not class to negate a component query.
  */
-export function Not<C extends Component<any>>(Component: ComponentConstructor<C>): NotComponent<C>;
+export function Not<C extends any>(
+  Component: ComponentConstructor<C>
+): NotComponent<C>;

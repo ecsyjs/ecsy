@@ -1,4 +1,8 @@
-import { Component, ComponentConstructor } from "./Component";
+import {
+  ComponentConstructor,
+  ComponentInstance,
+  ComponentClass,
+} from "./Component";
 
 /**
  * An entity in the world.
@@ -19,49 +23,49 @@ export class Entity {
    * @param Component Type of component to get
    * @param includeRemoved Whether a component that is staled to be removed should be also considered
    */
-  getComponent<C extends Component<any>>(
+  getComponent<C>(
     Component: ComponentConstructor<C>,
     includeRemoved?: boolean
-  ): Readonly<C> | undefined;
+  ): Readonly<ComponentInstance<C>> | undefined;
 
   /**
    * Get a component that is slated to be removed from this entity.
    */
-  getRemovedComponent<C extends Component<any>>(
-      Component: ComponentConstructor<C>
-  ): Readonly<C> | undefined;
+  getRemovedComponent<C>(
+    Component: ComponentConstructor<C>
+  ): Readonly<ComponentInstance<C>> | undefined;
 
   /**
    * Get an object containing all the components on this entity, where the object keys are the component types.
    */
-  getComponents(): { [componentName: string]: Component<any> };
+  getComponents(): { [componentName: string]: ComponentInstance<any> };
 
   /**
    * Get an object containing all the components that are slated to be removed from this entity, where the object keys are the component types.
    */
-  getComponentsToRemove(): { [componentName: string]: Component<any> };
+  getComponentsToRemove(): { [componentName: string]: ComponentInstance<any> };
 
   /**
    * Get a list of component types that have been added to this entity.
    */
-  getComponentTypes(): Array<Component<any>>;
+  getComponentTypes(): Array<ComponentConstructor<any>>;
 
   /**
    * Get a mutable reference to a component on this entity.
    * @param Component Type of component to get
    */
-  getMutableComponent<C extends Component<any>>(
+  getMutableComponent<C extends any>(
     Component: ComponentConstructor<C>
-  ): C | undefined;
+  ): ComponentInstance<C> | undefined;
 
   /**
    * Add a component to the entity.
    * @param Component Type of component to add to this entity
    * @param values Optional values to replace the default attributes on the component
    */
-  addComponent<C extends Component<any>>(
+  addComponent<C extends any>(
     Component: ComponentConstructor<C>,
-    values?: Partial<Omit<C, keyof Component<any>>>
+    values?: Partial<Omit<C, keyof ComponentClass<C>>>
   ): this;
 
   /**
@@ -69,7 +73,7 @@ export class Entity {
    * @param Component Type of component to remove from this entity
    * @param forceImmediate Whether a component should be removed immediately
    */
-  removeComponent<C extends Component<any>>(
+  removeComponent<C extends any>(
     Component: ComponentConstructor<C>,
     forceImmediate?: boolean
   ): this;
@@ -79,7 +83,7 @@ export class Entity {
    * @param Component Type of component
    * @param includeRemoved Whether a component that is staled to be removed should be also considered
    */
-  hasComponent<C extends Component<any>>(
+  hasComponent<C extends any>(
     Component: ComponentConstructor<C>,
     includeRemoved?: boolean
   ): boolean;
@@ -88,7 +92,7 @@ export class Entity {
    * Check if the entity has a component that is slated to be removed.
    * @param Component Type of component
    */
-  hasRemovedComponent<C extends Component<any>>(
+  hasRemovedComponent<C extends any>(
     Component: ComponentConstructor<C>
   ): boolean;
 
@@ -96,37 +100,29 @@ export class Entity {
    * Check if the entity has all components in a list.
    * @param Components Component types to check
    */
-  hasAllComponents(
-    Components: Array<ComponentConstructor<any>>
-  ): boolean
+  hasAllComponents(Components: Array<ComponentConstructor<any>>): boolean;
 
   /**
    * Check if the entity has any of the components in a list.
    * @param Components Component types to check
    */
-  hasAnyComponents(
-    Components: Array<ComponentConstructor<any>>
-  ): boolean
+  hasAnyComponents(Components: Array<ComponentConstructor<any>>): boolean;
 
   /**
    * Remove all components on this entity.
    * @param forceImmediate Whether all components should be removed immediately
    */
-  removeAllComponents(
-      forceImmediate?: boolean
-  ): void
+  removeAllComponents(forceImmediate?: boolean): void;
 
-  copy(source: this): this
+  copy(source: this): this;
 
-  clone(): this
+  clone(): this;
 
-  reset(): void
+  reset(): void;
 
   /**
    * Remove this entity from the world.
    * @param forceImmediate Whether this entity should be removed immediately
    */
-  remove(
-      forceImmediate?: boolean
-  ): void;
+  remove(forceImmediate?: boolean): void;
 }
