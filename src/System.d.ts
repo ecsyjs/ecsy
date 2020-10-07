@@ -21,7 +21,7 @@ export interface SystemQueries {
 /**
  * A system that manipulates entities in the world.
  */
-export abstract class System<EntityType extends Entity = Entity> {
+export abstract class System<EntityType extends Entity = Entity, WorldType extends World<EntityType> = World<EntityType>> {
   /**
    * Defines what Components the System will query for.
    * This needs to be user defined.
@@ -30,7 +30,7 @@ export abstract class System<EntityType extends Entity = Entity> {
 
   static isSystem: true;
 
-  constructor(world: World<EntityType>, attributes?: Attributes);
+  constructor(world: WorldType, attributes?: Attributes);
 
   /**
    * The results of the queries.
@@ -45,7 +45,7 @@ export abstract class System<EntityType extends Entity = Entity> {
     }
   }
 
-  world: World<EntityType>;
+  world: WorldType;
 
   /**
    * Whether the system will execute during the world tick.
