@@ -15,6 +15,7 @@ export interface SystemQueries {
       removed?: boolean,
       changed?: boolean | ComponentConstructor<any>[],
     },
+    mandatory?: boolean,
   }
 }
 
