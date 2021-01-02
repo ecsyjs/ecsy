@@ -84,6 +84,10 @@ export class World {
     return this.entityManager.createEntity(name);
   }
 
+  getEntityByName(name) {
+    return this.entityManager.getEntityByName(name);
+  }
+
   stats() {
     var stats = {
       entities: this.entityManager.stats(),

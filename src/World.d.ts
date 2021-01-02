@@ -80,4 +80,9 @@ export class World<EntityType extends Entity = Entity> {
    */
   createEntity(name?: string): EntityType
 
+  /**
+   * Get an entity registered in this world by name.
+   */
+  getEntityByName(name?: string): EntityType
+
 }
