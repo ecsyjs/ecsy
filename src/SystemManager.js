@@ -35,7 +35,7 @@ export class SystemManager {
     let system = this.getSystem(SystemClass);
     if (system === undefined) {
       console.warn(
-        `Can unregister system '${SystemClass.getName()}'. It doesn't exist.`
+        `Can't unregister system '${SystemClass.getName()}'. It doesn't exist.`
       );
       return this;
     }
