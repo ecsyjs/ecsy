@@ -78,7 +78,7 @@ export abstract class System<EntityType extends Entity = Entity> {
    * @param delta
    * @param time
    */
-  abstract execute(delta: number, time: number): void;
+  execute(delta: number, time: number): void;
 }
 
 export interface SystemConstructor<T extends System> {
