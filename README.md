@@ -25,12 +25,12 @@ For detailed information on the architecture and API please visit the [documenta
   - System can query mutable or immutable components
 - Predictable:
   - Systems will run on the order they were registered or based on the priority defined when registering them
-  - Reactive events will not generate a random callback when emited but queued and be processed in order
+  - Reactive events will not generate a random callback when emitted but queued and be processed in order
 - Modern Javascript: ES6, classes, modules,...
 - Pool for components and entities
 
 ## Goals
-Our goal is for ECSY to be a lightweight, simple, and performant ECS library that can be easily extended and encoruages open source collaboration.
+Our goal is for ECSY to be a lightweight, simple, and performant ECS library that can be easily extended and encourages open source collaboration.
 
 ECSY will not ship with features that bind it to a rendering engine or framework. Instead, we encourage the community to build framework specific projects like [ecsy-three](https://github.com/MozillaReality/ecsy-three), [ecsy-babylon](https://github.com/kaliber5/ecsy-babylon), and [ecsy-two](https://github.com/joshmarinacci/ecsy-two).
 
