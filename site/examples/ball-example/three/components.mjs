@@ -3,7 +3,12 @@ import { TagComponent, Component, Types } from "../../../build/ecsy.module.js";
 export class Collidable extends TagComponent {}
 export class Collider extends TagComponent {}
 export class Recovering extends TagComponent {}
+
 export class Moving extends TagComponent {}
+
+Moving.schema = {
+  offset: { type: Types.Number, default: 0 }
+};
 
 export class PulsatingScale extends Component {}
 
