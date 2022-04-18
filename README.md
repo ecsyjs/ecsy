@@ -40,11 +40,11 @@ ECSY is designed for a community driven ecosystem. We encourage users to come up
 
 # Examples
 - Ball example:
-  - three.js: https://ecsy.io/examples/ball-example/three
-  - babylon: https://ecsy.io/examples/ball-example/babylon
-- 2D Canvas https://ecsy.io/examples/canvas
-- Factory pattern with `Not` operator: https://ecsy.io/examples/factory
-- System state component example: https://ecsy.io/examples/systemstatecomponents
+  - three.js: https://ecsyjs.github.io/ecsy/examples/ball-example/three
+  - babylon: https://ecsyjs.github.io/ecsy/examples/ball-example/babylon
+- 2D Canvas https://ecsyjs.github.io/ecsy/examples/canvas
+- Factory pattern with `Not` operator: https://ecsyjs.github.io/ecsy/examples/factory
+- System state component example: https://ecsyjs.github.io/ecsy/examples/systemstatecomponents
 
 # Usage
 
@@ -70,7 +70,7 @@ npm install --save ecsy
     </style>
     
     <script type="module">
-      import { World, System, Component, TagComponent, Types } from "https://ecsy.io/build/ecsy.module.js";
+      import { World, System, Component, TagComponent, Types } from "https://ecsyjs.github.io/ecsy/build/ecsy.module.js";
 
       const NUM_ELEMENTS = 50;
       const SPEED_MULTIPLIER = 0.3;
