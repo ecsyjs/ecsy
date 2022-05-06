@@ -9,7 +9,7 @@
 
 ECSY (pronounced as "eck-see") is an highly experimental Entity Component System framework implemented in javascript, aiming to be lightweight, easy to use and with good performance.
 
-For detailed information on the architecture and API please visit the [documentation page](https://ecsy.io/docs/#/)
+For detailed information on the architecture and API please visit the [documentation page](https://ecsyjs.github.io/ecsy/docs/#/)
 
 * discourse forum: https://discourse.mozilla.org/c/mixed-reality/ecsy
 * discord: https://discord.gg/cFnrQ2v
@@ -40,11 +40,11 @@ ECSY is designed for a community driven ecosystem. We encourage users to come up
 
 # Examples
 - Ball example:
-  - three.js: https://ecsy.io/examples/ball-example/three
-  - babylon: https://ecsy.io/examples/ball-example/babylon
-- 2D Canvas https://ecsy.io/examples/canvas
-- Factory pattern with `Not` operator: https://ecsy.io/examples/factory
-- System state component example: https://ecsy.io/examples/systemstatecomponents
+  - three.js: https://ecsyjs.github.io/ecsy/examples/ball-example/three
+  - babylon: https://ecsyjs.github.io/ecsy/examples/ball-example/babylon
+- 2D Canvas https://ecsyjs.github.io/ecsy/examples/canvas
+- Factory pattern with `Not` operator: https://ecsyjs.github.io/ecsy/examples/factory
+- System state component example: https://ecsyjs.github.io/ecsy/examples/systemstatecomponents
 
 # Usage
 
@@ -68,15 +68,15 @@ npm install --save ecsy
         padding: 0;
       }
     </style>
-    
+
     <script type="module">
-      import { World, System, Component, TagComponent, Types } from "https://ecsy.io/build/ecsy.module.js";
+      import { World, System, Component, TagComponent, Types } from "https://ecsyjs.github.io/ecsy/build/ecsy.module.js";
 
       const NUM_ELEMENTS = 50;
       const SPEED_MULTIPLIER = 0.3;
       const SHAPE_SIZE = 50;
       const SHAPE_HALF_SIZE = SHAPE_SIZE / 2;
-      
+
       // Initialize canvas
       let canvas = document.querySelector("canvas");
       let canvasWidth = canvas.width = window.innerWidth;
@@ -86,7 +86,7 @@ npm install --save ecsy
       //----------------------
       // Components
       //----------------------
-      
+
       // Velocity component
       class Velocity extends Component {}
 
@@ -102,21 +102,21 @@ npm install --save ecsy
         x: { type: Types.Number },
         y: { type: Types.Number }
       };
-      
+
       // Shape component
       class Shape extends Component {}
 
       Shape.schema = {
         primitive: { type: Types.String, default: 'box' }
       };
-      
+
       // Renderable component
       class Renderable extends TagComponent {}
-      
+
       //----------------------
       // Systems
       //----------------------
-      
+
       // MovableSystem
       class MovableSystem extends System {
         // This method will get called on every frame by default
@@ -127,7 +127,7 @@ npm install --save ecsy
             var position = entity.getMutableComponent(Position);
             position.x += velocity.x * delta;
             position.y += velocity.y * delta;
-            
+
             if (position.x > canvasWidth + SHAPE_HALF_SIZE) position.x = - SHAPE_HALF_SIZE;
             if (position.x < - SHAPE_HALF_SIZE) position.x = canvasWidth + SHAPE_HALF_SIZE;
             if (position.y > canvasHeight + SHAPE_HALF_SIZE) position.y = - SHAPE_HALF_SIZE;
@@ -147,10 +147,10 @@ npm install --save ecsy
       class RendererSystem extends System {
         // This method will get called on every frame by default
         execute(delta, time) {
-          
+
           ctx.fillStyle = "#d4d4d4";
           ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-          
+
           // Iterate through all the entities on the query
           this.queries.renderables.results.forEach(entity => {
             var shape = entity.getComponent(Shape);
@@ -162,7 +162,7 @@ npm install --save ecsy
             }
           });
         }
-        
+
         drawCircle(position) {
           ctx.beginPath();
           ctx.arc(position.x, position.y, SHAPE_HALF_SIZE, 0, 2 * Math.PI, false);
@@ -170,9 +170,9 @@ npm install --save ecsy
           ctx.fill();
           ctx.lineWidth = 2;
           ctx.strokeStyle = "#0b845b";
-          ctx.stroke();          
+          ctx.stroke();
         }
-        
+
         drawBox(position) {
           ctx.beginPath();
           ctx.rect(position.x - SHAPE_HALF_SIZE, position.y - SHAPE_HALF_SIZE, SHAPE_SIZE, SHAPE_SIZE);
@@ -180,7 +180,7 @@ npm install --save ecsy
           ctx.fill();
           ctx.lineWidth = 2;
           ctx.strokeStyle = "#b74843";
-          ctx.stroke();                      
+          ctx.stroke();
         }
       }
 
@@ -188,7 +188,7 @@ npm install --save ecsy
       RendererSystem.queries = {
         renderables: { components: [Renderable, Shape] }
       }
-      
+
       // Create world and register the components and systems on it
       var world = new World();
       world
@@ -202,33 +202,33 @@ npm install --save ecsy
       // Some helper functions when creating the components
       function getRandomVelocity() {
         return {
-          x: SPEED_MULTIPLIER * (2 * Math.random() - 1), 
+          x: SPEED_MULTIPLIER * (2 * Math.random() - 1),
           y: SPEED_MULTIPLIER * (2 * Math.random() - 1)
         };
       }
-      
+
       function getRandomPosition() {
-        return { 
-          x: Math.random() * canvasWidth, 
+        return {
+          x: Math.random() * canvasWidth,
           y: Math.random() * canvasHeight
         };
       }
-      
+
       function getRandomShape() {
          return {
            primitive: Math.random() >= 0.5 ? 'circle' : 'box'
          };
       }
-      
+
       for (let i = 0; i < NUM_ELEMENTS; i++) {
         world
           .createEntity()
           .addComponent(Velocity, getRandomVelocity())
           .addComponent(Shape, getRandomShape())
           .addComponent(Position, getRandomPosition())
-          .addComponent(Renderable)        
+          .addComponent(Renderable)
       }
-            
+
       // Run!
       function run() {
         // Compute delta and elapsed time
@@ -243,9 +243,9 @@ npm install --save ecsy
       }
 
       var lastTime = performance.now();
-      run();      
+      run();
     </script>
-  </head>  
+  </head>
   <body>
     <canvas width="500" height="500"></canvas>
   </body>
@@ -258,10 +258,10 @@ You can also include the hosted javascript directly on your HTML:
 
 ```html
 <!-- Using UMD (It will expose a global ECSY namespace) -->
-<script src="https://ecsy.io/build/ecsy.js"></script>
+<script src="https://ecsyjs.github.io/ecsy/build/ecsy.js"></script>
 
 <!-- Using ES6 modules -->
-<script src="https://ecsy.io/build/ecsy.module.js"></script>
+<script src="https://ecsyjs.github.io/ecsy/build/ecsy.module.js"></script>
 ```
 
 [npm]: https://img.shields.io/npm/v/ecsy.svg
@@ -276,4 +276,3 @@ You can also include the hosted javascript directly on your HTML:
 [lgtm-url]: https://lgtm.com/projects/g/fernandojsg/ecsy/
 [build-status]: https://travis-ci.com/fernandojsg/ecsy.svg?branch=master
 [build-status-url]: https://travis-ci.com/fernandojsg/ecsy
-

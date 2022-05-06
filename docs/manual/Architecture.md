@@ -1,6 +1,6 @@
 # ECSY Architecture
 
-![ECSY architecture](https://ecsy.io/docs/manual/images/ECSY%20Architecture.svg)
+![ECSY architecture](https://ecsyjs.github.io/ecsy/docs/manual/images/ECSY%20Architecture.svg)
 
 ## Overview
 The following glossary is extracted from the [Getting started guide](/manual/Getting-started), it is recommended to read the whole section to get an overview on how the framework works.
@@ -38,7 +38,7 @@ And finally we define the systems that will add the logic to the game:
 - `Attack`: It will implement all the logic for attacks between `Enemy` and `Player` entities.
 - `Draw`: It will draw all the entities that has `Model3D` component on the screen.
 
-![Wolves and dragons example](https://ecsy.io/docs/manual/images/dragons.svg)
+![Wolves and dragons example](https://ecsyjs.github.io/ecsy/docs/manual/images/dragons.svg)
 
 ## World
 By default your application should have at least one `world`. A world is basically a container for `entities`, `components` and `systems`.  Even so, you can have multiple worlds running at the same time and enable or disable them as you need.
@@ -226,7 +226,7 @@ class ColorArray extends Component {
    * Clone returns a new, identical instance of a component.
    * We don't need to override clone in this case. However, if you needed to pass an argument
    * to the constructor, you could override clone to do so.
-   * 
+   *
    * clone() {
    *  return new this.constructor().copy(this);
    * }
@@ -372,7 +372,7 @@ MySystem.queries = {
 ## Entities
 An entity is an object that has a unique ID. Its purpose is to group components together. [API Reference](/api/classes/entity).
 
-![Entities](https://ecsy.io/docs/manual/images/entities.svg)
+![Entities](https://ecsyjs.github.io/ecsy/docs/manual/images/entities.svg)
 
 Entities should be created within a `World` context:
 
@@ -471,7 +471,7 @@ entity.removeComponent(ComponentA, true);
 
 Systems are used to transform data stored on the components. Usually each system defines one or more queries of entities and iterates through these lists per frame. [API Reference](/api/classes/system)
 
-![Wolves and dragons](https://ecsy.io/docs/manual/images/systems.svg)
+![Wolves and dragons](https://ecsyjs.github.io/ecsy/docs/manual/images/systems.svg)
 
 Every frame systems are executed and they create, remove or modify entities and components.
 
@@ -761,7 +761,7 @@ When a component or an entity is removed, one `to be removed` flag is activated 
 // Component to identify a wolf
 class Wolf extends TagComponent {}
 
-// Component to store how long the wolf is sleeping 
+// Component to store how long the wolf is sleeping
 class Sleeping extends Component {}
 
 Sleeping.schema = {
