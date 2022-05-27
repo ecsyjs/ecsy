@@ -1,14 +1,20 @@
-import { Component, ComponentConstructor } from "./Component";
+import {
+  ComponentConstructor,
+  ComponentInstance,
+  ComponentStatic,
+} from "./Component";
 
 /**
  * Create components that extend TagComponent in order to take advantage of performance optimizations for components
  * that do not store data
  */
-export class TagComponent extends Component<{}> {
-  static isTagComponent: true;
+interface TagComponentStatic extends ComponentStatic {
+  isTagComponent: true;
+  new (): ComponentInstance<{}>;
 }
 
-export interface TagComponentConstructor<C extends Component<{}>> extends ComponentConstructor<C> {
+export interface TagComponentConstructor extends ComponentConstructor<{}> {
   isTagComponent: true;
-  new (): C;
 }
+
+export declare const TagComponent: TagComponentStatic;

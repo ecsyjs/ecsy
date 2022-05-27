@@ -1,9 +1,5 @@
 import { PropType } from "./Types";
 
-/**
- * Base class for components.
- */
-
 export type ComponentSchemaProp = {
   default?: any;
   type: PropType<any, any>;
@@ -13,18 +9,27 @@ export type ComponentSchema = {
   [propName: string]: ComponentSchemaProp;
 };
 
-export class Component<C> {
-  static schema: ComponentSchema;
-  static isComponent: true;
-  constructor(props?: Partial<Omit<C, keyof Component<any>>> | false);
+// Base class for components,
+export declare class ComponentClass<C> {
   copy(source: this): this;
   clone(): this;
   reset(): void;
   dispose(): void;
+  constructor(props?: Partial<C> | false);
 }
 
-export interface ComponentConstructor<C extends Component<any>> {
+export type ComponentInstance<C> = ComponentClass<C> & C;
+
+interface ComponentStatic {
   schema: ComponentSchema;
   isComponent: true;
-  new (props?: Partial<Omit<C, keyof Component<any>>> | false): C;
+  new <C>(props?: Partial<C> | false): ComponentInstance<C>;
 }
+
+export interface ComponentConstructor<C> {
+  schema: ComponentSchema;
+  isComponent: true;
+  new (props?: Partial<C> | false): ComponentInstance<C>;
+}
+
+export declare const Component: ComponentStatic;
