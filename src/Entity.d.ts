@@ -1,4 +1,5 @@
 import { Component, ComponentConstructor } from "./Component";
+import { EntityManager } from "./EntityManager";
 
 /**
  * An entity in the world.
@@ -13,6 +14,11 @@ export class Entity {
    * Whether or not the entity is alive or removed.
    */
   alive: boolean;
+
+  /**
+   * Creates a new Entity.
+   */
+  constructor(entityManager?: EntityManager);
 
   /**
    * Get an immutable reference to a component on this entity.
