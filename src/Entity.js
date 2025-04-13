@@ -1,5 +1,4 @@
 import Query from "./Query.js";
-import wrapImmutableComponent from "./WrapImmutableComponent.js";
 
 export class Entity {
   constructor(entityManager) {
@@ -37,17 +36,13 @@ export class Entity {
       component = this._componentsToRemove[Component._typeId];
     }
 
-    return process.env.NODE_ENV !== "production"
-      ? wrapImmutableComponent(Component, component)
-      : component;
+    return component;
   }
 
   getRemovedComponent(Component) {
     const component = this._componentsToRemove[Component._typeId];
 
-    return process.env.NODE_ENV !== "production"
-      ? wrapImmutableComponent(Component, component)
-      : component;
+    return component;
   }
 
   getComponents() {
