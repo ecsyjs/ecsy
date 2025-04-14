@@ -39,6 +39,16 @@ export class Entity {
     return component;
   }
 
+  getComponentOrThrow(Component, includeRemoved) {
+    const component = this.getComponent(Component, includeRemoved);
+    if (!component) {
+      throw new Error(
+        `Entity ${this.id} does not have component ${Component.getName()}.`
+      );
+    }
+    return component;
+  }
+
   getRemovedComponent(Component) {
     const component = this._componentsToRemove[Component._typeId];
 
@@ -75,6 +85,16 @@ export class Entity {
           component
         );
       }
+    }
+    return component;
+  }
+
+  getMutableComponentOrThrow(Component) {
+    const component = this.getMutableComponent(Component);
+    if (!component) {
+      throw new Error(
+        `Entity ${this.id} does not have component ${Component.getName()}.`
+      );
     }
     return component;
   }
